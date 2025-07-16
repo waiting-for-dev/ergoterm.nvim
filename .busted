@@ -1,0 +1,9 @@
+return {
+  _all = {
+    lua = "nvim -l",
+    verbose = true,
+    output = "utfTerminal",
+    lpath = "lua/?.lua;spec/support/?.lua",
+    shuffle = true,
+  }
+}

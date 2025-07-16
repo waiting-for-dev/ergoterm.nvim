@@ -1,0 +1,32 @@
+name: Lint
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Luarocks
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y luarocks
+
+    - name: Install Lua Language Server
+      run: |
+        # Get the latest release URL
+        LATEST_URL=$(curl -s https://api.github.com/repos/LuaLS/lua-language-server/releases/latest | grep "browser_download_url.*linux-x64.tar.gz" | cut -d '"' -f 4)
+        wget $LATEST_URL -O lua-language-server.tar.gz
+        tar -xzf lua-language-server.tar.gz
+        chmod +x bin/lua-language-server
+
+    - name: Run linting
+      run: |
+        ./bin/lua-language-server --configpath=`pwd`/.luarc.json --checklevel=Information --check lua/
+        ./bin/lua-language-server --configpath=`pwd`/.luarc.json --checklevel=Information --check spec/
