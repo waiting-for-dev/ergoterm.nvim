@@ -272,7 +272,7 @@ term:open()   -- Just create the window (calls start() if needed)
 - `stop()` - Terminates job and cleans up buffer
 - `delete()` - Permanently removes terminal from session
 - `toggle(layout?)` - Closes if open, focuses if closed
-- `send(input, action?, trim?, new_line?, decorator?)` - Sends text to terminal with various behaviors
+- `send(input, opts)` - Sends text to terminal with various behaviors
 
 ### State Queries
 
@@ -283,20 +283,20 @@ term:open()   -- Just create the window (calls start() if needed)
 
 ### Sending Text to Terminals
 
-The `Terminal:send(input, action?, trim?, new_line?, decorator?)` method provides flexible text input to terminals with various interaction modes:
+The `Terminal:send(input, opts)` method provides flexible text input to terminals with various interaction modes:
 
 ```lua
 -- Send current line interactively (focuses terminal)
 term:send("single_line")
 
 -- Send custom text without focusing terminal
-term:send({"echo hello", "ls -la"}, "visible")
+term:send({"echo hello", "ls -la"}, { action = "visible" })
 
 -- Send visual selection silently (no UI changes)
-term:send("visual_selection", "silent")
+term:send("visual_selection", { action = "silent" })
 
 -- Send with custom formatting
-term:send({"print('hello')"}, "interactive", false, true, markdown_decorator)
+term:send({"print('hello')"}, { trim = false, decorator = markdown_decorator })
 ```
 
 **Input types:**
@@ -328,7 +328,7 @@ local function timestamp_decorator(text)
 end
 
 -- Use with Terminal:send()
-terminal:send({"echo hello"}, "interactive", true, true, timestamp_decorator)
+terminal:send({"echo hello"}, { decorator = timestamp_decorator })
 ```
 
 ### Example: AI-Assisted Development with Aider
@@ -366,15 +366,15 @@ end, opts)
 
 -- Sends current visual selection to Aider session
 map("v", "<leader>as", function()
-  aider:send("visual_selection", "interactive", false)
+  aider:send("visual_selection", { trim = false })
 end, opts)
 
 -- Send code to Aider as markdown (preserves formatting)
 map("n", "<leader>aS", function()
-  aider:send("single_line", "interactive", false, true, require("ergoterm.decorators").markdown_code)
+  aider:send("single_line", { trim = false, decorator = require("ergoterm.decorators").markdown_code })
 end, opts)
 map("v", "<leader>aS", function()
-  aider:send("visual_selection", "interactive", false, true, require("ergoterm.decorators").markdown_code)
+  aider:send("visual_selection", { trim = false, decorator = require("ergoterm.decorators").markdown_code })
 end, opts)
 ```
 

@@ -472,9 +472,15 @@ function Terminal:toggle(layout)
   return self
 end
 
+---@class SendOptions
+---@field action? "interactive"|"visible"|"silent" terminal interaction mode (default: "interactive")
+---@field trim? boolean remove leading/trailing whitespace (default: true)
+---@field new_line? boolean append newline for command execution (default: true)
+---@field decorator? fun(text: string[]): string[] transform text before sending
+
 ---Sends text input to the terminal job
 ---
----Automatically starts the terminal if not running. The action parameter controls
+---Automatically starts the terminal if not running. The opts.action parameter controls
 ---window behavior: "interactive" focuses the terminal for user interaction,
 ---"visible" shows output without stealing focus, "silent" sends without UI changes.
 ---Text is trimmed by default and gets a trailing newline for command execution.
@@ -486,16 +492,14 @@ end
 ---• "visual_selection" - sends the current visual character selection
 ---
 ---@param input string[]|"single_line"|"visual_lines"|"visual_selection" lines of text to send or selection type
----@param action? "interactive"|"visible"|"silent" terminal interaction mode (default: "interactive")
----@param trim? boolean remove leading/trailing whitespace (default: true)
----@param new_line? boolean append newline for command execution (default: true)
----@param decorator? fun(text: string[]): string[] transform text before sending
+---@param opts? SendOptions options for sending text
 ---@return self for method chaining
-function Terminal:send(input, action, trim, new_line, decorator)
-  local computed_action = action or "interactive"
-  local computed_trim = trim == nil or trim
-  local computed_new_line = new_line == nil or new_line
-  local computed_decorator = decorator or text_decorators.identity
+function Terminal:send(input, opts)
+  opts = opts or {}
+  local computed_action = opts.action or "interactive"
+  local computed_trim = opts.trim == nil or opts.trim
+  local computed_new_line = opts.new_line == nil or opts.new_line
+  local computed_decorator = opts.decorator or text_decorators.identity
   local caller_window = vim.api.nvim_get_current_win()
   local text_input
   if type(input) == "string" then

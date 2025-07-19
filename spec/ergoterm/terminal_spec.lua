@@ -1452,7 +1452,7 @@ describe(":send", function()
     local term = terms.Terminal:new():start()
     local spy_chansend = spy.on(vim.fn, "chansend")
 
-    term:send({ "foo" }, nil, nil, false)
+    term:send({ "foo" }, { new_line = false })
     vim.wait(100)
 
     assert.spy(spy_chansend).was_called_with(
@@ -1474,7 +1474,7 @@ describe(":send", function()
 
   it("does not trim input if trim is false", function()
     local term = terms.Terminal:new({ cmd = "cat" }):start()
-    term:send({ "  qux  " }, nil, false)
+    term:send({ "  qux  " }, { trim = false })
 
     vim.wait(100)
     local lines = vim.api.nvim_buf_get_lines(term:get_state("bufnr"), 0, -1, false)
@@ -1493,7 +1493,7 @@ describe(":send", function()
       return result
     end
 
-    term:send({ "foo" }, nil, nil, nil, decorator)
+    term:send({ "foo" }, { decorator = decorator })
     vim.wait(100)
 
     assert.spy(spy_chansend).was_called_with(
@@ -1519,7 +1519,7 @@ describe(":send", function()
     local term = terms.Terminal:new({ cmd = "cat" }):start()
     term:close()
 
-    term:send({ "foo" }, "visible")
+    term:send({ "foo" }, { action = "visible" })
     vim.wait(100)
 
     assert.is_true(term:is_open())
@@ -1529,7 +1529,7 @@ describe(":send", function()
     local term = terms.Terminal:new({ cmd = "cat" }):start()
     term:close()
 
-    term:send({ "foo" }, "silent")
+    term:send({ "foo" }, { action = "silent" })
     vim.wait(100)
 
     assert.is_false(term:is_open())
@@ -1539,7 +1539,7 @@ describe(":send", function()
     local term = terms.Terminal:new({ cmd = "cat" }):start()
     term:close()
 
-    term:send({ "foo" }, "interactive")
+    term:send({ "foo" }, { action = "interactive" })
     vim.wait(100)
 
     assert.is_true(term:is_focused())
@@ -1549,7 +1549,7 @@ describe(":send", function()
     local term = terms.Terminal:new({ cmd = "cat" }):start()
     local original_win = vim.api.nvim_get_current_win()
 
-    term:send({ "foo" }, "visible")
+    term:send({ "foo" }, { action = "visible" })
     vim.wait(100)
 
     assert.equal(original_win, vim.api.nvim_get_current_win())

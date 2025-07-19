@@ -177,7 +177,12 @@ describe("M.send", function()
 
     commands.send("text='hello world'", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(match._, { "hello world" }, nil, nil, nil, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(match._, { "hello world" }, {
+      action = nil,
+      trim = nil,
+      new_line = nil,
+      decorator = text_decorators.identity
+    })
   end)
 
   it("sends according to given action", function()
@@ -186,7 +191,12 @@ describe("M.send", function()
 
     commands.send("action=silent", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(term, "single_line", "silent", nil, nil, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(term, "single_line", {
+      action = "silent",
+      trim = nil,
+      new_line = nil,
+      decorator = text_decorators.identity
+    })
   end)
 
   it("decorates text with given decorator", function()
@@ -195,7 +205,12 @@ describe("M.send", function()
 
     commands.send("decorator=markdown_code", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(match._, "single_line", nil, nil, nil, text_decorators.markdown_code)
+    assert.spy(spy_send).was_called_with(match._, "single_line", {
+      action = nil,
+      trim = nil,
+      new_line = nil,
+      decorator = text_decorators.markdown_code
+    })
   end)
 
   it("trims text if specified", function()
@@ -204,7 +219,12 @@ describe("M.send", function()
 
     commands.send("trim=false", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(match._, "single_line", nil, false, nil, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(match._, "single_line", {
+      action = nil,
+      trim = false,
+      new_line = nil,
+      decorator = text_decorators.identity
+    })
   end)
 
   it("adds new_line if specified", function()
@@ -213,7 +233,12 @@ describe("M.send", function()
 
     commands.send("new_line=false", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(match._, "single_line", nil, nil, false, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(match._, "single_line", {
+      action = nil,
+      trim = nil,
+      new_line = false,
+      decorator = text_decorators.identity
+    })
   end)
 
   it("uses last focused terminal when called with the bang option", function()
@@ -223,7 +248,12 @@ describe("M.send", function()
 
     commands.send("text='bang test'", 0, true, null_picker)
 
-    assert.spy(spy_send).was_called_with(match._, { "bang test" }, nil, nil, nil, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(match._, { "bang test" }, {
+      action = nil,
+      trim = nil,
+      new_line = nil,
+      decorator = text_decorators.identity
+    })
   end)
 
   it("ignores non selectable terminals when called with the bang option", function()
@@ -235,7 +265,12 @@ describe("M.send", function()
 
     commands.send("text='bang test'", 0, true, null_picker)
 
-    assert.spy(spy_send).was_called_with(match._, { "bang test" }, nil, nil, nil, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(match._, { "bang test" }, {
+      action = nil,
+      trim = nil,
+      new_line = nil,
+      decorator = text_decorators.identity
+    })
   end)
 
   it("calls picker to select a terminal when not in bang mode", function()
@@ -244,7 +279,12 @@ describe("M.send", function()
 
     commands.send("text='picker test'", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(match._, { "picker test" }, nil, nil, nil, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(match._, { "picker test" }, {
+      action = nil,
+      trim = nil,
+      new_line = nil,
+      decorator = text_decorators.identity
+    })
   end)
 
   it("notifies when no terminals are focused in bang mode", function()
@@ -268,7 +308,12 @@ describe("M.send", function()
 
     commands.send("", 1, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(match._, "visual_lines", nil, nil, nil, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(match._, "visual_lines", {
+      action = nil,
+      trim = nil,
+      new_line = nil,
+      decorator = text_decorators.identity
+    })
 
     vim.fn.visualmode = original_visualmode
   end)
@@ -282,7 +327,12 @@ describe("M.send", function()
 
     commands.send("", 1, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(match._, "visual_selection", nil, nil, nil, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(match._, "visual_selection", {
+      action = nil,
+      trim = nil,
+      new_line = nil,
+      decorator = text_decorators.identity
+    })
 
     vim.fn.visualmode = original_visualmode
   end)
@@ -293,7 +343,12 @@ describe("M.send", function()
 
     commands.send("", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(match._, "single_line", nil, nil, nil, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(match._, "single_line", {
+      action = nil,
+      trim = nil,
+      new_line = nil,
+      decorator = text_decorators.identity
+    })
   end)
 end)
 

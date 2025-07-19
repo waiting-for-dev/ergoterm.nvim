@@ -96,7 +96,12 @@ function M.send(args, range, bang, picker)
   local decorator = text_decorators[decorator_name]
 
   local send_to_terminal = function(t)
-    t:send(input, parsed.action, parsed.trim, parsed.new_line, decorator)
+    t:send(input, {
+      action = parsed.action,
+      trim = parsed.trim,
+      new_line = parsed.new_line,
+      decorator = decorator
+    })
   end
   if bang then
     return M._execute_on_last_focused(send_to_terminal)
