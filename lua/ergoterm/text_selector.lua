@@ -3,6 +3,7 @@ local M = {}
 ---@alias selection_type "single_line" | "visual_lines" | "visual_selection" | "line" | "char"
 
 ---@param selection_type selection_type
+---@return string[]
 function M.select(selection_type)
   local lines = {}
   -- Beginning of the selection: line number, column number
@@ -30,7 +31,7 @@ function M.select(selection_type)
     end
   end
   if not lines or not next(lines) then
-    return
+    return {}
   else
     return lines
   end

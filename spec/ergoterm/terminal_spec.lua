@@ -1417,6 +1417,24 @@ describe(":send", function()
     assert.is_true(vim.tbl_contains(lines, "hello"))
   end)
 
+  it("sends text using selection type", function()
+    local text_selector = require("ergoterm.text_selector")
+    local original_select = text_selector.select
+    text_selector.select = function(selection_type)
+      assert.equal("single_line", selection_type)
+      return { "selected text" }
+    end
+
+    local term = terms.Terminal:new({ cmd = "cat" }):start()
+    term:send("single_line")
+    vim.wait(100)
+
+    local lines = vim.api.nvim_buf_get_lines(term:get_state("bufnr"), 0, -1, false)
+    assert.is_true(vim.tbl_contains(lines, "selected text"))
+
+    text_selector.select = original_select
+  end)
+
   it("adds a newline by default", function()
     local term = terms.Terminal:new():start()
     local spy_chansend = spy.on(vim.fn, "chansend")

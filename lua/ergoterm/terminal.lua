@@ -13,6 +13,8 @@ local config = lazy.require("ergoterm.config")
 local mode = lazy.require("ergoterm.mode")
 ---@module "ergoterm.text_decorators"
 local text_decorators = lazy.require("ergoterm.text_decorators")
+---@module "ergoterm.text_selector"
+local text_selector = lazy.require("ergoterm.text_selector")
 ---@module "ergoterm.utils"
 local utils = lazy.require("ergoterm.utils")
 
@@ -477,7 +479,13 @@ end
 ---"visible" shows output without stealing focus, "silent" sends without UI changes.
 ---Text is trimmed by default and gets a trailing newline for command execution.
 ---
----@param input string[] lines of text to send
+---Input can be provided as:
+---• Array of strings - sends the text directly
+---• "single_line" - sends the current line under cursor
+---• "visual_lines" - sends the current visual line selection
+---• "visual_selection" - sends the current visual character selection
+---
+---@param input string[]|"single_line"|"visual_lines"|"visual_selection" lines of text to send or selection type
 ---@param action? "interactive"|"visible"|"silent" terminal interaction mode (default: "interactive")
 ---@param trim? boolean remove leading/trailing whitespace (default: true)
 ---@param new_line? boolean append newline for command execution (default: true)
@@ -489,15 +497,21 @@ function Terminal:send(input, action, trim, new_line, decorator)
   local computed_new_line = new_line == nil or new_line
   local computed_decorator = decorator or text_decorators.identity
   local caller_window = vim.api.nvim_get_current_win()
+  local text_input
+  if type(input) == "string" then
+    text_input = text_selector.select(input)
+  else
+    text_input = input
+  end
   if computed_new_line then
-    table.insert(input, "")
+    table.insert(text_input, "")
   end
   if computed_trim then
-    for i, line in ipairs(input) do
-      input[i] = line:gsub("^%s+", ""):gsub("%s+$", "")
+    for i, line in ipairs(text_input) do
+      text_input[i] = line:gsub("^%s+", ""):gsub("%s+$", "")
     end
   end
-  local decorated_input = computed_decorator(input)
+  local decorated_input = computed_decorator(text_input)
   vim.fn.chansend(self._state.job_id, decorated_input)
   self:_scroll_bottom()
   if computed_action ~= "silent" and not self:is_open() then

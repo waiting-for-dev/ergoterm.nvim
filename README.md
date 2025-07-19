@@ -328,6 +328,16 @@ map("n", "<leader>aa", function()
   aider:send({ "/add " .. file })
 end, opts)
 
+-- Sends current line to Aider session
+map("n", "<leader>as", function()
+  aider:send("single_line")
+end, opts)
+
+-- Sends current visual selection to Aider session
+map("v", "<leader>as", function()
+  aider:send("visual_selection")
+end, opts)
+
 -- Send code to Aider as markdown (preserves formatting)
 map("n", "<leader>aS", ":TermSend! action=visible trim=false decorator=markdown_code<CR>", opts)
 map("x", "<leader>aS", ":TermSend! action=visible trim=false decorator=markdown_code<CR>", opts)

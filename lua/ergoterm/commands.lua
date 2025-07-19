@@ -11,8 +11,6 @@ local config = lazy.require("ergoterm.config")
 local terms = lazy.require("ergoterm.terminal")
 ---@module "ergoterm.text_decorators"
 local text_decorators = lazy.require("ergoterm.text_decorators")
----@module "ergoterm.text_selector"
-local text_selector = lazy.require("ergoterm.text_selector")
 ---@module "ergoterm.utils"
 local utils = lazy.require("ergoterm.utils")
 
@@ -62,7 +60,6 @@ end
 ---extracted based on context:
 ---• Normal mode: current line under cursor
 ---• Visual selection: selected text (character-wise or line-wise)
----• Range command: uses visual selection logic
 ---
 ---Action modes control terminal behavior:
 ---• "interactive" - opens and focuses terminal (default)
@@ -93,7 +90,7 @@ function M.send(args, range, bang, picker)
   })
   local selection = range == 0 and "single_line" or
       (vim.fn.visualmode() == "V" and "visual_lines" or "visual_selection")
-  local input = parsed.text and { parsed.text } or text_selector.select(selection)
+  local input = parsed.text and { parsed.text } or selection
 
   local decorator_name = parsed.decorator or text_decorators.DECORATORS.IDENTITY
   local decorator = text_decorators[decorator_name]

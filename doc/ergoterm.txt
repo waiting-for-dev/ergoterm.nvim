@@ -175,8 +175,8 @@ Syntax: >vim
 <
 
 Without a range, sends the current line. With a visual range, sends the
-selected text. The bang (!) version sends to the last focused terminal
-without opening a picker.
+selected text (character-wise or line-wise). The bang (!) version sends to the
+last focused terminal without opening a picker.
 
 Options:
     text={text}           Custom text to send
@@ -520,11 +520,17 @@ Terminal:delete()                                       *Terminal:delete()*
 Terminal:toggle({layout})                               *Terminal:toggle()*
     Close if open, focus if closed. Convenient show/hide toggle.
 
-Terminal:send({text}, {options})                        *Terminal:send()*
+Terminal:send({input}, {options})                       *Terminal:send()*
     Send text to terminal with various behavior options.
     
+    Input can be provided as:
+    • Array of strings - sends the text directly
+    • "single_line" - sends the current line under cursor
+    • "visual_lines" - sends the current visual line selection
+    • "visual_selection" - sends the current visual character selection
+
     Parameters:
-        {text}     - Array of text lines to send
+        {input}    - Array of text lines or selection type string
         {action}   - "interactive"|"visible"|"silent" (default: "interactive")
         {trim}     - Remove whitespace (default: true)
         {new_line} - Add newline (default: true)
@@ -684,6 +690,16 @@ Example integration with Aider for AI-assisted development: >lua
     map("n", "<leader>aa", function()
       local file = vim.fn.expand("%:p")
       aider:send({ "/add " .. file })
+    end, opts)
+
+    -- Sends current line to Aider session
+    map("n", "<leader>as", function()
+      aider:send("single_line")
+    end, opts)
+    
+    -- Sends current visual selection to Aider session
+    map("v", "<leader>as", function()
+      aider:send("visual_selection")
     end, opts)
     
     -- Send code to Aider as markdown (preserves formatting)

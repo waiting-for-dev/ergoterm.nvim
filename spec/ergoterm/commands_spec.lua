@@ -186,7 +186,7 @@ describe("M.send", function()
 
     commands.send("action=silent", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(term, { "test line" }, "silent", nil, nil, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(term, "single_line", "silent", nil, nil, text_decorators.identity)
   end)
 
   it("decorates text with given decorator", function()
@@ -195,7 +195,7 @@ describe("M.send", function()
 
     commands.send("decorator=markdown_code", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(match._, { "test line" }, nil, nil, nil, text_decorators.markdown_code)
+    assert.spy(spy_send).was_called_with(match._, "single_line", nil, nil, nil, text_decorators.markdown_code)
   end)
 
   it("trims text if specified", function()
@@ -204,7 +204,7 @@ describe("M.send", function()
 
     commands.send("trim=false", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(match._, { "test line" }, nil, false, nil, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(match._, "single_line", nil, false, nil, text_decorators.identity)
   end)
 
   it("adds new_line if specified", function()
@@ -213,7 +213,7 @@ describe("M.send", function()
 
     commands.send("new_line=false", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(match._, { "test line" }, nil, nil, false, text_decorators.identity)
+    assert.spy(spy_send).was_called_with(match._, "single_line", nil, nil, false, text_decorators.identity)
   end)
 
   it("uses last focused terminal when called with the bang option", function()
@@ -260,40 +260,40 @@ describe("M.send", function()
   end)
 
   it("uses text selector for visual selection when range > 0", function()
-    terms.Terminal:new():start()
-    local spy_text_selector = spy.on(text_selector, "select")
+    local term = terms.Terminal:new():start()
+    local spy_send = spy.on(term, "send")
     local original_visualmode = vim.fn.visualmode
     --- @diagnostic disable-next-line: duplicate-set-field
     vim.fn.visualmode = function() return "V" end
 
     commands.send("", 1, false, select_only_picker)
 
-    assert.spy(spy_text_selector).was_called_with("visual_lines")
+    assert.spy(spy_send).was_called_with(match._, "visual_lines", nil, nil, nil, text_decorators.identity)
 
     vim.fn.visualmode = original_visualmode
   end)
 
   it("uses text selector for visual selection when range > 0 and visual mode is not line-wise", function()
-    terms.Terminal:new():start()
-    local spy_text_selector = spy.on(text_selector, "select")
+    local term = terms.Terminal:new():start()
+    local spy_send = spy.on(term, "send")
     local original_visualmode = vim.fn.visualmode
     --- @diagnostic disable-next-line: duplicate-set-field
     vim.fn.visualmode = function() return "v" end
 
     commands.send("", 1, false, select_only_picker)
 
-    assert.spy(spy_text_selector).was_called_with("visual_selection")
+    assert.spy(spy_send).was_called_with(match._, "visual_selection", nil, nil, nil, text_decorators.identity)
 
     vim.fn.visualmode = original_visualmode
   end)
 
   it("uses text selector for single line when range is 0", function()
-    terms.Terminal:new():start()
-    local spy_text_selector = spy.on(text_selector, "select")
+    local term = terms.Terminal:new():start()
+    local spy_send = spy.on(term, "send")
 
     commands.send("", 0, false, select_only_picker)
 
-    assert.spy(spy_text_selector).was_called_with("single_line")
+    assert.spy(spy_send).was_called_with(match._, "single_line", nil, nil, nil, text_decorators.identity)
   end)
 end)
 
