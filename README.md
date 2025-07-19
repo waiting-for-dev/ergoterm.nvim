@@ -18,7 +18,7 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 {
-  "waiting-from-dev/ergoterm.nvim",
+  "waiting-for-dev/ergoterm.nvim",
   config = function()
     require("ergoterm").setup()
   end
@@ -29,7 +29,7 @@ Using [packer.nvim](https://github.com/wbthomason/packer.nvim):
 
 ```lua
 use {
-  "waiting-from-dev/ergoterm.nvim",
+  "waiting-for-dev/ergoterm.nvim",
   config = function()
     require("ergoterm").setup()
   end
@@ -39,7 +39,7 @@ use {
 Using [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
-Plug 'waiting-from-dev/ergoterm.nvim'
+Plug 'waiting-for-dev/ergoterm.nvim'
 ```
 
 Then add this to your `init.lua` or in a lua block:
