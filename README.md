@@ -366,7 +366,7 @@ end, opts)
 
 -- Sends current visual selection to Aider session
 map("v", "<leader>as", function()
-  aider:send("visual_selection")
+  aider:send("visual_selection", "interactive", false)
 end, opts)
 
 -- Send code to Aider as markdown (preserves formatting)
