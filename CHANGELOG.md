@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.0.3] - 2025-07-19
+
 - BREAKING: `Terminal:send` takes options as a table instead of ordered parameters.
 - `Terminal:send` accepts `decorator` option as a string to look up by name.
 
