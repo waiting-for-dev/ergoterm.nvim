@@ -119,6 +119,11 @@ Options:
     name={name}         Terminal name for identification (default: the
         terminal's cmd)
     dir={directory}     Working directory (default: current)
+                        Can be:
+                        • Absolute path: "/home/user/project"
+                        • Relative path: "~/my-project" or "./subdir"
+                        • "git_dir" - Auto-detect git repository root
+                        • nil - Use current working directory
     cmd={command}       Shell command to run (default: system shell)
 
 Available layouts:

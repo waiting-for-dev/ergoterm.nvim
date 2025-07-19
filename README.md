@@ -70,6 +70,7 @@ Create new terminals with `:TermNew` and customize them with options:
   - `above`, `below`, `left`, `right`, `tab`, `float`, `window`
 - `name` - Terminal name for identification (defaults to the terminal command)
 - `dir` - Working directory (default: current directory)
+  - Accepts absolute paths (`/home/user/project`), relative paths (`~/my-project`, `./subdir`), `"git_dir"` for auto-detected git repository root, or `nil` for current directory
 - `cmd` - Shell command to run (default: system shell)
 
 ### Selecting Terminals
@@ -214,6 +215,7 @@ All options default to values from your configuration:
 - `clear_env` - Use clean environment for the job
 - `close_on_job_exit` - Close terminal window when process exits
 - `dir` - Working directory for the terminal
+  - Accepts absolute paths, relative paths (with `~` expansion), `"git_dir"` for git repository root, or `nil` for current directory
 - `env` - Environment variables for the job
 - `float_opts` - Floating window configuration options
 - `float_winblend` - Transparency level for floating windows
