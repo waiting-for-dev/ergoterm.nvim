@@ -476,7 +476,7 @@ end
 ---@field action? "interactive"|"visible"|"silent" terminal interaction mode (default: "interactive")
 ---@field trim? boolean remove leading/trailing whitespace (default: true)
 ---@field new_line? boolean append newline for command execution (default: true)
----@field decorator? fun(text: string[]): string[] transform text before sending
+---@field decorator? fun(text: string[]): string[]|string transform text before sending
 
 ---Sends text input to the terminal job
 ---
@@ -499,7 +499,12 @@ function Terminal:send(input, opts)
   local computed_action = opts.action or "interactive"
   local computed_trim = opts.trim == nil or opts.trim
   local computed_new_line = opts.new_line == nil or opts.new_line
-  local computed_decorator = opts.decorator or text_decorators.identity
+  local computed_decorator
+  if type(opts.decorator) == "string" then
+    computed_decorator = text_decorators[opts.decorator] or text_decorators.identity
+  else
+    computed_decorator = opts.decorator or text_decorators.identity
+  end
   local caller_window = vim.api.nvim_get_current_win()
   local text_input
   if type(input) == "string" then

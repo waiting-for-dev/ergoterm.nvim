@@ -371,10 +371,10 @@ end, opts)
 
 -- Send code to Aider as markdown (preserves formatting)
 map("n", "<leader>aS", function()
-  aider:send("single_line", { trim = false, decorator = require("ergoterm.decorators").markdown_code })
+  aider:send("single_line", { trim = false, decorator = "markdown_code" })
 end, opts)
 map("v", "<leader>aS", function()
-  aider:send("visual_selection", { trim = false, decorator = require("ergoterm.decorators").markdown_code })
+  aider:send("visual_selection", { trim = false, decorator = "markdown_code" })
 end, opts)
 ```
 

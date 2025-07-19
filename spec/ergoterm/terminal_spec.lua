@@ -1502,6 +1502,32 @@ describe(":send", function()
     )
   end)
 
+  it("applies decorator string to input", function()
+    local term = terms.Terminal:new():start()
+    local spy_chansend = spy.on(vim.fn, "chansend")
+
+    term:send({ "foo" }, { decorator = "identity" })
+    vim.wait(100)
+
+    assert.spy(spy_chansend).was_called_with(
+      term:get_state("job_id"),
+      { "foo", "" }
+    )
+  end)
+
+  it("falls back to identity decorator for unknown string decorator", function()
+    local term = terms.Terminal:new():start()
+    local spy_chansend = spy.on(vim.fn, "chansend")
+
+    term:send({ "foo" }, { decorator = "unknown_decorator" })
+    vim.wait(100)
+
+    assert.spy(spy_chansend).was_called_with(
+      term:get_state("job_id"),
+      { "foo", "" }
+    )
+  end)
+
   it("uses identity function as default decorator", function()
     local term = terms.Terminal:new():start()
     local spy_chansend = spy.on(vim.fn, "chansend")

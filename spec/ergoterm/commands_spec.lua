@@ -181,7 +181,7 @@ describe("M.send", function()
       action = nil,
       trim = nil,
       new_line = nil,
-      decorator = text_decorators.identity
+      decorator = nil
     })
   end)
 
@@ -195,7 +195,7 @@ describe("M.send", function()
       action = "silent",
       trim = nil,
       new_line = nil,
-      decorator = text_decorators.identity
+      decorator = nil
     })
   end)
 
@@ -209,7 +209,7 @@ describe("M.send", function()
       action = nil,
       trim = nil,
       new_line = nil,
-      decorator = text_decorators.markdown_code
+      decorator = "markdown_code"
     })
   end)
 
@@ -223,7 +223,7 @@ describe("M.send", function()
       action = nil,
       trim = false,
       new_line = nil,
-      decorator = text_decorators.identity
+      decorator = nil
     })
   end)
 
@@ -237,7 +237,7 @@ describe("M.send", function()
       action = nil,
       trim = nil,
       new_line = false,
-      decorator = text_decorators.identity
+      decorator = nil
     })
   end)
 
@@ -252,7 +252,7 @@ describe("M.send", function()
       action = nil,
       trim = nil,
       new_line = nil,
-      decorator = text_decorators.identity
+      decorator = nil
     })
   end)
 
@@ -269,7 +269,7 @@ describe("M.send", function()
       action = nil,
       trim = nil,
       new_line = nil,
-      decorator = text_decorators.identity
+      decorator = nil
     })
   end)
 
@@ -283,7 +283,7 @@ describe("M.send", function()
       action = nil,
       trim = nil,
       new_line = nil,
-      decorator = text_decorators.identity
+      decorator = nil
     })
   end)
 
@@ -312,7 +312,7 @@ describe("M.send", function()
       action = nil,
       trim = nil,
       new_line = nil,
-      decorator = text_decorators.identity
+      decorator = nil
     })
 
     vim.fn.visualmode = original_visualmode
@@ -331,7 +331,7 @@ describe("M.send", function()
       action = nil,
       trim = nil,
       new_line = nil,
-      decorator = text_decorators.identity
+      decorator = nil
     })
 
     vim.fn.visualmode = original_visualmode
@@ -347,7 +347,7 @@ describe("M.send", function()
       action = nil,
       trim = nil,
       new_line = nil,
-      decorator = text_decorators.identity
+      decorator = nil
     })
   end)
 end)

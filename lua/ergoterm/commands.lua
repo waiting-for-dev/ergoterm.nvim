@@ -9,8 +9,6 @@ local commandline = lazy.require("ergoterm.commandline")
 local config = lazy.require("ergoterm.config")
 ---@module "ergoterm.terminal"
 local terms = lazy.require("ergoterm.terminal")
----@module "ergoterm.text_decorators"
-local text_decorators = lazy.require("ergoterm.text_decorators")
 ---@module "ergoterm.utils"
 local utils = lazy.require("ergoterm.utils")
 
@@ -92,15 +90,12 @@ function M.send(args, range, bang, picker)
       (vim.fn.visualmode() == "V" and "visual_lines" or "visual_selection")
   local input = parsed.text and { parsed.text } or selection
 
-  local decorator_name = parsed.decorator or text_decorators.DECORATORS.IDENTITY
-  local decorator = text_decorators[decorator_name]
-
   local send_to_terminal = function(t)
     t:send(input, {
       action = parsed.action,
       trim = parsed.trim,
       new_line = parsed.new_line,
-      decorator = decorator
+      decorator = parsed.decorator
     })
   end
   if bang then
