@@ -272,7 +272,7 @@ term:open()   -- Just create the window (calls start() if needed)
 - `stop()` - Terminates job and cleans up buffer
 - `delete()` - Permanently removes terminal from session
 - `toggle(layout?)` - Closes if open, focuses if closed
-- `send(text, options)` - Sends text to terminal with various behaviors
+- `send(input, action?, trim?, new_line?, decorator?)` - Sends text to terminal with various behaviors
 
 ### State Queries
 
@@ -281,9 +281,38 @@ term:open()   -- Just create the window (calls start() if needed)
 - `is_focused()` - Is currently active window
 - `is_stopped()` - Job has been terminated
 
+### Sending Text to Terminals
+
+The `Terminal:send(input, action?, trim?, new_line?, decorator?)` method provides flexible text input to terminals with various interaction modes:
+
+```lua
+-- Send current line interactively (focuses terminal)
+term:send("single_line")
+
+-- Send custom text without focusing terminal
+term:send({"echo hello", "ls -la"}, "visible")
+
+-- Send visual selection silently (no UI changes)
+term:send("visual_selection", "silent")
+
+-- Send with custom formatting
+term:send({"print('hello')"}, "interactive", false, true, markdown_decorator)
+```
+
+**Input types:**
+- `string[]` - Array of text lines to send directly
+- `"single_line"` - Current line under cursor
+- `"visual_lines"` - Current visual line selection  
+- `"visual_selection"` - Current visual character selection
+
+**Action modes:**
+- `"interactive"` - Focus terminal after sending (default)
+- `"visible"` - Show terminal output without stealing focus
+- `"silent"` - Send text without any UI changes
+
 For complete API documentation and advanced usage patterns, see [`lua/ergoterm/terminal.lua`](lua/ergoterm/terminal.lua).
 
-### Custom Text Decorators
+#### Custom Text Decorators
 
 Create custom text transformations for sending code to terminals:
 
@@ -299,7 +328,7 @@ local function timestamp_decorator(text)
 end
 
 -- Use with Terminal:send()
-terminal:send({"echo hello"}, { decorator = timestamp_decorator })
+terminal:send({"echo hello"}, "interactive", true, true, timestamp_decorator)
 ```
 
 ### Example: AI-Assisted Development with Aider
@@ -341,8 +370,12 @@ map("v", "<leader>as", function()
 end, opts)
 
 -- Send code to Aider as markdown (preserves formatting)
-map("n", "<leader>aS", ":TermSend! action=visible trim=false decorator=markdown_code<CR>", opts)
-map("x", "<leader>aS", ":TermSend! action=visible trim=false decorator=markdown_code<CR>", opts)
+map("n", "<leader>aS", function()
+  aider:send("single_line", "interactive", false, true, require("ergoterm.decorators").markdown_code)
+end, opts)
+map("v", "<leader>aS", function()
+  aider:send("visual_selection", "interactive", false, true, require("ergoterm.decorators").markdown_code)
+end, opts)
 ```
 
 ## Configuration

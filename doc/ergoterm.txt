@@ -708,9 +708,12 @@ Example integration with Aider for AI-assisted development: >lua
     end, opts)
     
     -- Send code to Aider as markdown (preserves formatting)
-    map("n", "<leader>aS", ":TermSend! action=visible trim=false decorator=markdown_code<CR>", opts)
-    map("x", "<leader>aS", ":TermSend! action=visible trim=false decorator=markdown_code<CR>", opts)
-<
+    map("n", "<leader>aS", function()
+      aider:send("single_line", "interactive", false, true, require("ergoterm.decorators").markdown_code)
+    end, opts)
+    map("v", "<leader>aS", function()
+      aider:send("visual_selection", "interactive", false, true, require("ergoterm.decorators").markdown_code)
+    end, opts)
 
 ==============================================================================
 9. TROUBLESHOOTING                                   *ergoterm-troubleshooting*
