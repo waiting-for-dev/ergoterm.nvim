@@ -5,10 +5,10 @@ local M = {}
 function M.select_actions()
   return {
     default = { fn = function(term) term:focus() end, desc = "open" },
-    ["<C-s>"] = { fn = function(term) term:focus("below") end, desc = "open-in-horizontal-split" },
-    ["<C-v>"] = { fn = function(term) term:focus("right") end, desc = "open-in-vertical-split" },
-    ["<C-t>"] = { fn = function(term) term:focus("tab") end, desc = "open-in-tab" },
-    ["<C-f>"] = { fn = function(term) term:focus("float") end, desc = "open-in-float-window" }
+    ["<C-s>"] = { fn = function(term) term:focus("below") end, desc = "Open in horizontal split" },
+    ["<C-v>"] = { fn = function(term) term:focus("right") end, desc = "Open in vertical split" },
+    ["<C-t>"] = { fn = function(term) term:focus("tab") end, desc = "Open in tab" },
+    ["<C-f>"] = { fn = function(term) term:focus("float") end, desc = "Open in float window" }
   }
 end
 
@@ -102,12 +102,12 @@ function M.select(terminals, prompt, definitions)
             actions.close(prompt_bufnr)
             local selection = action_state.get_selected_entry()
             definition.fn(selection.value)
-          end)
+          end, { desc = definition.desc })
           map("n", key, function()
             actions.close(prompt_bufnr)
             local selection = action_state.get_selected_entry()
             definition.fn(selection.value)
-          end)
+          end, { desc = definition.desc })
         end
       end
       return true
