@@ -266,15 +266,20 @@ All configuration options are optional and will use sensible defaults.
 ------------------------------------------------------------------------------
 5.2 Options                                                 *ergoterm-options*
 
+Configuration is organized into two main sections:
+
+**terminal_defaults** - Default settings applied to all new terminals
+(overridable on individual instances):
+
                                                               *ergoterm-shell*
-shell ~
+terminal_defaults.shell ~
     Default: `vim.o.shell`
     Type: `string` or `function`
     
     Default shell command to use for new terminals.
 
                                                              *ergoterm-layout*
-layout ~
+terminal_defaults.layout ~
     Default: `"below"`
     Type: `string`
     
@@ -282,35 +287,35 @@ layout ~
     See |ergoterm-termnew| for available layouts.
 
                                                         *ergoterm-auto_scroll*
-auto_scroll ~
+terminal_defaults.auto_scroll ~
     Default: `true`
     Type: `boolean`
     
     Automatically scroll terminal output to bottom.
 
                                                    *ergoterm-close_on_job_exit*
-close_on_job_exit ~
+terminal_defaults.close_on_job_exit ~
     Default: `true`
     Type: `boolean`
     
     Close terminal window when the job process exits.
 
                                                        *ergoterm-persist_mode*
-persist_mode ~
+terminal_defaults.persist_mode ~
     Default: `false`
     Type: `boolean`
     
     Remember terminal mode (normal/insert) between visits.
 
                                                     *ergoterm-start_in_insert*
-start_in_insert ~
+terminal_defaults.start_in_insert ~
     Default: `true`
     Type: `boolean`
     
     Start terminals in insert mode by default.
 
                                                          *ergoterm-selectable*
-selectable ~
+terminal_defaults.selectable ~
     Default: `true`
     Type: `boolean`
     
@@ -323,7 +328,7 @@ selectable ~
     selection mode with |ergoterm-termtoggleuniversalselection|.
 
                                                          *ergoterm-float_opts*
-float_opts ~
+terminal_defaults.float_opts ~
     Default: See below
     Type: `table`
     
@@ -337,21 +342,23 @@ float_opts ~
 <
 
                                                      *ergoterm-float_winblend*
-float_winblend ~
+terminal_defaults.float_winblend ~
     Default: `10`
     Type: `number`
     
     Transparency level for floating windows (0-100).
 
                                                           *ergoterm-clear_env*
-clear_env ~
+terminal_defaults.clear_env ~
     Default: `false`
     Type: `boolean`
     
     Use clean environment for terminal jobs.
 
+**picker** - Picker configuration:
+
                                                              *ergoterm-picker*
-picker ~
+picker.picker ~
     Default: `nil` (auto-detect)
     Type: `string`, `table`, or `nil`
     
@@ -367,64 +374,66 @@ picker ~
 
 ErgoTerm supports various callbacks for terminal lifecycle events:
 
+**Callbacks** - All callbacks are part of terminal_defaults:
+
                                                            *ergoterm-on_close*
-on_close ~
+terminal_defaults.on_close ~
     Type: `function(term)`
     Default: No-op
     
     Called when a terminal window is closed.
 
                                                           *ergoterm-on_create*
-on_create ~
+terminal_defaults.on_create ~
     Type: `function(term)`
     Default: No-op
     
     Called when a terminal buffer is first created.
 
                                                            *ergoterm-on_focus*
-on_focus ~
+terminal_defaults.on_focus ~
     Type: `function(term)`
     Default: No-op
     
     Called when a terminal window gains focus.
 
                                                         *ergoterm-on_job_exit*
-on_job_exit ~
+terminal_defaults.on_job_exit ~
     Type: `function(term, job_id, exit_code, event_name)`
     Default: No-op
     
     Called when the terminal process exits.
 
                                                       *ergoterm-on_job_stderr*
-on_job_stderr ~
+terminal_defaults.on_job_stderr ~
     Type: `function(term, channel_id, data_lines, stream_name)`
     Default: No-op
     
     Called when the terminal process outputs to stderr.
 
                                                       *ergoterm-on_job_stdout*
-on_job_stdout ~
+terminal_defaults.on_job_stdout ~
     Type: `function(term, channel_id, data_lines, stream_name)`
     Default: No-op
     
     Called when the terminal process outputs to stdout.
 
                                                             *ergoterm-on_open*
-on_open ~
+terminal_defaults.on_open ~
     Type: `function(term)`
     Default: No-op
     
     Called when a terminal window is opened.
 
                                                            *ergoterm-on_start*
-on_start ~
+terminal_defaults.on_start ~
     Type: `function(term)`
     Default: No-op
     
     Called when a terminal job process starts.
 
                                                             *ergoterm-on_stop*
-on_stop ~
+terminal_defaults.on_stop ~
     Type: `function(term)`
     Default: No-op
     

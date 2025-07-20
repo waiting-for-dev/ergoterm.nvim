@@ -384,51 +384,62 @@ ErgoTerm can be customized through the `setup()` function. Here are the defaults
 
 ```lua
 require("ergoterm").setup({
-  -- Default shell command
-  shell = vim.o.shell,
-  
-  -- Default window layout
-  layout = "below",
-  
-  -- Auto-scroll terminal output
-  auto_scroll = true,
-  
-  -- Close terminal window when job exits
-  close_on_job_exit = true,
-  
-  -- Remember terminal mode between visits
-  persist_mode = false,
-  
-  -- Start terminals in insert mode
-  start_in_insert = true,
-  
-  -- Show terminals in picker by default
-  selectable = true,
-  
-  -- Floating window options
-  float_opts = {
-    title_pos = "left",
-    relative = "editor",
-    border = "single",
-    zindex = 50
+  -- Terminal defaults - applied to all new terminals but overridable per instance
+  terminal_defaults = {
+    -- Default shell command
+    shell = vim.o.shell,
+    
+    -- Default window layout
+    layout = "below",
+    
+    -- Auto-scroll terminal output
+    auto_scroll = true,
+    
+    -- Close terminal window when job exits
+    close_on_job_exit = true,
+    
+    -- Remember terminal mode between visits
+    persist_mode = false,
+    
+    -- Start terminals in insert mode
+    start_in_insert = true,
+    
+    -- Show terminals in picker by default
+    selectable = true,
+    
+    -- Floating window options
+    float_opts = {
+      title_pos = "left",
+      relative = "editor",
+      border = "single",
+      zindex = 50
+    },
+    
+    -- Floating window transparency
+    float_winblend = 10,
+    
+    -- Clean job environment
+    clear_env = false,
+    
+    -- Default callbacks (all no-ops by default)
+    on_close = function(term) end,
+    on_create = function(term) end,
+    on_focus = function(term) end,
+    on_job_exit = function(term, job_id, exit_code, event_name) end,
+    on_job_stderr = function(term, channel_id, data_lines, stream_name) end,
+    on_job_stdout = function(term, channel_id, data_lines, stream_name) end,
+    on_open = function(term) end,
+    on_start = function(term) end,
+    on_stop = function(term) end,
   },
   
-  -- Floating window transparency
-  float_winblend = 10,
-  
-  -- Clean job environment
-  clear_env = false,
-  
-  -- Default callbacks (all no-ops by default)
-  on_close = function(term) end,
-  on_create = function(term) end,
-  on_focus = function(term) end,
-  on_job_exit = function(term, job_id, exit_code, event_name) end,
-  on_job_stderr = function(term, channel_id, data_lines, stream_name) end,
-  on_job_stdout = function(term, channel_id, data_lines, stream_name) end,
-  on_open = function(term) end,
-  on_start = function(term) end,
-  on_stop = function(term) end,
+  -- Picker configuration
+  picker = {
+    -- Picker to use for terminal selection
+    -- Can be "telescope", "fzf-lua", "vim-ui-select", or a custom picker object
+    -- nil = auto-detect (telescope > fzf-lua > vim.ui.select)
+    picker = nil,
+  }
 })
 ```
 

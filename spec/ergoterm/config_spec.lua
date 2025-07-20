@@ -7,32 +7,54 @@ describe("config.get", function()
     local conf = config.get()
 
     assert.is_table(conf)
-    assert.is_not_nil(conf.layout)
+    assert.is_not_nil(conf.terminal_defaults)
+    assert.is_not_nil(conf.picker)
   end)
 
   it("returns a specific config value when key is provided", function()
-    assert.equal(config.get("layout"), "below")
+    assert.equal(config.get("terminal_defaults.layout"), "below")
+  end)
+
+  it("returns nested config sections", function()
+    local terminal_defaults = config.get("terminal_defaults")
+    assert.is_table(terminal_defaults)
+    assert.equal(terminal_defaults.layout, "below")
+
+    local picker_config = config.get("picker")
+    assert.is_table(picker_config)
+  end)
+
+  it("returns nil for non-existent keys", function()
+    assert.is_nil(config.get("nonexistent"))
+    assert.is_nil(config.get("terminal_defaults.nonexistent"))
   end)
 end)
 
 describe("config.set", function()
   it("overrides config values with user config", function()
-    local old_layout = config.get("layout")
+    local old_layout = config.get("terminal_defaults.layout")
 
     ---@diagnostic disable: missing-fields
-    config.set({ layout = "left", auto_scroll = false })
+    config.set({ terminal_defaults = { layout = "left", auto_scroll = false } })
 
-    assert.equal(config.get("layout"), "left")
-    assert.is_false(config.get("auto_scroll"))
+    assert.equal(config.get("terminal_defaults.layout"), "left")
+    assert.is_false(config.get("terminal_defaults.auto_scroll"))
 
-    config.set({ layout = old_layout, auto_scroll = true })
+    config.set({ terminal_defaults = { layout = old_layout, auto_scroll = true } })
   end)
 
   it("merges deeply into nested tables", function()
     ---@diagnostic disable: missing-fields
-    config.set({ float_opts = { width = 123 } })
+    config.set({ terminal_defaults = { float_opts = { width = 123 } } })
 
-    assert.equal(config.get("float_opts").width, 123)
+    assert.equal(config.get("terminal_defaults.float_opts").width, 123)
+  end)
+
+  it("allows setting picker configuration", function()
+    ---@diagnostic disable: missing-fields
+    config.set({ picker = { picker = "telescope" } })
+
+    assert.equal(config.get("picker.picker"), "telescope")
   end)
 end)
 
@@ -52,7 +74,7 @@ describe("config.build_picker", function()
       return false
     end
 
-    local conf = { picker = nil }
+    local conf = { picker = { picker = nil } }
     local picker = config.build_picker(conf)
 
     assert.is_not_nil(picker)
@@ -60,7 +82,7 @@ describe("config.build_picker", function()
   end)
 
   it("returns built-in picker when picker is a string", function()
-    local conf = { picker = "vim-ui-select" }
+    local conf = { picker = { picker = "vim-ui-select" } }
     local picker = config.build_picker(conf)
 
     assert.is_not_nil(picker)
@@ -72,14 +94,14 @@ describe("config.build_picker", function()
       select = function() end,
       select_actions = function() return {} end
     }
-    local conf = { picker = custom_picker }
+    local conf = { picker = { picker = custom_picker } }
     local picker = config.build_picker(conf)
 
     assert.equal(picker, custom_picker)
   end)
 
   it("throws error for unknown picker name", function()
-    local conf = { picker = "unknown-picker" }
+    local conf = { picker = { picker = "unknown-picker" } }
 
     assert.has_error(function()
       config.build_picker(conf)

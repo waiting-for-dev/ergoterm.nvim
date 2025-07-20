@@ -224,30 +224,29 @@ Terminal.__index = Terminal
 ---@param args TermCreateArgs?
 ---@return Terminal the newly created terminal instance
 function Terminal:new(args)
-  local conf = config.get()
   local term = args or {} ---@cast term Terminal
   setmetatable(term, self)
-  term.auto_scroll = vim.F.if_nil(term.auto_scroll, conf.auto_scroll)
-  term.cmd = term.cmd or config.get("shell")
-  term.clear_env = vim.F.if_nil(term.clear_env, conf.clear_env)
-  term.close_on_job_exit = vim.F.if_nil(term.close_on_job_exit, conf.close_on_job_exit)
-  term.layout = term.layout or conf.layout
+  term.auto_scroll = vim.F.if_nil(term.auto_scroll, config.get("terminal_defaults.auto_scroll"))
+  term.cmd = term.cmd or config.get("terminal_defaults.shell")
+  term.clear_env = vim.F.if_nil(term.clear_env, config.get("terminal_defaults.clear_env"))
+  term.close_on_job_exit = vim.F.if_nil(term.close_on_job_exit, config.get("terminal_defaults.close_on_job_exit"))
+  term.layout = term.layout or config.get("terminal_defaults.layout")
   term.env = term.env
   term.name = term.name or term.cmd
-  term.float_opts = vim.tbl_deep_extend("keep", term.float_opts or {}, conf.float_opts) --@type FloatOpts
-  term.float_winblend = term.float_winblend or conf.float_winblend
-  term.persist_mode = vim.F.if_nil(term.persist_mode, conf.persist_mode)
-  term.selectable = vim.F.if_nil(term.selectable, conf.selectable)
-  term.start_in_insert = vim.F.if_nil(term.start_in_insert, conf.start_in_insert)
-  term.on_close = vim.F.if_nil(term.on_close, conf.on_close)
-  term.on_create = vim.F.if_nil(term.on_create, conf.on_create)
-  term.on_focus = vim.F.if_nil(term.on_focus, conf.on_focus)
-  term.on_job_stderr = vim.F.if_nil(term.on_job_stderr, conf.on_job_stderr)
-  term.on_job_stdout = vim.F.if_nil(term.on_job_stdout, conf.on_job_stdout)
-  term.on_job_exit = vim.F.if_nil(term.on_job_exit, conf.on_job_exit)
-  term.on_open = vim.F.if_nil(term.on_open, conf.on_open)
-  term.on_start = vim.F.if_nil(term.on_start, conf.on_start)
-  term.on_stop = vim.F.if_nil(term.on_stop, conf.on_stop)
+  term.float_opts = vim.tbl_deep_extend("keep", term.float_opts or {}, config.get("terminal_defaults.float_opts")) --@type FloatOpts
+  term.float_winblend = term.float_winblend or config.get("terminal_defaults.float_winblend")
+  term.persist_mode = vim.F.if_nil(term.persist_mode, config.get("terminal_defaults.persist_mode"))
+  term.selectable = vim.F.if_nil(term.selectable, config.get("terminal_defaults.selectable"))
+  term.start_in_insert = vim.F.if_nil(term.start_in_insert, config.get("terminal_defaults.start_in_insert"))
+  term.on_close = vim.F.if_nil(term.on_close, config.get("terminal_defaults.on_close"))
+  term.on_create = vim.F.if_nil(term.on_create, config.get("terminal_defaults.on_create"))
+  term.on_focus = vim.F.if_nil(term.on_focus, config.get("terminal_defaults.on_focus"))
+  term.on_job_stderr = vim.F.if_nil(term.on_job_stderr, config.get("terminal_defaults.on_job_stderr"))
+  term.on_job_stdout = vim.F.if_nil(term.on_job_stdout, config.get("terminal_defaults.on_job_stdout"))
+  term.on_job_exit = vim.F.if_nil(term.on_job_exit, config.get("terminal_defaults.on_job_exit"))
+  term.on_open = vim.F.if_nil(term.on_open, config.get("terminal_defaults.on_open"))
+  term.on_start = vim.F.if_nil(term.on_start, config.get("terminal_defaults.on_start"))
+  term.on_stop = vim.F.if_nil(term.on_stop, config.get("terminal_defaults.on_stop"))
   term.id = M._initialize_id()
   term:_initialize_state()
   term:_add_to_state()

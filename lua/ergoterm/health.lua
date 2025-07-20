@@ -25,7 +25,7 @@ function M.check()
   if config_ok then
     vim.health.ok("Configuration module loaded successfully")
 
-    local picker = config.get("picker")
+    local picker = config.get("picker.picker")
     if picker then
       if type(picker) == "string" then
         vim.health.ok("Picker configured: " .. picker)

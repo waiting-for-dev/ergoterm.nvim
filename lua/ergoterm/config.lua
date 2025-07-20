@@ -37,7 +37,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field row? number
 ---@field col? number
 
----@class ErgoTermConfig
+---@class TerminalDefaults
 ---@field auto_scroll boolean
 ---@field clear_env boolean
 ---@field close_on_job_exit boolean
@@ -57,54 +57,65 @@ M.NULL_CALLBACK = function(...) end
 ---@field shell string|fun():string
 ---@field selectable boolean
 ---@field start_in_insert boolean
+
+---@class PickerConfig
 ---@field picker PickerOption
+
+---@class ErgoTermConfig
+---@field terminal_defaults TerminalDefaults
+---@field picker PickerConfig
 
 ---@type ErgoTermConfig
 local config = {
-  auto_scroll = true,
-  clear_env = false,
-  close_on_job_exit = true,
-  layout = "below",
-  float_opts = {
-    title_pos = "left",
-    width = math.ceil(math.min(vim.o.columns, math.max(80, vim.o.columns - 20))),
-    height = math.ceil(math.min(vim.o.lines, math.max(20, vim.o.lines - 10))),
-    relative = "editor",
-    border = "single",
-    zindex = 50
+  terminal_defaults = {
+    auto_scroll = true,
+    clear_env = false,
+    close_on_job_exit = true,
+    layout = "below",
+    float_opts = {
+      title_pos = "left",
+      width = math.ceil(math.min(vim.o.columns, math.max(80, vim.o.columns - 20))),
+      height = math.ceil(math.min(vim.o.lines, math.max(20, vim.o.lines - 10))),
+      relative = "editor",
+      border = "single",
+      zindex = 50
+    },
+    float_winblend = 10,
+    persist_mode = false,
+    selectable = true,
+    on_close = M.NULL_CALLBACK,
+    on_create = M.NULL_CALLBACK,
+    on_focus = M.NULL_CALLBACK,
+    on_job_exit = M.NULL_CALLBACK,
+    on_open = M.NULL_CALLBACK,
+    on_stop = M.NULL_CALLBACK,
+    on_start = M.NULL_CALLBACK,
+    on_job_stderr = M.NULL_CALLBACK,
+    on_job_stdout = M.NULL_CALLBACK,
+    shell = vim.o.shell,
+    start_in_insert = true,
   },
-  float_winblend = 10,
-  persist_mode = false,
-  selectable = true,
-  on_close = M.NULL_CALLBACK,
-  on_create = M.NULL_CALLBACK,
-  on_focus = M.NULL_CALLBACK,
-  on_job_exit = M.NULL_CALLBACK,
-  on_open = M.NULL_CALLBACK,
-  on_stop = M.NULL_CALLBACK,
-  on_start = M.NULL_CALLBACK,
-  on_job_stderr = M.NULL_CALLBACK,
-  on_job_stdout = M.NULL_CALLBACK,
-  picker = nil,
-  shell = vim.o.shell,
-  start_in_insert = true,
+  picker = {
+    picker = nil,
+  }
 }
 
 ---Get the picker to select terminals
 ---
----If the `picker` field is set in the config, it will return that.
+---If the `picker.picker` field is set in the config, it will return that.
 ---
 ---@param conf ErgoTermConfig
 ---
 ---@return Picker
 function M.build_picker(conf)
-  if conf.picker == nil then
+  local picker_option = conf.picker.picker
+  if picker_option == nil then
     return M._detect_picker()
-  elseif type(conf.picker) == "string" then
-    return M._get_picker_by_name(conf.picker)
+  elseif type(picker_option) == "string" then
+    return M._get_picker_by_name(picker_option)
   else
     ---@diagnostic disable-next-line: return-type-mismatch
-    return conf.picker
+    return picker_option
   end
 end
 
@@ -135,8 +146,19 @@ end
 ---@param key string?
 ---@return any
 function M.get(key)
-  if key then return config[key] end
-  return config
+  if not key then return config end
+  local parts = vim.split(key, ".", { plain = true })
+  local current = config
+
+  for _, part in ipairs(parts) do
+    if type(current) == "table" and current[part] ~= nil then
+      current = current[part]
+    else
+      return nil
+    end
+  end
+
+  return current
 end
 
 ---@param user_conf ErgoTermConfig

@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- BREAKING: Config is now nested under `config.terminal_defaults` & `config.picker` objects
 - Fix Telescope actions descriptions
 
 ## [0.0.3] - 2025-07-19
