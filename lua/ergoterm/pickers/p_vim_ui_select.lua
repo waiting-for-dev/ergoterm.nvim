@@ -1,10 +1,5 @@
 local M = {}
 
-function M.select_actions()
-  return {
-    default = { fn = function(term) term:focus() end, desc = "" },
-  }
-end
 
 function M.select(terminals, prompt, callbacks)
   vim.ui.select(terminals, {

@@ -69,8 +69,10 @@ end
 function M.get_actions(definitions)
   local actions = {}
   for key, definition in pairs(definitions) do
-    actions[key] = {
-      desc = definition.desc,
+    local transformed_key = M._transform_key_for_fzf(key)
+    local transformed_desc = M._transform_description(definition.desc)
+    actions[transformed_key] = {
+      desc = transformed_desc,
       fn = function(selected)
         local id = M.get_term_id_from_selected(selected[1])
         local term = terms.get(id)
@@ -79,16 +81,6 @@ function M.get_actions(definitions)
     }
   end
   return actions
-end
-
-function M.select_actions()
-  return {
-    default = { fn = function(term) term:focus() end, desc = "open" },
-    ["ctrl-s"] = { fn = function(term) term:focus("below") end, desc = "open-in-horizontal-split" },
-    ["ctrl-v"] = { fn = function(term) term:focus("right") end, desc = "open-in-vertical-split" },
-    ["ctrl-t"] = { fn = function(term) term:focus("tab") end, desc = "open-in-tab" },
-    ["ctrl-f"] = { fn = function(term) term:focus("float") end, desc = "open-in-float-window" }
-  }
 end
 
 function M.select(terminals, prompt, definitions)
@@ -100,6 +92,91 @@ function M.select(terminals, prompt, definitions)
       previewer = M.previewer
     }
   )
+end
+
+-- Transform Vim-style key notation to fzf-lua format
+-- <C-s> -> ctrl-s, <M-s> -> alt-s, <S-F1> -> shift-f1, etc.
+function M._transform_key_for_fzf(key)
+  -- Handle Control keys: <C-s> -> ctrl-s
+  if key:match("^<C%-(.+)>$") then
+    local char = key:match("^<C%-(.+)>$")
+    return "ctrl-" .. char:lower()
+  end
+
+  -- Handle Meta/Alt keys: <M-s> -> alt-s, <A-s> -> alt-s
+  if key:match("^<[MA]%-(.+)>$") then
+    local char = key:match("^<[MA]%-(.+)>$")
+    return "alt-" .. char:lower()
+  end
+
+  -- Handle Shift keys: <S-F1> -> shift-f1
+  if key:match("^<S%-(.+)>$") then
+    local char = key:match("^<S%-(.+)>$")
+    return "shift-" .. char:lower()
+  end
+
+  -- Handle function keys: <F1> -> f1, <F12> -> f12
+  if key:match("^<F(%d+)>$") then
+    local num = key:match("^<F(%d+)>$")
+    return "f" .. num
+  end
+
+  -- Handle special keys: <Tab> -> tab, <Space> -> space, <Enter> -> enter
+  local special_keys = {
+    ["<Tab>"] = "tab",
+    ["<Space>"] = "space",
+    ["<Enter>"] = "enter",
+    ["<Return>"] = "enter",
+    ["<CR>"] = "enter",
+    ["<Esc>"] = "esc",
+    ["<BS>"] = "bs",
+    ["<Backspace>"] = "bs",
+    ["<Del>"] = "del",
+    ["<Delete>"] = "del",
+    ["<Home>"] = "home",
+    ["<End>"] = "end",
+    ["<PageUp>"] = "page-up",
+    ["<PageDown>"] = "page-down",
+    ["<Up>"] = "up",
+    ["<Down>"] = "down",
+    ["<Left>"] = "left",
+    ["<Right>"] = "right"
+  }
+
+  if special_keys[key] then
+    return special_keys[key]
+  end
+
+  -- Handle combination keys: <C-S-f> -> ctrl-shift-f, <M-C-s> -> alt-ctrl-s
+  if key:match("^<.*>$") then
+    local inner = key:match("^<(.*)>$")
+    local parts = {}
+
+    -- Split by hyphens and process each modifier
+    for part in inner:gmatch("[^%-]+") do
+      if part == "C" then
+        table.insert(parts, "ctrl")
+      elseif part == "M" or part == "A" then
+        table.insert(parts, "alt")
+      elseif part == "S" then
+        table.insert(parts, "shift")
+      else
+        -- This is the actual key
+        table.insert(parts, part:lower())
+      end
+    end
+
+    if #parts > 1 then
+      return table.concat(parts, "-")
+    end
+  end
+
+  -- Return unchanged if no transformation needed
+  return key
+end
+
+function M._transform_description(description)
+  return description:lower():gsub("%s+", "-")
 end
 
 return M

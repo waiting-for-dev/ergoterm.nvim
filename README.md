@@ -94,6 +94,8 @@ When using fzf-lua or Telescope, additional keybindings are available in the pic
 - `<Ctrl-t>` - Open in new tab
 - `<Ctrl-f>` - Open in floating window
 
+These keybindings can be customized through the `picker.select_actions` and `picker.extra_select_actions` configuration options (see [Configuration](#configuration) section).
+
 ### Sending Text to Terminals
 
 Send text from your buffer to any terminal:
@@ -439,6 +441,21 @@ require("ergoterm").setup({
     -- Can be "telescope", "fzf-lua", "vim-ui-select", or a custom picker object
     -- nil = auto-detect (telescope > fzf-lua > vim.ui.select)
     picker = nil,
+
+    -- Default actions available in terminal picker
+    -- These replace the built-in actions entirely
+    select_actions = {
+      default = { fn = function(term) term:focus() end, desc = "Open" },
+      ["<C-s>"] = { fn = function(term) term:focus("below") end, desc = "Open in horizontal split" },
+      ["<C-v>"] = { fn = function(term) term:focus("right") end, desc = "Open in vertical split" },
+      ["<C-t>"] = { fn = function(term) term:focus("tab") end, desc = "Open in tab" },
+      ["<C-f>"] = { fn = function(term) term:focus("float") end, desc = "Open in float window" }
+    },
+
+    -- Additional actions to append to select_actions
+    -- These are merged with select_actions, allowing you to add custom actions
+    -- without replacing the defaults
+    extra_select_actions = {}
   }
 })
 ```

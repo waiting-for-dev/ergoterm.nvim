@@ -5,8 +5,7 @@
 ---@field desc string the description of the action
 
 ---@class Picker
----@field select fun(term: Terminal[], prompt: string, callbacks: table<string, PickerCallbackDefinition>)
----@field select_actions fun(): table<string, PickerCallbackDefinition>
+---@field select fun(terminals: Terminal[], prompt: string, callbacks: table<string, PickerCallbackDefinition>): any
 
 ---@alias PickerName "fzf-lua" | "telescope" | "vim-ui-select"
 ---@alias PickerOption Picker | PickerName | nil
@@ -60,6 +59,8 @@ M.NULL_CALLBACK = function(...) end
 
 ---@class PickerConfig
 ---@field picker PickerOption
+---@field select_actions table<string, PickerCallbackDefinition>
+---@field extra_select_actions table<string, PickerCallbackDefinition>
 
 ---@class ErgoTermConfig
 ---@field terminal_defaults TerminalDefaults
@@ -97,6 +98,14 @@ local config = {
   },
   picker = {
     picker = nil,
+    select_actions = {
+      default = { fn = function(term) term:focus() end, desc = "Open" },
+      ["<C-s>"] = { fn = function(term) term:focus("below") end, desc = "Open in horizontal split" },
+      ["<C-v>"] = { fn = function(term) term:focus("right") end, desc = "Open in vertical split" },
+      ["<C-t>"] = { fn = function(term) term:focus("tab") end, desc = "Open in tab" },
+      ["<C-f>"] = { fn = function(term) term:focus("float") end, desc = "Open in float window" }
+    },
+    extra_select_actions = {}
   }
 }
 

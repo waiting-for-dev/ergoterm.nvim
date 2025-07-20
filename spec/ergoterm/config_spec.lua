@@ -91,8 +91,7 @@ describe("config.build_picker", function()
 
   it("returns custom picker object when picker is an object", function()
     local custom_picker = {
-      select = function() end,
-      select_actions = function() return {} end
+      select = function() end
     }
     local conf = { picker = { picker = custom_picker } }
     local picker = config.build_picker(conf)

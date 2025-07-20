@@ -1,6 +1,7 @@
 ---@diagnostic disable: undefined-field
 
 local commands = require("ergoterm.commands")
+local config = require("ergoterm.config")
 local terms = require("ergoterm.terminal")
 local test_helpers = require("test_helpers")
 
@@ -91,20 +92,18 @@ describe("M.new", function()
 end)
 
 describe("M.select", function()
-  it("calls picker with the picker select options", function()
-    local select_actions_result = { default = { fn = function() end, desc = "open" } }
+  it("calls picker with the configured select options", function()
     local picker = {
       select = function(terminals, prompt, callbacks)
         return { terminals, prompt, callbacks }
-      end,
-      select_actions = function() return select_actions_result end
+      end
     }
     local term = terms.Terminal:new():start()
 
     local result = commands.select(false, picker)
 
     assert.equal("Please select a terminal to open (or focus): ", result[2])
-    assert.equal(select_actions_result, result[3])
+    assert.equal(config.get("picker.select_actions"), result[3])
     assert.equal(1, #result[1])
     assert.is_true(vim.tbl_contains(result[1], term))
   end)

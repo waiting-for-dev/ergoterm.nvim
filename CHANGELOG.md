@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Added support for `picker.select_actions` & `picker.extra_select_actions` settings.
+
 ## [0.1.0] - 2025-07-19
 
 - BREAKING: Config is now nested under `config.terminal_defaults` & `config.picker` objects

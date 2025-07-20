@@ -168,6 +168,10 @@ When using fzf-lua or Telescope, additional keybindings are available:
     <C-t>       Open in new tab
     <C-f>       Open in floating window
 
+These keybindings can be customized through the `picker.select_actions` and
+`picker.extra_select_actions` configuration options. See |ergoterm-picker-actions|
+for details.
+
 ------------------------------------------------------------------------------
 4.3 TermSend                                               *ergoterm-termsend*
 
@@ -361,13 +365,49 @@ terminal_defaults.clear_env ~
 picker.picker ~
     Default: `nil` (auto-detect)
     Type: `string`, `table`, or `nil`
-    
+
     Picker to use for terminal selection. Can be:
     • `nil` - Auto-detect (telescope > fzf-lua > vim.ui.select)
     • `"telescope"` - Use Telescope picker
     • `"fzf-lua"` - Use fzf-lua picker  
     • `"vim-ui-select"` - Use built-in vim.ui.select
-    • Custom picker table with `select` and `select_actions` functions
+    • Custom picker table with `select` function
+
+                                                 *ergoterm-picker-actions*
+picker.select_actions ~
+    Default: See below
+    Type: `table<string, PickerCallbackDefinition>`
+
+    Actions available in the terminal picker. These completely replace the
+    built-in actions. Each key is a keybinding, and the value is a table with:
+    • `fn` - Function that receives the selected terminal
+    • `desc` - Description shown in picker UI
+
+    Default actions: >lua
+        select_actions = {
+          default = { fn = function(term) term:focus() end, desc = "Open" },
+          ["<C-s>"] = { fn = function(term) term:focus("below") end, desc = "Open in horizontal split" },
+          ["<C-v>"] = { fn = function(term) term:focus("right") end, desc = "Open in vertical split" },
+          ["<C-t>"] = { fn = function(term) term:focus("tab") end, desc = "Open in tab" },
+          ["<C-f>"] = { fn = function(term) term:focus("float") end, desc = "Open in float window" }
+        }
+
+
+picker.extra_select_actions ~
+    Default: `{}` (empty)
+    Type: `table<string, PickerCallbackDefinition>`
+
+    Additional actions to append to `select_actions`. These are merged with
+    the default or configured `select_actions`, allowing you to add custom
+    actions without replacing the built-in ones.
+
+    Example: >lua
+        extra_select_actions = {
+          ["<C-d>"] = { fn = function(term) term:delete() end, desc = "Delete terminal" },
+          ["<C-r>"] = { fn = function(term) term:stop(); term:start() end, desc = "Restart terminal" }
+        }
+
+
 
 ------------------------------------------------------------------------------
 5.3 Callbacks                                             *ergoterm-callbacks*

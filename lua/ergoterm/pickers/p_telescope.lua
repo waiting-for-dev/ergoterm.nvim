@@ -2,15 +2,6 @@ local terms = require("ergoterm.terminal")
 
 local M = {}
 
-function M.select_actions()
-  return {
-    default = { fn = function(term) term:focus() end, desc = "open" },
-    ["<C-s>"] = { fn = function(term) term:focus("below") end, desc = "Open in horizontal split" },
-    ["<C-v>"] = { fn = function(term) term:focus("right") end, desc = "Open in vertical split" },
-    ["<C-t>"] = { fn = function(term) term:focus("tab") end, desc = "Open in tab" },
-    ["<C-f>"] = { fn = function(term) term:focus("float") end, desc = "Open in float window" }
-  }
-end
 
 function M.select(terminals, prompt, definitions)
   local pickers = require("telescope.pickers")
