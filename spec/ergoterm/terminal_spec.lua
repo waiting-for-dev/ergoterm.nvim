@@ -1258,13 +1258,32 @@ describe(":is_focused", function()
 end)
 
 describe(":stop", function()
-  it("closes the terminal if open", function()
+  it("closes the terminal if open by default", function()
     local term = terms.Terminal:new()
     term:open()
 
     term:stop()
 
     assert.is_false(term:is_open())
+  end)
+
+  it("closes the terminal if open when with_close is true", function()
+    local term = terms.Terminal:new()
+    term:open()
+
+    term:stop(true)
+
+    assert.is_false(term:is_open())
+  end)
+
+  it("does not close the terminal if open when with_close is false", function()
+    local term = terms.Terminal:new()
+    term:open()
+
+    local spy_termclose = spy.on(term, "close")
+    term:stop(false)
+
+    assert.spy(spy_termclose).was_not_called()
   end)
 
   it("runs the on_stop callback", function()
@@ -1297,16 +1316,6 @@ describe(":stop", function()
     term:stop()
 
     assert.is_nil(term:get_state("job_id"))
-  end)
-
-  it("deletes the associated buffer", function()
-    local term = terms.Terminal:new()
-    term:start()
-    local bufnr = term:get_state("bufnr")
-
-    term:stop()
-
-    assert.is_false(vim.api.nvim_buf_is_valid(bufnr))
   end)
 
   it("resets the buffer id in the state", function()
@@ -1344,6 +1353,34 @@ describe(":delete", function()
     term:delete()
 
     assert.is_true(term:is_stopped())
+  end)
+
+  it("closes the terminal window by default when stopping", function()
+    local term = terms.Terminal:new()
+    term:open()
+
+    term:delete()
+
+    assert.is_false(term:is_open())
+  end)
+
+  it("closes the terminal window when with_close is true", function()
+    local term = terms.Terminal:new()
+    term:open()
+
+    term:delete(true)
+
+    assert.is_false(term:is_open())
+  end)
+
+  it("does not close the terminal window when with_close is false", function()
+    local term = terms.Terminal:new()
+    term:open()
+
+    local spy_termclose = spy.on(term, "close")
+    term:delete(false)
+
+    assert.spy(spy_termclose).was_not_called()
   end)
 
   it("removes the terminal from the state", function()
@@ -1743,6 +1780,37 @@ describe(":on_term_close", function()
     term:on_term_close()
 
     assert.is_nil(terms.get(term.id))
+    vim.schedule = original_schedule
+  end)
+
+  it("closes the terminal window when close_on_job_exit is true", function()
+    local term = terms.Terminal:new({ close_on_job_exit = true })
+    term:open()
+    local original_schedule = vim.schedule
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.schedule = function(fn)
+      fn()
+    end
+
+    term:on_term_close()
+
+    assert.is_false(term:is_open())
+    vim.schedule = original_schedule
+  end)
+
+  it("does not close the terminal window when close_on_job_exit is false", function()
+    local term = terms.Terminal:new({ close_on_job_exit = false })
+    term:open()
+    local original_schedule = vim.schedule
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.schedule = function(fn)
+      fn()
+    end
+
+    local spy_term_close = spy.on(term, "close")
+    term:on_term_close()
+
+    assert.spy(spy_term_close).was_not_called()
     vim.schedule = original_schedule
   end)
 end)

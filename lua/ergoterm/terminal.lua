@@ -414,19 +414,20 @@ end
 
 ---Terminates the terminal job and cleans up resources
 ---
----Stops the underlying job process, deletes the buffer, and closes any open
+---Stops the underlying job process, deletes the buffer, and optionally closes any open
 ---windows. Triggers the `on_stop` callback. The terminal can be restarted
 ---later with `start()`.
 ---
+---@param with_close? boolean whether to close the terminal window (default: true)
 ---@return Terminal self for method chaining
-function Terminal:stop()
-  if self:is_open() then self:close() end
+function Terminal:stop(with_close)
+  with_close = vim.F.if_nil(with_close, true)
+  if with_close and self:is_open() then self:close() end
   if self:is_started() then
     self:on_stop()
     vim.fn.jobstop(self._state.job_id)
     self._state.job_id = nil
     if self._state.bufnr then
-      vim.api.nvim_buf_delete(self._state.bufnr, { force = true })
       self._state.bufnr = nil
     end
   end
@@ -445,9 +446,11 @@ end
 ---Stops the terminal if running and removes it from the module's terminal
 ---registry. This is irreversible - the terminal instance becomes unusable
 ---after deletion.
-function Terminal:delete()
+---
+---@param with_close? boolean whether to close the terminal window when stopping (default: true)
+function Terminal:delete(with_close)
   if not self:is_stopped() then
-    self:stop()
+    self:stop(with_close)
   end
   if M._state.last_focused == self then
     M._state.last_focused = nil
@@ -573,9 +576,12 @@ end
 ---Handles terminal close events
 ---
 ---Automatically deletes the terminal instance when the underlying terminal
----process exits. Scheduled to run after the current event to avoid conflicts.
+---process exits.
+---
+---Respects the `close_on_job_exit` setting to determine whether
+---to close the terminal window.
 function Terminal:on_term_close()
-  vim.schedule(function() self:delete() end)
+  vim.schedule(function() self:delete(self.close_on_job_exit) end)
 end
 
 ---Accesses internal terminal state
