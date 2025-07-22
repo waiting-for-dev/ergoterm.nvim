@@ -1630,6 +1630,19 @@ describe(":send", function()
     local lines = vim.api.nvim_buf_line_count(term:get_state("bufnr"))
     assert.equal(lines, cursor[1])
   end)
+
+  it("notifies error for invalid string input type", function()
+    local term = terms.Terminal:new():start()
+
+    local result = test_helpers.mocking_notify(function()
+      term:send("invalid_type")
+    end)
+
+    ---@diagnostic disable: need-check-nil
+    assert.equal("Invalid input type 'invalid_type'. Must be one of: single_line, visual_lines, visual_selection", result.msg)
+    assert.equal("error", result.level)
+    ---@diagnostic enable: need-check-nil
+  end)
 end)
 
 describe(":clear", function()

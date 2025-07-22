@@ -510,6 +510,14 @@ function Terminal:send(input, opts)
   local caller_window = vim.api.nvim_get_current_win()
   local text_input
   if type(input) == "string" then
+    local valid_selection_types = { "single_line", "visual_lines", "visual_selection" }
+    if not vim.tbl_contains(valid_selection_types, input) then
+      utils.notify(
+        string.format("Invalid input type '%s'. Must be one of: %s", input, table.concat(valid_selection_types, ", ")),
+        "error"
+      )
+      return self
+    end
     text_input = text_selector.select(input)
   else
     text_input = input
