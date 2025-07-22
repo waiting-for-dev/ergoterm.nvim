@@ -513,7 +513,8 @@ function Terminal:send(input, opts)
     local valid_selection_types = { "single_line", "visual_lines", "visual_selection" }
     if not vim.tbl_contains(valid_selection_types, input) then
       utils.notify(
-        string.format("Invalid input type '%s'. Must be one of: %s", input, table.concat(valid_selection_types, ", ")),
+        string.format("Invalid input type '%s'. Must be a table with one item per line or one of: %s", input,
+          table.concat(valid_selection_types, ", ")),
         "error"
       )
       return self

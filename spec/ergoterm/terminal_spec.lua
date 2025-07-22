@@ -1635,11 +1635,14 @@ describe(":send", function()
     local term = terms.Terminal:new():start()
 
     local result = test_helpers.mocking_notify(function()
+      ---@diagnostic disable-next-line: param-type-mismatch
       term:send("invalid_type")
     end)
 
     ---@diagnostic disable: need-check-nil
-    assert.equal("Invalid input type 'invalid_type'. Must be one of: single_line, visual_lines, visual_selection", result.msg)
+    assert.equal(
+      "Invalid input type 'invalid_type'. Must be a table with one item per line or one of: single_line, visual_lines, visual_selection",
+      result.msg)
     assert.equal("error", result.level)
     ---@diagnostic enable: need-check-nil
   end)
