@@ -627,12 +627,6 @@ end
 function Terminal:_initialize_exit_handler(callback)
   return function(job, exit_code, event)
     callback(self, job, exit_code, event)
-    if self:is_open() and self.close_on_job_exit then
-      self:close()
-      if vim.api.nvim_buf_is_loaded(self._state.bufnr) then
-        vim.api.nvim_buf_delete(self._state.bufnr, { force = true })
-      end
-    end
   end
 end
 
@@ -758,7 +752,7 @@ function Terminal:_setup_buffer_autocommands()
   vim.api.nvim_create_autocmd("TermClose", {
     buffer = self._state.bufnr,
     group = group,
-    callback = function() self:delete() end,
+    callback = function() self:on_term_close() end
   })
 end
 
