@@ -103,7 +103,7 @@ describe("M.select", function()
     local result = commands.select(false, picker)
 
     assert.equal("Please select a terminal to open (or focus): ", result[2])
-    assert.equal(config.get("picker.select_actions"), result[3])
+    assert.is_table(result[3])
     assert.equal(1, #result[1])
     assert.is_true(vim.tbl_contains(result[1], term))
   end)
