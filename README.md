@@ -63,6 +63,7 @@ Create new terminals with `:TermNew` and customize them with options:
 ```vim
 :TermNew
 :TermNew layout=float name=server dir=~/my-project cmd=iex
+:TermNew layout=right auto_scroll=false persist_mode=true
 ```
 
 **Available options:**
@@ -72,6 +73,11 @@ Create new terminals with `:TermNew` and customize them with options:
 - `dir` - Working directory (default: current directory)
   - Accepts absolute paths (`/home/user/project`), relative paths (`~/my-project`, `./subdir`), `"git_dir"` for auto-detected git repository root, or `nil` for current directory
 - `cmd` - Shell command to run (default: system shell)
+- `auto_scroll` - Automatically scroll terminal output to bottom (default: `true`)
+- `persist_mode` - Remember terminal mode between visits (default: `false`)
+- `selectable` - Show in selection picker and allow as last focused (default: `true`)
+- `start_in_insert` - Start terminal in insert mode (default: `true`)
+- `close_on_job_exit` - Close terminal window when process exits (default: `true`)
 
 ### 🎯 Selecting Terminals
 

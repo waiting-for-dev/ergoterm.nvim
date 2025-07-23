@@ -125,6 +125,11 @@ Options:
                         • "git_dir" - Auto-detect git repository root
                         • nil - Use current working directory
     cmd={command}       Shell command to run (default: system shell)
+    auto_scroll={boolean}       Auto-scroll terminal output (default: true)
+    persist_mode={boolean}      Remember terminal mode between visits (default: false)
+    selectable={boolean}        Show in selection picker and allow as last focused (default: true)
+    start_in_insert={boolean}   Start terminal in insert mode (default: true)
+    close_on_job_exit={boolean} Close terminal window when process exits (default: true)
 
 Available layouts:
     above      Horizontal split above current window
@@ -139,6 +144,7 @@ Examples: >vim
     :TermNew
     :TermNew layout=float
     :TermNew layout=right name=server dir=~/project cmd=npm start
+    :TermNew layout=float auto_scroll=false persist_mode=true
 <
 
 ------------------------------------------------------------------------------

@@ -29,8 +29,23 @@ function M.new(args)
     dir = { parsed.dir, "string", true },
     layout = { parsed.layout, "string", true },
     name = { parsed.name, "string", true },
+    auto_scroll = { parsed.auto_scroll, "boolean", true },
+    persist_mode = { parsed.persist_mode, "boolean", true },
+    selectable = { parsed.selectable, "boolean", true },
+    start_in_insert = { parsed.start_in_insert, "boolean", true },
+    close_on_job_exit = { parsed.close_on_job_exit, "boolean", true },
   })
-  return terms.Terminal:new({ cmd = parsed.cmd, dir = parsed.dir, layout = parsed.layout, name = parsed.name }):focus()
+  return terms.Terminal:new({
+    cmd = parsed.cmd,
+    dir = parsed.dir,
+    layout = parsed.layout,
+    name = parsed.name,
+    auto_scroll = parsed.auto_scroll,
+    persist_mode = parsed.persist_mode,
+    selectable = parsed.selectable,
+    start_in_insert = parsed.start_in_insert,
+    close_on_job_exit = parsed.close_on_job_exit,
+  }):focus()
 end
 
 ---Allows selection of a terminal

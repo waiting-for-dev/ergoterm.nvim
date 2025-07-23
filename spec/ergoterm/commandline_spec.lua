@@ -89,9 +89,50 @@ describe("commandline.term_new_complete", function()
   it("completes available options", function()
     local result = commandline.term_new_complete("", "", 0)
 
+    assert.is_true(vim.tbl_contains(result, "cmd="))
     assert.is_true(vim.tbl_contains(result, "dir="))
     assert.is_true(vim.tbl_contains(result, "layout="))
     assert.is_true(vim.tbl_contains(result, "name="))
+    assert.is_true(vim.tbl_contains(result, "auto_scroll="))
+    assert.is_true(vim.tbl_contains(result, "persist_mode="))
+    assert.is_true(vim.tbl_contains(result, "selectable="))
+    assert.is_true(vim.tbl_contains(result, "start_in_insert="))
+    assert.is_true(vim.tbl_contains(result, "close_on_job_exit="))
+  end)
+
+  it("completes boolean values for auto_scroll", function()
+    local result = commandline.term_new_complete("auto_scroll=", "auto_scroll=", 12)
+
+    assert.is_true(vim.tbl_contains(result, "auto_scroll=true"))
+    assert.is_true(vim.tbl_contains(result, "auto_scroll=false"))
+  end)
+
+  it("completes boolean values for persist_mode", function()
+    local result = commandline.term_new_complete("persist_mode=", "persist_mode=", 13)
+
+    assert.is_true(vim.tbl_contains(result, "persist_mode=true"))
+    assert.is_true(vim.tbl_contains(result, "persist_mode=false"))
+  end)
+
+  it("completes boolean values for selectable", function()
+    local result = commandline.term_new_complete("selectable=", "selectable=", 11)
+
+    assert.is_true(vim.tbl_contains(result, "selectable=true"))
+    assert.is_true(vim.tbl_contains(result, "selectable=false"))
+  end)
+
+  it("completes boolean values for start_in_insert", function()
+    local result = commandline.term_new_complete("start_in_insert=", "start_in_insert=", 16)
+
+    assert.is_true(vim.tbl_contains(result, "start_in_insert=true"))
+    assert.is_true(vim.tbl_contains(result, "start_in_insert=false"))
+  end)
+
+  it("completes boolean values for close_on_job_exit", function()
+    local result = commandline.term_new_complete("close_on_job_exit=", "close_on_job_exit=", 18)
+
+    assert.is_true(vim.tbl_contains(result, "close_on_job_exit=true"))
+    assert.is_true(vim.tbl_contains(result, "close_on_job_exit=false"))
   end)
 end)
 

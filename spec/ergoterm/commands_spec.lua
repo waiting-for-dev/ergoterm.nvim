@@ -81,6 +81,88 @@ describe("M.new", function()
     assert.is_not_nil(term)
     assert.is_true(term:is_focused())
   end)
+
+  it("creates a new terminal with auto_scroll=true by default", function()
+    local term = commands.new("")
+
+    assert.is_not_nil(term)
+    assert.is_true(term.auto_scroll)
+  end)
+
+  it("creates a new terminal with the given auto_scroll option", function()
+    local term = commands.new("auto_scroll=false")
+
+    assert.is_not_nil(term)
+    assert.is_false(term.auto_scroll)
+  end)
+
+  it("creates a new terminal with persist_mode=false by default", function()
+    local term = commands.new("")
+
+    assert.is_not_nil(term)
+    assert.is_false(term.persist_mode)
+  end)
+
+  it("creates a new terminal with the given persist_mode option", function()
+    local term = commands.new("persist_mode=true")
+
+    assert.is_not_nil(term)
+    assert.is_true(term.persist_mode)
+  end)
+
+  it("creates a new terminal with selectable=true by default", function()
+    local term = commands.new("")
+
+    assert.is_not_nil(term)
+    assert.is_true(term.selectable)
+  end)
+
+  it("creates a new terminal with the given selectable option", function()
+    local term = commands.new("selectable=false")
+
+    assert.is_not_nil(term)
+    assert.is_false(term.selectable)
+  end)
+
+  it("creates a new terminal with start_in_insert=true by default", function()
+    local term = commands.new("")
+
+    assert.is_not_nil(term)
+    assert.is_true(term.start_in_insert)
+  end)
+
+  it("creates a new terminal with the given start_in_insert option", function()
+    local term = commands.new("start_in_insert=false")
+
+    assert.is_not_nil(term)
+    assert.is_false(term.start_in_insert)
+  end)
+
+  it("creates a new terminal with close_on_job_exit=true by default", function()
+    local term = commands.new("")
+
+    assert.is_not_nil(term)
+    assert.is_true(term.close_on_job_exit)
+  end)
+
+  it("creates a new terminal with the given close_on_job_exit option", function()
+    local term = commands.new("close_on_job_exit=false")
+
+    assert.is_not_nil(term)
+    assert.is_false(term.close_on_job_exit)
+  end)
+
+  it("creates a new terminal with multiple configuration options", function()
+    local term = commands.new("layout=float auto_scroll=false persist_mode=true selectable=false start_in_insert=false close_on_job_exit=false")
+
+    assert.is_not_nil(term)
+    assert.equal("float", term:get_state("layout"))
+    assert.is_false(term.auto_scroll)
+    assert.is_true(term.persist_mode)
+    assert.is_false(term.selectable)
+    assert.is_false(term.start_in_insert)
+    assert.is_false(term.close_on_job_exit)
+  end)
 end)
 
 describe("M.select", function()
