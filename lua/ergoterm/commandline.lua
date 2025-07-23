@@ -26,6 +26,7 @@ local p = {
 ---@field persist_mode boolean?
 ---@field selectable boolean?
 ---@field start_in_insert boolean?
+---@field close_on_job_exit boolean?
 ---@field text string?
 ---@field trailing string?
 
@@ -59,7 +60,7 @@ function M.parse(args)
       if #part > 1 then
         local arg = vim.split(part, "=")
         local key, value = arg[1], arg[2]
-        if key == "trim" or key == "new_line" or key == "auto_scroll" or key == "persist_mode" or key == "selectable" or key == "start_in_insert" then
+        if key == "trim" or key == "new_line" or key == "auto_scroll" or key == "persist_mode" or key == "selectable" or key == "start_in_insert" or key == "close_on_job_exit" then
           value = M._toboolean(value)
         end
         result[key] = value
@@ -200,6 +201,8 @@ M._all_options = {
   selectable = function() return { "true", "false" } end,
 
   start_in_insert = function() return { "true", "false" } end,
+
+  close_on_job_exit = function() return { "true", "false" } end,
 }
 
 M._term_new_options = {
@@ -216,6 +219,7 @@ M._term_update_options = {
   persist_mode = M._all_options.persist_mode,
   selectable = M._all_options.selectable,
   start_in_insert = M._all_options.start_in_insert,
+  close_on_job_exit = M._all_options.close_on_job_exit,
 }
 
 M._term_send_options = {

@@ -401,6 +401,14 @@ describe("M.update", function()
     assert.is_false(term.start_in_insert)
   end)
 
+  it("updates close_on_job_exit option", function()
+    local term = terms.Terminal:new():start()
+
+    commands.update("close_on_job_exit=false", false, select_only_picker)
+
+    assert.is_false(term.close_on_job_exit)
+  end)
+
   it("uses last focused terminal when called with the bang option", function()
     local term = terms.Terminal:new():start()
     term:focus()

@@ -232,6 +232,7 @@ Updatable options:
     selectable={boolean}         Show in selection picker and allow as last focused
                                  (can be overridden by universal selection mode)
     start_in_insert={boolean}    Start in insert mode
+    close_on_job_exit={boolean}  Close terminal window when job exits
 
 Examples: >vim
     :TermUpdate layout=float

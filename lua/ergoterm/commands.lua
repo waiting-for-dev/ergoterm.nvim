@@ -130,6 +130,7 @@ function M.update(args, bang, picker)
     persist_mode = { parsed.persist_mode, "boolean", true },
     selectable = { parsed.selectable, "boolean", true },
     start_in_insert = { parsed.start_in_insert, "boolean", true },
+    close_on_job_exit = { parsed.close_on_job_exit, "boolean", true },
   })
   local update_terminal = function(t)
     t:update(parsed)
