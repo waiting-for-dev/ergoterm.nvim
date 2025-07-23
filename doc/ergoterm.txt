@@ -563,13 +563,19 @@ Terminal:close()                                        *Terminal:close()*
     Close terminal window but keep job running.
     Terminal can be reopened later.
 
-Terminal:stop()                                         *Terminal:stop()*
+Terminal:stop({with_close})                             *Terminal:stop()*
     Terminate job process and clean up buffer.
     Terminal can be restarted later.
 
-Terminal:delete()                                       *Terminal:delete()*
+    Parameters:
+        {with_close} - boolean, whether to close the terminal window (default: true)
+
+Terminal:delete({with_close})                           *Terminal:delete()*
     Permanently remove terminal from session.
     This is irreversible.
+
+    Parameters:
+        {with_close} - boolean, whether to close the terminal window when stopping (default: true)
 
 Terminal:toggle({layout})                               *Terminal:toggle()*
     Close if open, focus if closed. Convenient show/hide toggle.
