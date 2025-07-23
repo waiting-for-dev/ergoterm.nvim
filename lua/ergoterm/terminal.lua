@@ -711,7 +711,7 @@ end
 function Terminal:_start_job()
   return vim.fn.termopen(self.cmd, {
     detach = 1,
-    cwd = self.dir,
+    cwd = self._state.dir,
     on_exit = self._state.on_job_exit,
     on_stdout = self._state.on_job_stdout,
     on_stderr = self._state.on_job_stderr,

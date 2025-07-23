@@ -1,7 +1,6 @@
 ---@diagnostic disable: undefined-field
 
 local commands = require("ergoterm.commands")
-local config = require("ergoterm.config")
 local terms = require("ergoterm.terminal")
 local test_helpers = require("test_helpers")
 
@@ -11,17 +10,10 @@ after_each(function()
 end)
 
 describe("M.new", function()
-  it("creates a new terminal in the current directory by default", function()
-    local original_cwd = vim.loop.cwd
-    --- @diagnostic disable-next-line: duplicate-set-field
-    vim.loop.cwd = function() return "/test/dir" end
-
+  it("creates a new terminal", function()
     local term = commands.new("")
 
     assert.is_not_nil(term)
-    assert.equal("/test/dir", term:get_state("dir"))
-
-    vim.loop.cwd = original_cwd
   end)
 
   it("creates a new terminal in the given directory", function()

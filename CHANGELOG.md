@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Added support for `picker.select_actions` & `picker.extra_select_actions` settings.
 - Fix `close_job_on_exit` not being respected.
+- Fix `git_dir` value for `dir` not expanding to the actual git directory when starting a terminal.
 
 ## [0.1.0] - 2025-07-19
 
