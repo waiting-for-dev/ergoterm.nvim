@@ -12,7 +12,7 @@ A Neovim plugin for seamless terminal workflow integration. Smart picker-based t
 - 💾 **Saved terminals** - Reuse terminal configurations across Neovim sessions
 - ⚡ **Powerful API** - Extensive Lua API for custom workflows and integrations
 
-## Installation
+## 📦 Installation
 
 Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
@@ -54,9 +54,9 @@ After installation, you can verify everything is working correctly by running:
 :checkhealth ergoterm
 ```
 
-## Basic Usage
+## 🚀 Basic Usage
 
-### Creating Terminals
+### 🔧 Creating Terminals
 
 Create new terminals with `:TermNew` and customize them with options:
 
@@ -73,7 +73,7 @@ Create new terminals with `:TermNew` and customize them with options:
   - Accepts absolute paths (`/home/user/project`), relative paths (`~/my-project`, `./subdir`), `"git_dir"` for auto-detected git repository root, or `nil` for current directory
 - `cmd` - Shell command to run (default: system shell)
 
-### Selecting Terminals
+### 🎯 Selecting Terminals
 
 Choose from active terminals:
 
@@ -96,7 +96,7 @@ When using fzf-lua or Telescope, additional keybindings are available in the pic
 
 These keybindings can be customized through the `picker.select_actions` and `picker.extra_select_actions` configuration options (see [Configuration](#configuration) section).
 
-### Sending Text to Terminals
+### 📤 Sending Text to Terminals
 
 Send text from your buffer to any terminal:
 
@@ -118,7 +118,7 @@ Send text from your buffer to any terminal:
 - `trim` - Remove whitespace (default: `true`)
 - `new_line` - Add newline for execution (default: `true`)
 
-### Updating Terminal Settings
+### ⚙️ Updating Terminal Settings
 
 Modify existing terminal configuration:
 
@@ -135,7 +135,7 @@ Modify existing terminal configuration:
 - `selectable` - Show in selection picker and allow as last focused (can be overridden by universal selection mode)
 - `start_in_insert` - Start in insert mode
 
-### Universal Selection Mode
+### 🌐 Universal Selection Mode
 
 Toggle universal selection mode to temporarily override the `selectable` setting:
 
@@ -145,7 +145,7 @@ Toggle universal selection mode to temporarily override the `selectable` setting
 
 When enabled, all terminals become selectable and can be set as last focused, regardless of their individual `selectable` setting. This provides a way to access non-selectable terminals through pickers and bang commands when needed.
 
-## Example Keymaps
+## ⌨️ Example Keymaps
 
 Here are some useful keymaps to get you started:
 
@@ -175,11 +175,11 @@ map("n", "<leader>cS", ":TermSend! action=visible trim=false decorator=markdown_
 map("x", "<leader>cS", ":TermSend! action=visible trim=false decorator=markdown_code<CR>", opts)
 ```
 
-## Standalone Terminals
+## 💾 Standalone Terminals
 
 Create persistent terminal configurations that survive across Neovim sessions. These terminals are defined once and can be quickly accessed with a single command.
 
-### Creating Standalone Terminals
+### 🏗️ Creating Standalone Terminals
 
 Define terminals in your configuration:
 
@@ -208,7 +208,7 @@ vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end, { desc = "Ope
 vim.keymap.set("n", "<leader>ai", function() aider:toggle() end, { desc = "Open aider" })
 ```
 
-### Available Options
+### 🔧 Available Options
 
 All options default to values from your configuration:
 
@@ -236,11 +236,11 @@ All options default to values from your configuration:
 - `selectable` - Include terminal in selection picker and allow as last focused (can be overridden by universal selection mode)
 - `start_in_insert` - Start terminal in insert mode
 
-## API Overview
+## ⚡ API Overview
 
 ErgoTerm provides a comprehensive Lua API centered around terminal lifecycle management. The design follows a hierarchical pattern where higher-level methods automatically call lower-level ones as needed.
 
-### Terminal Lifecycle
+### 🔄 Terminal Lifecycle
 
 Every terminal follows this lifecycle progression:
 
@@ -265,7 +265,7 @@ term:start()  -- Just start the job process
 term:open()   -- Just create the window (calls start() if needed)
 ```
 
-### Core Methods
+### 🛠️ Core Methods
 
 - `start()` - Creates buffer and starts job process
 - `open(layout?)` - Creates window with optional layout override
@@ -276,14 +276,14 @@ term:open()   -- Just create the window (calls start() if needed)
 - `toggle(layout?)` - Closes if open, focuses if closed
 - `send(input, opts)` - Sends text to terminal with various behaviors
 
-### State Queries
+### 🔍 State Queries
 
 - `is_started()` - Has active buffer and job
 - `is_open()` - Has visible window
 - `is_focused()` - Is currently active window
 - `is_stopped()` - Job has been terminated
 
-### Sending Text to Terminals
+### 📤 Sending Text to Terminals
 
 The `Terminal:send(input, opts)` method provides flexible text input to terminals with various interaction modes:
 
@@ -314,7 +314,7 @@ term:send({"print('hello')"}, { trim = false, decorator = markdown_decorator })
 
 For complete API documentation and advanced usage patterns, see [`lua/ergoterm/terminal.lua`](lua/ergoterm/terminal.lua).
 
-#### Custom Text Decorators
+#### 🎨 Custom Text Decorators
 
 Create custom text transformations for sending code to terminals:
 
@@ -333,7 +333,7 @@ end
 terminal:send({"echo hello"}, { decorator = timestamp_decorator })
 ```
 
-### Example: AI-Assisted Development with Aider
+### 🤖 Example: AI-Assisted Development with Aider
 
 Here's an example showing how to integrate [Aider](https://aider.chat/) for AI-assisted coding:
 
@@ -380,7 +380,7 @@ map("v", "<leader>aS", function()
 end, opts)
 ```
 
-## Configuration
+## ⚙️ Configuration
 
 ErgoTerm can be customized through the `setup()` function. Here are the defaults:
 
@@ -460,11 +460,11 @@ require("ergoterm").setup({
 })
 ```
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit issues, feature requests, or pull requests.
 
-### Development Setup
+### 🛠️ Development Setup
 
 1. Clone the repository
 2. Install dependencies for testing:
@@ -477,18 +477,18 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
    busted
    ```
 
-### Guidelines
+### 📋 Guidelines
 
 - Follow existing code style and conventions
 - Add tests for new features
 - Update documentation for user-facing changes
 - Keep commits focused and write clear commit messages
 
-## License
+## 📄 License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
 - Thanks to [@akinsho](https://github.com/akinsho) for [toggleterm.nvim](https://github.com/akinsho/toggleterm.nvim), which provided the foundation for this project
 - The Neovim community for their excellent plugin ecosystem and documentation
