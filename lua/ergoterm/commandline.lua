@@ -56,11 +56,21 @@ function M.parse(args)
       args = args:gsub(pattern, "")
     end
 
+    local boolean_options = {
+      trim = true,
+      new_line = true,
+      auto_scroll = true,
+      persist_mode = true,
+      selectable = true,
+      start_in_insert = true,
+      close_on_job_exit = true,
+    }
+
     for _, part in ipairs(vim.split(args, " ")) do
       if #part > 1 then
         local arg = vim.split(part, "=")
         local key, value = arg[1], arg[2]
-        if key == "trim" or key == "new_line" or key == "auto_scroll" or key == "persist_mode" or key == "selectable" or key == "start_in_insert" or key == "close_on_job_exit" then
+        if boolean_options[key] then
           value = M._toboolean(value)
         end
         result[key] = value
