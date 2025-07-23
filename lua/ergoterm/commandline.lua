@@ -107,6 +107,11 @@ function M._get_path_parts(typed_path)
   return nil, nil
 end
 
+---@return string[]
+function M._boolean_options()
+  return { "true", "false" }
+end
+
 M._all_options = {
   --- Suggests commands
   ---@param typed_cmd string|nil
@@ -200,19 +205,19 @@ M._all_options = {
     )
   end,
 
-  trim = function() return { "true", "false" } end,
+  trim = M._boolean_options,
 
-  new_line = function() return { "true", "false" } end,
+  new_line = M._boolean_options,
 
-  auto_scroll = function() return { "true", "false" } end,
+  auto_scroll = M._boolean_options,
 
-  persist_mode = function() return { "true", "false" } end,
+  persist_mode = M._boolean_options,
 
-  selectable = function() return { "true", "false" } end,
+  selectable = M._boolean_options,
 
-  start_in_insert = function() return { "true", "false" } end,
+  start_in_insert = M._boolean_options,
 
-  close_on_job_exit = function() return { "true", "false" } end,
+  close_on_job_exit = M._boolean_options,
 }
 
 M._term_new_options = {
