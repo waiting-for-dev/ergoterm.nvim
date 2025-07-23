@@ -218,7 +218,8 @@ All options default to values from your configuration:
 - `close_on_job_exit` - Close terminal window when process exits
 - `dir` - Working directory for the terminal
   - Accepts absolute paths, relative paths (with `~` expansion), `"git_dir"` for git repository root, or `nil` for current directory
-- `env` - Environment variables for the job
+- `env` - Environment variables for the job (table of key-value pairs)
+  - Example: `{ PATH = "/custom/path", DEBUG = "1" }`
 - `float_opts` - Floating window configuration options
 - `float_winblend` - Transparency level for floating windows
 - `layout` - Default window layout when opening
@@ -422,6 +423,9 @@ require("ergoterm").setup({
     
     -- Clean job environment
     clear_env = false,
+
+    -- Environment variables for terminal jobs
+    env = nil,  -- Example: { PATH = "/custom/path", DEBUG = "1" }
     
     -- Default callbacks (all no-ops by default)
     on_close = function(term) end,

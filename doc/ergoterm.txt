@@ -359,6 +359,14 @@ terminal_defaults.clear_env ~
     
     Use clean environment for terminal jobs.
 
+                                                               *ergoterm-env*
+terminal_defaults.env ~
+    Default: `nil`
+    Type: `table<string, string>`
+
+    Environment variables to pass to terminal jobs.
+    Example: `{ PATH = "/custom/path", DEBUG = "1" }`
+
 **picker** - Picker configuration:
 
                                                              *ergoterm-picker*
