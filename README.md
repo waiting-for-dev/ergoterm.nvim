@@ -6,11 +6,11 @@ A Neovim plugin for seamless terminal workflow integration. Smart picker-based t
 
 ## Features
 
-- **Flexible terminal creation** - Spawn terminals with your preferred layout (split, float, tab, etc.)
-- **Smart terminal selection** - Pick from active terminals using your favorite picker (Telescope, fzf-lua, or built-in)
-- **Seamless text sending** - Send code, commands, or selections directly to any terminal
-- **Saved terminals** - Reuse terminal configurations across Neovim sessions
-- **Powerful API** - Extensive Lua API for custom workflows and integrations
+- 🚀 **Flexible terminal creation** - Spawn terminals with your preferred layout (split, float, tab, etc.)
+- 🎯 **Smart terminal selection** - Pick from active terminals using your favorite picker (Telescope, fzf-lua, or built-in)
+- 📤 **Seamless text sending** - Send code, commands, or selections directly to any terminal
+- 💾 **Saved terminals** - Reuse terminal configurations across Neovim sessions
+- ⚡ **Powerful API** - Extensive Lua API for custom workflows and integrations
 
 ## Installation
 
