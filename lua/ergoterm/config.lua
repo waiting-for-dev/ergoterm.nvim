@@ -37,34 +37,34 @@ M.NULL_CALLBACK = function(...) end
 ---@field col? number
 
 ---@class TerminalDefaults
----@field auto_scroll boolean
----@field clear_env boolean
----@field close_on_job_exit boolean
----@field layout layout
----@field float_opts FloatOpts
----@field float_winblend number
----@field on_close on_close
----@field on_create on_create
----@field on_focus on_focus
----@field on_job_exit on_job_exit
----@field on_job_stdout on_job_stdout
----@field on_job_stderr on_job_stderr
----@field on_open on_open
----@field on_stop on_stop
----@field on_start on_start
----@field persist_mode boolean
----@field shell string|fun():string
----@field selectable boolean
----@field start_in_insert boolean
+---@field auto_scroll boolean?
+---@field clear_env boolean?
+---@field close_on_job_exit boolean?
+---@field layout layout?
+---@field float_opts FloatOpts?
+---@field float_winblend number?
+---@field on_close on_close?
+---@field on_create on_create?
+---@field on_focus on_focus?
+---@field on_job_exit on_job_exit?
+---@field on_job_stdout on_job_stdout?
+---@field on_job_stderr on_job_stderr?
+---@field on_open on_open?
+---@field on_stop on_stop?
+---@field on_start on_start?
+---@field persist_mode boolean?
+---@field shell string|fun():string?
+---@field selectable boolean?
+---@field start_in_insert boolean?
 
 ---@class PickerConfig
----@field picker PickerOption
----@field select_actions table<string, PickerCallbackDefinition>
----@field extra_select_actions table<string, PickerCallbackDefinition>
+---@field picker PickerOption?
+---@field select_actions table<string, PickerCallbackDefinition>?
+---@field extra_select_actions table<string, PickerCallbackDefinition>?
 
 ---@class ErgoTermConfig
----@field terminal_defaults TerminalDefaults
----@field picker PickerConfig
+---@field terminal_defaults TerminalDefaults?
+---@field picker PickerConfig?
 
 ---@type ErgoTermConfig
 local config = {
