@@ -305,7 +305,7 @@ term:send({"echo hello", "ls -la"}, { action = "visible" })
 term:send("visual_selection", { action = "silent" })
 
 -- Send with custom formatting
-term:send({"print('hello')"}, { trim = false, decorator = "markdown_decorator" })
+term:send({"print('hello')"}, { trim = false, decorator = "markdown_code" })
 ```
 
 **Input types:**
