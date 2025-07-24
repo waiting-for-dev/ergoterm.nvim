@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Allow updating the `close_on_job_exit` setting from the `:TermUpdate` command.
 - Allow creating a terminal with all other boolean settings.
+- Recompute directory on `term:start()`.
 
 ## [0.1.1] - 2025-07-23
 

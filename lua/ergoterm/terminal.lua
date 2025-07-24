@@ -288,6 +288,7 @@ end
 ---@return self for method chaining
 function Terminal:start()
   if not self:is_started() then
+    self._state.dir = self:_initialize_dir()
     self._state.bufnr = vim.api.nvim_create_buf(false, false)
     vim.api.nvim_buf_call(self._state.bufnr, function()
       self._state.job_id = self:_start_job()
