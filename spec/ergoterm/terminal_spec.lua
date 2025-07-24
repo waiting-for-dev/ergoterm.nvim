@@ -900,6 +900,26 @@ describe(":start", function()
     assert.is_true(aucmds[1].buffer == bufnr)
     assert.is_true(aucmds[1].group_name == "ErgoTermBuffer")
   end)
+
+  it("recomputes dir on start", function()
+    local original_termopen = vim.fn.termopen
+    local original_cwd = vim.loop.cwd
+    vim.fn.termopen = function(_, _) return 1 end
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.loop.cwd = function() return "/initial/dir" end
+
+    local term = terms.Terminal:new({})
+
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.loop.cwd = function() return "/changed/dir" end
+
+    term:start()
+
+    assert.equal("/changed/dir", term:get_state("dir"))
+
+    vim.fn.termopen = original_termopen
+    vim.loop.cwd = original_cwd
+  end)
 end)
 
 describe(":is_started", function()
