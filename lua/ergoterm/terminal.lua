@@ -20,11 +20,13 @@ local utils = lazy.require("ergoterm.utils")
 
 ---@class State
 ---@field last_focused Terminal? Last focused terminal
+---@field last_focused_selectable Terminal? Last selectable focused terminal
 ---@field ids number[] All session terminal ids, even when deleted
 ---@field terminals Terminal[] All terminals
 ---@field universal_selection boolean Whether to ignore selectable flag in selection and last focused
 M._state = {
   last_focused = nil,
+  last_focused_selectable = nil,
   ids = {},
   terminals = {},
   universal_selection = false
@@ -44,12 +46,16 @@ end
 
 ---Returns the most recently focused terminal
 ---
----Tracks the last terminal that received focus through the `focus()` method.
----Useful for operations that should target the previously active terminal.
+---If `universal_selection` is enabled, returns the last focused terminal regardless
+---of its `selectable` flag. Otherwise, returns the last focused terminal that is `selectable`.
 ---
 ---@return Terminal? the last focused terminal, or nil if none have been focused
 function M.get_last_focused()
-  return M._state.last_focused
+  if M._state.universal_selection then
+    return M._state.last_focused
+  else
+    return M._state.last_focused_selectable
+  end
 end
 
 ---Returns all terminals in the current session
@@ -456,6 +462,9 @@ function Terminal:delete(with_close)
   if M._state.last_focused == self then
     M._state.last_focused = nil
   end
+  if M._state.last_focused_selectable == self then
+    M._state.last_focused_selectable = nil
+  end
   M._state.terminals[self.id] = nil
 end
 
@@ -729,8 +738,9 @@ end
 
 ---@private
 function Terminal:_set_last_focused()
-  if M._state.universal_selection or self.selectable then
-    M._state.last_focused = self
+  M._state.last_focused = self
+  if self.selectable then
+    M._state.last_focused_selectable = self
   end
   return self
 end

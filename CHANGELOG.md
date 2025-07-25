@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Allow last focused non selectable terminal to be focused when universal selection is turned on.
+
 ## [0.1.2] - 2025-07-24
 
 - Allow updating the `close_on_job_exit` setting from the `:TermUpdate` command.

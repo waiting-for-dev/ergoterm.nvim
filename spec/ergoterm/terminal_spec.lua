@@ -39,34 +39,23 @@ describe(".get_focused", function()
 end)
 
 describe(".get_last_focused", function()
-  it("returns last focused terminal", function()
-    local term = terms.Terminal:new()
-    term:focus()
-    term:close()
-
-    assert.equal(
-      terms.get_last_focused(),
-      term
-    )
-  end)
-
-  it("ignores non selectable terminals", function()
+  it("returns last focused selectable terminal when universal selection is disabled", function()
     local term1 = terms.Terminal:new({ selectable = false })
     local term2 = terms.Terminal:new()
     term2:focus()
-    term1:close()
+    term1:focus()
 
     local result = terms.get_last_focused()
 
     assert.equal(result, term2)
   end)
 
-  it("includes non selectable terminals when universal selection is enabled", function()
+  it("returns last focused terminal regardless of selectable option when universal selection is enabled", function()
     local term1 = terms.Terminal:new({ selectable = false })
     local term2 = terms.Terminal:new()
     term2:focus()
-    terms.toggle_universal_selection()
     term1:focus()
+    terms.toggle_universal_selection()
 
     local result = terms.get_last_focused()
 
@@ -75,16 +64,7 @@ describe(".get_last_focused", function()
     terms.toggle_universal_selection()
   end)
 
-  it("returns currently focused terminal", function()
-    local term = terms.Terminal:new()
-    term:focus()
-
-    local result = terms.get_last_focused()
-
-    assert.equal(result, term)
-  end)
-
-  it("returns nil when no terminals exist", function()
+  it("returns nil when no terminal has been focused", function()
     assert.is_nil(
       terms.get_last_focused()
     )
