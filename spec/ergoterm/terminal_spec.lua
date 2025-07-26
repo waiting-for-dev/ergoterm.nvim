@@ -1896,6 +1896,82 @@ describe(":on_term_close", function()
   end)
 end)
 
+describe(":on_vim_resized", function()
+  it("updates state with new computed float options", function()
+    local original_lines = vim.o.lines
+    local original_columns = vim.o.columns
+    vim.o.lines = 40
+    vim.o.columns = 80
+
+    local term = terms.Terminal:new({ layout = "float", float_opts = { width = 60, height = 30 } })
+    term:open("float")
+
+    -- Change screen size
+    vim.o.lines = 50
+    vim.o.columns = 100
+
+    term:on_vim_resized()
+
+    local new_float_opts = term:get_state("float_opts")
+    assert.equal(math.ceil((50 - 30)) * 0.5 - 1, new_float_opts.row)
+    assert.equal(math.ceil((100 - 60)) * 0.5 - 1, new_float_opts.col)
+
+    vim.o.lines = original_lines
+    vim.o.columns = original_columns
+  end)
+
+  it("applies new computed float options to the window", function()
+    local original_lines = vim.o.lines
+    local original_columns = vim.o.columns
+    vim.o.lines = 40
+    vim.o.columns = 80
+
+    local term = terms.Terminal:new({ layout = "float", float_opts = { width = 60, height = 30 } })
+    term:open("float")
+    local spy_win_set_config = spy.on(vim.api, "nvim_win_set_config")
+
+    -- Change screen size
+    vim.o.lines = 50
+    vim.o.columns = 100
+
+    term:on_vim_resized()
+
+    assert.spy(spy_win_set_config).was_called_with(term:get_state("window"), match.is_table())
+
+    vim.o.lines = original_lines
+    vim.o.columns = original_columns
+  end)
+
+  it("does nothing if layout is not float", function()
+    local term = terms.Terminal:new({ layout = "below" })
+    term:open("below")
+    local spy_win_set_config = spy.on(vim.api, "nvim_win_set_config")
+
+    term:on_vim_resized()
+
+    assert.spy(spy_win_set_config).was_not_called()
+  end)
+end)
+
+describe(":_setup_buffer_autocommands", function()
+  it("adds a VimResized autocommand", function()
+    local term = terms.Terminal:new()
+
+    term:start()
+
+    local bufnr = term:get_state("bufnr")
+    local aucmds = vim.api.nvim_get_autocmds({
+      event = "VimResized",
+      buffer = bufnr,
+      group = "ErgoTermBuffer",
+    })
+
+    assert.is_true(#aucmds > 0)
+    assert.is_true(aucmds[1].buffer == bufnr)
+    assert.is_true(aucmds[1].group_name == "ErgoTermBuffer")
+  end)
+end)
+
 describe(":get_state", function()
   it("returns the given key in the state of the terminal", function()
     local term = terms.Terminal:new()
