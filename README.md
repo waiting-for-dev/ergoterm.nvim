@@ -100,7 +100,7 @@ When using fzf-lua or Telescope, additional keybindings are available in the pic
 - `<Ctrl-t>` - Open in new tab
 - `<Ctrl-f>` - Open in floating window
 
-These keybindings can be customized through the `picker.select_actions` and `picker.extra_select_actions` configuration options (see [Configuration](#-configuration) section).
+These keybindings can be customized through the `picker.select_actions` and `picker.extra_select_actions` configuration options (see [Configuration](#️-configuration) section).
 
 ### 📤 Sending Text to Terminals
 
