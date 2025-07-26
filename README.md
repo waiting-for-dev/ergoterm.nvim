@@ -241,6 +241,9 @@ All options default to values from your configuration:
 - `on_stop` - Called when the terminal job process stops. Receives the terminal instance as its only argument
 - `persist_mode` - Remember terminal mode between visits
 - `selectable` - Include terminal in selection picker and allow as last focused (can be overridden by universal selection mode)
+- `size` - Size configuration for different window layouts (table with `above`, `below`, `left`, `right` keys)
+  - Each direction accepts either a string with percentage (e.g., `"30%"`) or a number for absolute size
+  - Example: `{ below = 20, right = "40%" }` - 20 lines high for below splits, 40% width for right splits
 - `start_in_insert` - Start terminal in insert mode
 
 ## ⚡ API Overview
@@ -427,6 +430,14 @@ require("ergoterm").setup({
     -- Floating window transparency
     float_winblend = 10,
     
+    -- Size configuration for different layouts
+    size = {
+      below = "50%",   -- 50% of screen height
+      above = "50%",   -- 50% of screen height
+      left = "50%",    -- 50% of screen width
+      right = "50%"    -- 50% of screen width
+    },
+
     -- Clean job environment
     clear_env = false,
 

@@ -50,6 +50,14 @@ describe("config.set", function()
     assert.equal(config.get("terminal_defaults.float_opts").width, 123)
   end)
 
+  it("allows setting size configuration", function()
+    ---@diagnostic disable: missing-fields
+    config.set({ terminal_defaults = { size = { below = 25, right = "75%" } } })
+
+    assert.equal(config.get("terminal_defaults.size").below, 25)
+    assert.equal(config.get("terminal_defaults.size").right, "75%")
+  end)
+
   it("allows setting picker configuration", function()
     ---@diagnostic disable: missing-fields
     config.set({ picker = { picker = "telescope" } })

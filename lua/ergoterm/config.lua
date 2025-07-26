@@ -36,6 +36,12 @@ M.NULL_CALLBACK = function(...) end
 ---@field row? number
 ---@field col? number
 
+---@class SizeOpts
+---@field below? string|number
+---@field above? string|number
+---@field left? string|number
+---@field right? string|number
+
 ---@class TerminalDefaults
 ---@field auto_scroll boolean?
 ---@field clear_env boolean?
@@ -55,6 +61,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field persist_mode boolean?
 ---@field shell string|fun():string?
 ---@field selectable boolean?
+---@field size SizeOpts?
 ---@field start_in_insert boolean?
 
 ---@class PickerConfig
@@ -84,6 +91,12 @@ local config = {
     float_winblend = 10,
     persist_mode = false,
     selectable = true,
+    size = {
+      below = "50%",
+      above = "50%",
+      left = "50%",
+      right = "50%"
+    },
     on_close = M.NULL_CALLBACK,
     on_create = M.NULL_CALLBACK,
     on_focus = M.NULL_CALLBACK,

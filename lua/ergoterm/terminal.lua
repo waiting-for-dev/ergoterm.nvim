@@ -179,6 +179,12 @@ function M.reset_ids()
   M._state.ids = {}
 end
 
+---@class ComputedSizeOpts
+---@field below number
+---@field above number
+---@field left number
+---@field right number
+
 ---@class TerminalState
 ---@field bufnr number?
 ---@field dir? string
@@ -189,6 +195,7 @@ end
 ---@field on_job_exit on_job_exit
 ---@field on_job_stdout on_job_stdout
 ---@field on_job_stderr on_job_stderr
+---@field size ComputedSizeOpts
 ---@field tabpage number?
 ---@field window number?
 
@@ -214,6 +221,7 @@ end
 ---@field on_start on_start?
 ---@field persist_mode boolean? whether or not to persist the mode of the terminal on return
 ---@field selectable boolean? whether or not the terminal is visible in picker selections and can be last focused
+---@field size SizeOpts? size configuration for different layouts
 ---@field start_in_insert boolean?
 
 ---@class Terminal : TermCreateArgs
@@ -243,6 +251,7 @@ function Terminal:new(args)
   term.float_winblend = term.float_winblend or config.get("terminal_defaults.float_winblend")
   term.persist_mode = vim.F.if_nil(term.persist_mode, config.get("terminal_defaults.persist_mode"))
   term.selectable = vim.F.if_nil(term.selectable, config.get("terminal_defaults.selectable"))
+  term.size = vim.tbl_deep_extend("keep", term.size or {}, config.get("terminal_defaults.size")) --@type SizeOpts
   term.start_in_insert = vim.F.if_nil(term.start_in_insert, config.get("terminal_defaults.start_in_insert"))
   term.on_close = vim.F.if_nil(term.on_close, config.get("terminal_defaults.on_close"))
   term.on_create = vim.F.if_nil(term.on_create, config.get("terminal_defaults.on_create"))
@@ -262,14 +271,16 @@ end
 ---Updates terminal configuration after creation
 ---
 ---Most options can be changed, but 'cmd' and 'dir' are immutable after creation.
----Float options are merged with existing values rather than replaced entirely.
+---Float and size options are merged with existing values rather than replaced entirely.
 ---
 ---@param opts TermCreateArgs configuration changes to apply
 ---@return Terminal? self for method chaining, or nil on error
 function Terminal:update(opts)
-  if opts.float_opts then
-    self.float_opts = vim.tbl_deep_extend("keep", opts.float_opts, self.float_opts)
-    opts.float_opts = nil
+  for _, key in ipairs({ "float_opts", "size" }) do
+    if opts[key] then
+      self[key] = vim.tbl_deep_extend("keep", opts[key], self[key])
+      opts[key] = nil
+    end
   end
   for k, v in pairs(opts) do
     if k == "cmd" or k == "dir" then
@@ -339,13 +350,13 @@ function Terminal:open(layout)
     local current_win = vim.api.nvim_get_current_win()
     local computed_layout = layout or self._state.layout
     if computed_layout == "above" then
-      vim.cmd("split")
+      vim.cmd(self._state.size.above .. "split")
     elseif computed_layout == "below" then
-      vim.cmd("botright split")
+      vim.cmd("botright " .. self._state.size.below .. "split")
     elseif computed_layout == "left" then
-      vim.cmd("vsplit")
+      vim.cmd(self._state.size.left .. "vsplit")
     elseif computed_layout == "right" then
-      vim.cmd("botright vsplit")
+      vim.cmd("botright " .. self._state.size.right .. "vsplit")
     elseif computed_layout == "tab" then
       vim.cmd("tabnew")
       vim.bo.bufhidden = "wipe"
@@ -675,6 +686,7 @@ function Terminal:_initialize_state()
     on_job_exit = self:_initialize_exit_handler(self.on_job_exit),
     on_job_stdout = self:_initialize_output_handler(self.on_job_stdout),
     on_job_stderr = self:_initialize_output_handler(self.on_job_stderr),
+    size = self:_initialize_size(),
     tabpage = nil,
     window = nil
   }
@@ -687,6 +699,7 @@ function Terminal:_recompute_state()
   self._state.on_job_exit = self:_initialize_exit_handler(self.on_job_exit)
   self._state.on_job_stdout = self:_initialize_output_handler(self.on_job_stdout)
   self._state.on_job_stderr = self:_initialize_output_handler(self.on_job_stderr)
+  self._state.size = self:_initialize_size()
 end
 
 ---@private
@@ -715,6 +728,24 @@ function Terminal:_initialize_float_opts()
   float_opts.row = float_opts.row or math.ceil(vim.o.lines - float_opts.height) * 0.5 - 1
   float_opts.col = float_opts.col or math.ceil(vim.o.columns - float_opts.width) * 0.5 - 1
   return float_opts
+end
+
+---@private
+function Terminal:_initialize_size()
+  local size = {}
+  for direction, value in pairs(self.size) do
+    if type(value) == "string" and value:match("%%$") then
+      local percentage = tonumber(value:match("(%d+)%%"))
+      if direction == "below" or direction == "above" then
+        size[direction] = math.ceil(vim.o.lines * percentage / 100)
+      else
+        size[direction] = math.ceil(vim.o.columns * percentage / 100)
+      end
+    else
+      size[direction] = value
+    end
+  end
+  return size
 end
 
 ---@private

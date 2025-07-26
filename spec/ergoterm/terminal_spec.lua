@@ -465,6 +465,31 @@ describe(":new", function()
     assert.is_true(term.selectable)
   end)
 
+  it("takes size option", function()
+    local term = terms.Terminal:new({ size = { below = 20, right = "30%" } })
+
+    assert.equal(20, term.size.below)
+    assert.equal("30%", term.size.right)
+  end)
+
+  it("defaults to config's size", function()
+    local term = terms.Terminal:new()
+
+    assert.equal("50%", term.size.below)
+    assert.equal("50%", term.size.above)
+    assert.equal("50%", term.size.left)
+    assert.equal("50%", term.size.right)
+  end)
+
+  it("merges size with defaults for non-given options", function()
+    local term = terms.Terminal:new({ size = { below = 20 } })
+
+    assert.equal(20, term.size.below)
+    assert.equal("50%", term.size.above)
+    assert.equal("50%", term.size.left)
+    assert.equal("50%", term.size.right)
+  end)
+
   it("takes on_close option", function()
     local foo = nil
 
@@ -697,6 +722,37 @@ describe(":new", function()
     assert.equal(10, term:get_state("float_opts").col)
   end)
 
+  it("initializes size with numeric values", function()
+    local term = terms.Terminal:new({ size = { below = 20, right = 30 } })
+
+    assert.equal(20, term:get_state("size").below)
+    assert.equal(30, term:get_state("size").right)
+  end)
+
+  it("initializes size with percentage values for vertical layouts", function()
+    local original_lines = vim.o.lines
+    vim.o.lines = 40
+
+    local term = terms.Terminal:new({ size = { below = "25%", above = "75%" } })
+
+    assert.equal(10, term:get_state("size").below)
+    assert.equal(30, term:get_state("size").above)
+
+    vim.o.lines = original_lines
+  end)
+
+  it("initializes size with percentage values for horizontal layouts", function()
+    local original_columns = vim.o.columns
+    vim.o.columns = 80
+
+    local term = terms.Terminal:new({ size = { left = "25%", right = "75%" } })
+
+    assert.equal(20, term:get_state("size").left)
+    assert.equal(60, term:get_state("size").right)
+
+    vim.o.columns = original_columns
+  end)
+
   it("initializes on_job_exit so it calls provided on_job_exit", function()
     local foo = nil
     local term = terms.Terminal:new({ on_job_exit = function() foo = "foo" end })
@@ -756,6 +812,15 @@ describe(":update", function()
     term:update({ float_opts = { width = 200 } })
 
     assert.equal(1, term:get_state("float_opts").height)
+  end)
+
+  it("doesn't override size that are not-given options", function()
+    local term = terms.Terminal:new({ size = { below = 20, right = "30%" } })
+
+    term:update({ size = { below = 25 } })
+
+    assert.equal(25, term.size.below)
+    assert.equal("30%", term.size.right)
   end)
 
   it("recomputes on_job_exit", function()

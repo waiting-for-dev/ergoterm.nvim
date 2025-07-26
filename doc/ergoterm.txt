@@ -338,6 +338,32 @@ terminal_defaults.selectable ~
     Note: This setting can be temporarily overridden by enabling universal
     selection mode with |ergoterm-termtoggleuniversalselection|.
 
+                                                               *ergoterm-size*
+terminal_defaults.size ~
+    Default: See below
+    Type: `table`
+
+    Size configuration for different window layouts: >lua
+        size = {
+          below = "50%",
+          above = "50%", 
+          left = "50%",
+          right = "50%"
+        }
+
+
+    Each direction accepts either:
+    • String with percentage (e.g., "30%") - Percentage of screen dimension
+    • Number - Absolute size in lines (for above/below) or columns (for left/right)
+
+    Examples: >lua
+        size = {
+          below = 20,      -- 20 lines high
+          right = "40%",   -- 40% of screen width
+          float = "80%"    -- Not used, floats use float_opts instead
+        }
+
+
                                                          *ergoterm-float_opts*
 terminal_defaults.float_opts ~
     Default: See below
