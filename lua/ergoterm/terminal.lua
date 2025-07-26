@@ -262,7 +262,7 @@ function Terminal:new(args)
   term.on_open = vim.F.if_nil(term.on_open, config.get("terminal_defaults.on_open"))
   term.on_start = vim.F.if_nil(term.on_start, config.get("terminal_defaults.on_start"))
   term.on_stop = vim.F.if_nil(term.on_stop, config.get("terminal_defaults.on_stop"))
-  term.id = M._initialize_id()
+  term.id = M._compute_id()
   term:_initialize_state()
   term:_add_to_state()
   return term
@@ -305,7 +305,7 @@ end
 ---@return self for method chaining
 function Terminal:start()
   if not self:is_started() then
-    self._state.dir = self:_initialize_dir()
+    self._state.dir = self:_compute_dir()
     self._state.bufnr = vim.api.nvim_create_buf(false, false)
     vim.api.nvim_buf_call(self._state.bufnr, function()
       self._state.job_id = self:_start_job()
@@ -649,7 +649,7 @@ function Terminal:_set_options()
 end
 
 ---@private
-function M._initialize_id()
+function M._compute_id()
   return #M._state.ids + 1
 end
 
@@ -660,14 +660,14 @@ function Terminal:_add_to_state()
 end
 
 ---@private
-function Terminal:_initialize_exit_handler(callback)
+function Terminal:_compute_exit_handler(callback)
   return function(job, exit_code, event)
     callback(self, job, exit_code, event)
   end
 end
 
 ---@private
-function Terminal:_initialize_output_handler(callback)
+function Terminal:_compute_output_handler(callback)
   return function(channel_id, data, name)
     if self.auto_scroll then self:_scroll_bottom() end
     callback(self, channel_id, data, name)
@@ -678,32 +678,31 @@ end
 function Terminal:_initialize_state()
   self._state = {
     bufnr = nil,
-    dir = self:_initialize_dir(),
+    dir = self:_compute_dir(),
     layout = self.layout,
-    float_opts = self:_initialize_float_opts(),
+    float_opts = self:_compute_float_opts(),
     job_id = nil,
     mode = mode.get_initial(self.start_in_insert),
-    on_job_exit = self:_initialize_exit_handler(self.on_job_exit),
-    on_job_stdout = self:_initialize_output_handler(self.on_job_stdout),
-    on_job_stderr = self:_initialize_output_handler(self.on_job_stderr),
-    size = self:_initialize_size(),
+    on_job_exit = self:_compute_exit_handler(self.on_job_exit),
+    on_job_stdout = self:_compute_output_handler(self.on_job_stdout),
+    on_job_stderr = self:_compute_output_handler(self.on_job_stderr),
+    size = self:_compute_size(),
     tabpage = nil,
     window = nil
   }
 end
 
----@private
 function Terminal:_recompute_state()
   self._state.mode = mode.get_initial(self.start_in_insert)
   self._state.layout = self.layout
-  self._state.on_job_exit = self:_initialize_exit_handler(self.on_job_exit)
-  self._state.on_job_stdout = self:_initialize_output_handler(self.on_job_stdout)
-  self._state.on_job_stderr = self:_initialize_output_handler(self.on_job_stderr)
-  self._state.size = self:_initialize_size()
+  self._state.on_job_exit = self:_compute_exit_handler(self.on_job_exit)
+  self._state.on_job_stdout = self:_compute_output_handler(self.on_job_stdout)
+  self._state.on_job_stderr = self:_compute_output_handler(self.on_job_stderr)
+  self._state.size = self:_compute_size()
 end
 
 ---@private
-function Terminal:_initialize_dir()
+function Terminal:_compute_dir()
   local dir = nil
   if self.dir == "git_dir" then
     dir = utils.git_dir()
@@ -722,7 +721,7 @@ function Terminal:_initialize_dir()
 end
 
 ---@private
-function Terminal:_initialize_float_opts()
+function Terminal:_compute_float_opts()
   local float_opts = self.float_opts or {}
   float_opts.title = float_opts.title or self.name
   float_opts.row = float_opts.row or math.ceil(vim.o.lines - float_opts.height) * 0.5 - 1
@@ -731,7 +730,7 @@ function Terminal:_initialize_float_opts()
 end
 
 ---@private
-function Terminal:_initialize_size()
+function Terminal:_compute_size()
   local size = {}
   for direction, value in pairs(self.size) do
     if type(value) == "string" and value:match("%%$") then
