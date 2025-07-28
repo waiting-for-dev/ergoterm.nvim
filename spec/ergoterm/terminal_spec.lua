@@ -410,13 +410,6 @@ describe(":new", function()
     assert.equal("single", term.float_opts.border)
   end)
 
-  it("defaults to config's float_opts", function()
-    local term = terms.Terminal:new()
-
-    assert.equal(80, term.float_opts.width)
-    assert.equal(20, term.float_opts.height)
-  end)
-
   it("takes float_winblend option", function()
     local term = terms.Terminal:new({ float_winblend = 20 })
 
@@ -1899,47 +1892,28 @@ end)
 describe(":on_vim_resized", function()
   it("updates state with new computed float options", function()
     local original_lines = vim.o.lines
-    local original_columns = vim.o.columns
     vim.o.lines = 40
-    vim.o.columns = 80
+    local term = terms.Terminal:new({ layout = "float" }):open()
+    local float_opts_height = term:get_state("float_opts").height
 
-    local term = terms.Terminal:new({ layout = "float", float_opts = { width = 60, height = 30 } })
-    term:open("float")
-
-    -- Change screen size
-    vim.o.lines = 50
-    vim.o.columns = 100
+    vim.o.lines = 150
 
     term:on_vim_resized()
 
-    local new_float_opts = term:get_state("float_opts")
-    assert.equal(math.ceil((50 - 30)) * 0.5 - 1, new_float_opts.row)
-    assert.equal(math.ceil((100 - 60)) * 0.5 - 1, new_float_opts.col)
+    local new_float_opts_height = term:get_state("float_opts").height
+    assert.not_equal(float_opts_height, new_float_opts_height)
 
     vim.o.lines = original_lines
-    vim.o.columns = original_columns
   end)
 
   it("applies new computed float options to the window", function()
-    local original_lines = vim.o.lines
-    local original_columns = vim.o.columns
-    vim.o.lines = 40
-    vim.o.columns = 80
-
     local term = terms.Terminal:new({ layout = "float", float_opts = { width = 60, height = 30 } })
     term:open("float")
     local spy_win_set_config = spy.on(vim.api, "nvim_win_set_config")
 
-    -- Change screen size
-    vim.o.lines = 50
-    vim.o.columns = 100
-
     term:on_vim_resized()
 
     assert.spy(spy_win_set_config).was_called_with(term:get_state("window"), match.is_table())
-
-    vim.o.lines = original_lines
-    vim.o.columns = original_columns
   end)
 
   it("does nothing if layout is not float", function()

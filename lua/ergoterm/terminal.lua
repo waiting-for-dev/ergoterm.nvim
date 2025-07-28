@@ -614,6 +614,17 @@ function Terminal:on_term_close()
   vim.schedule(function() self:delete(self.close_on_job_exit) end)
 end
 
+---Handles Vim resize events for the terminal
+---
+---Updates the floating window configuration if the terminal is in float layout.
+function Terminal:on_vim_resized()
+  if self._state.layout == "float" then
+    local float_opts = self:_compute_float_opts()
+    self._state.float_opts = float_opts
+    vim.api.nvim_win_set_config(self._state.window, float_opts)
+  end
+end
+
 ---Accesses internal terminal state
 ---
 ---Primarily used for debugging and testing.
@@ -722,8 +733,10 @@ end
 
 ---@private
 function Terminal:_compute_float_opts()
-  local float_opts = self.float_opts or {}
+  local float_opts = vim.tbl_deep_extend("keep", {}, self.float_opts or {})
   float_opts.title = float_opts.title or self.name
+  float_opts.height = float_opts.height or math.ceil(math.min(vim.o.lines, math.max(20, vim.o.lines - 5)))
+  float_opts.width = float_opts.width or math.ceil(math.min(vim.o.columns, math.max(80, vim.o.columns - 10)))
   float_opts.row = float_opts.row or math.ceil(vim.o.lines - float_opts.height) * 0.5 - 1
   float_opts.col = float_opts.col or math.ceil(vim.o.columns - float_opts.width) * 0.5 - 1
   return float_opts
@@ -809,6 +822,11 @@ function Terminal:_setup_buffer_autocommands()
     buffer = self._state.bufnr,
     group = group,
     callback = function() self:on_term_close() end
+  })
+  vim.api.nvim_create_autocmd("VimResized", {
+    buffer = self._state.bufnr,
+    group = group,
+    callback = function() self:on_vim_resized() end
   })
 end
 
