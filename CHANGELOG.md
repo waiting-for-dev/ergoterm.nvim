@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 - Allow last focused non selectable terminal to be focused when universal selection is turned on.
 - Add `size` option for split layouts, accepting both numeric and percentage values.
 - Make floating terminals resize
+- Add `sticky` option for terminals visible from the picker even if not started.
+- BREAKING: Rename `term:delete()` to `term:cleanup()` and `terms.delete_all()` to `terms.cleanup_all()`.
 
 ## [0.1.2] - 2025-07-24
 

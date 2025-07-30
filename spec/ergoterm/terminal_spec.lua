@@ -7,7 +7,7 @@ local mode = require("ergoterm.mode")
 local test_helpers = require("test_helpers")
 
 after_each(function()
-  terms.delete_all()
+  terms.cleanup_all({ close = true, force = true })
   terms.reset_ids()
 end)
 
@@ -191,7 +191,60 @@ describe(".select", function()
     ---@diagnostic enable: need-check-nil
   end)
 
-  it("excludes terminals with selectable=false from picker", function()
+  it("includes started terminals with selectable=true from picler", function()
+    local picker = {
+      select = function(terminals, prompt, callbacks)
+        return { terminals, prompt, callbacks }
+      end
+    }
+    local term = terms.Terminal:new({ selectable = true }):start()
+    local callbacks = {}
+
+    local result = terms.select(picker, "prompt", callbacks)
+
+    ---@diagnostic disable: need-check-nil
+    assert.equal(1, #result[1])
+    assert.is_true(vim.tbl_contains(result[1], term))
+    ---@diagnostic enable: need-check-nil
+  end)
+
+  it("excludes non-started terminals with selectable=true from picler", function()
+    local picker = {
+      select = function(terminals, prompt, callbacks)
+        return { terminals, prompt, callbacks }
+      end
+    }
+    local term1 = terms.Terminal:new({ selectable = true }):start()
+    local term2 = terms.Terminal:new({ selectable = true })
+    local callbacks = {}
+
+    local result = terms.select(picker, "prompt", callbacks)
+
+    ---@diagnostic disable: need-check-nil
+    assert.equal(1, #result[1])
+    assert.is_true(vim.tbl_contains(result[1], term1))
+    assert.is_false(vim.tbl_contains(result[1], term2))
+    ---@diagnostic enable: need-check-nil
+  end)
+
+  it("includes sticky terminals with selectable=true even when not started", function()
+    local picker = {
+      select = function(terminals, prompt, callbacks)
+        return { terminals, prompt, callbacks }
+      end
+    }
+    local term = terms.Terminal:new({ selectable = true, sticky = true })
+    local callbacks = {}
+
+    local result = terms.select(picker, "prompt", callbacks)
+
+    ---@diagnostic disable: need-check-nil
+    assert.equal(1, #result[1])
+    assert.is_true(vim.tbl_contains(result[1], term))
+    ---@diagnostic enable: need-check-nil
+  end)
+
+  it("excludes started terminals with selectable=false from picker", function()
     local picker = {
       select = function(terminals, prompt, callbacks)
         return { terminals, prompt, callbacks }
@@ -207,6 +260,25 @@ describe(".select", function()
     assert.equal(1, #result[1])
     assert.is_true(vim.tbl_contains(result[1], visible_term))
     assert.is_false(vim.tbl_contains(result[1], hidden_term))
+    ---@diagnostic enable: need-check-nil
+  end)
+
+  it("excludes sticky terminals with selectable=false from picker", function()
+    local picker = {
+      select = function(terminals, prompt, callbacks)
+        return { terminals, prompt, callbacks }
+      end
+    }
+    local started_term = terms.Terminal:new({ selectable = true }):start()
+    local sticky_term = terms.Terminal:new({ selectable = false, sticky = true })
+    local callbacks = {}
+
+    local result = terms.select(picker, "prompt", callbacks)
+
+    ---@diagnostic disable: need-check-nil
+    assert.equal(1, #result[1])
+    assert.is_true(vim.tbl_contains(result[1], started_term))
+    assert.is_false(vim.tbl_contains(result[1], sticky_term))
     ---@diagnostic enable: need-check-nil
   end)
 
@@ -247,11 +319,11 @@ describe(".select", function()
   end)
 end)
 
-describe(".delete_all", function()
-  it("deletes all terminals", function()
+describe(".cleanup_all", function()
+  it("cleans up all terminals", function()
     local term = terms.Terminal:new()
 
-    terms.delete_all()
+    terms.cleanup_all()
 
     assert.is_nil(terms.get(term.id))
   end)
@@ -259,8 +331,38 @@ describe(".delete_all", function()
   it("stops any running terminals", function()
     local term = terms.Terminal:new():start()
 
-    terms.delete_all()
+    terms.cleanup_all()
 
+    assert.is_nil(terms.get(term.id))
+  end)
+
+  it("does not remove sticky terminals from session unless force is true", function()
+    local regular_term = terms.Terminal:new()
+    local sticky_term = terms.Terminal:new({ sticky = true })
+
+    terms.cleanup_all()
+
+    assert.is_nil(terms.get(regular_term.id))
+    assert.is_not_nil(terms.get(sticky_term.id))
+  end)
+
+  it("removes sticky terminals from session when force is true", function()
+    local regular_term = terms.Terminal:new()
+    local sticky_term = terms.Terminal:new({ sticky = true })
+
+    terms.cleanup_all({ force = true })
+
+    assert.is_nil(terms.get(regular_term.id))
+    assert.is_nil(terms.get(sticky_term.id))
+  end)
+
+  it("passes close option to individual terminals", function()
+    local term = terms.Terminal:new()
+    term:open()
+
+    terms.cleanup_all({ close = false })
+
+    assert.is_true(term:is_open())
     assert.is_nil(terms.get(term.id))
   end)
 end)
@@ -309,7 +411,7 @@ end)
 describe(".reset_ids", function()
   it("resets sequence of terminal ids", function()
     local term1 = terms.Terminal:new()
-    term1:delete()
+    term1:cleanup()
 
     terms.reset_ids()
     local term2 = terms.Terminal:new()
@@ -456,6 +558,18 @@ describe(":new", function()
     local term = terms.Terminal:new()
 
     assert.is_true(term.selectable)
+  end)
+
+  it("takes sticky option", function()
+    local term = terms.Terminal:new({ sticky = true })
+
+    assert.is_true(term.sticky)
+  end)
+
+  it("defaults to config's sticky", function()
+    local term = terms.Terminal:new()
+
+    assert.is_false(term.sticky)
   end)
 
   it("takes size option", function()
@@ -626,9 +740,9 @@ describe(":new", function()
     assert.equal(2, term2.id)
   end)
 
-  it("doesn't build deleted terminal ids", function()
+  it("doesn't build cleaned up terminal ids", function()
     local term1 = terms.Terminal:new()
-    term1:delete()
+    term1:cleanup()
     local term2 = terms.Terminal:new()
 
     assert.equal(2, term2.id)
@@ -867,6 +981,13 @@ describe(":update", function()
     assert.equal("Cannot change dir after terminal creation", result.msg)
     assert.equal("error", result.level)
     ---@diagnostic enable: need-check-nil
+  end)
+
+  it("updates sticky option", function()
+    local term = terms.Terminal:new({ sticky = false })
+    term:update({ sticky = true })
+
+    assert.is_true(term.sticky)
   end)
 end)
 
@@ -1325,7 +1446,7 @@ describe(":stop", function()
     assert.is_false(term:is_open())
   end)
 
-  it("closes the terminal if open when with_close is true", function()
+  it("closes the terminal if open when close is true", function()
     local term = terms.Terminal:new()
     term:open()
 
@@ -1334,7 +1455,7 @@ describe(":stop", function()
     assert.is_false(term:is_open())
   end)
 
-  it("does not close the terminal if open when with_close is false", function()
+  it("does not close the terminal if open when close is false", function()
     local term = terms.Terminal:new()
     term:open()
 
@@ -1403,12 +1524,12 @@ describe(":is_stopped", function()
   end)
 end)
 
-describe(":delete", function()
+describe(":cleanup", function()
   it("stops the terminal if started", function()
     local term = terms.Terminal:new()
     term:start()
 
-    term:delete()
+    term:cleanup()
 
     assert.is_true(term:is_stopped())
   end)
@@ -1417,26 +1538,26 @@ describe(":delete", function()
     local term = terms.Terminal:new()
     term:open()
 
-    term:delete()
+    term:cleanup()
 
     assert.is_false(term:is_open())
   end)
 
-  it("closes the terminal window when with_close is true", function()
+  it("closes the terminal window when close is true", function()
     local term = terms.Terminal:new()
     term:open()
 
-    term:delete(true)
+    term:cleanup({ close = true })
 
     assert.is_false(term:is_open())
   end)
 
-  it("does not close the terminal window when with_close is false", function()
+  it("does not close the terminal window when close is false", function()
     local term = terms.Terminal:new()
     term:open()
 
     local spy_termclose = spy.on(term, "close")
-    term:delete(false)
+    term:cleanup({ close = false })
 
     assert.spy(spy_termclose).was_not_called()
   end)
@@ -1444,8 +1565,34 @@ describe(":delete", function()
   it("removes the terminal from the state", function()
     local term = terms.Terminal:new()
 
-    term:delete()
+    term:cleanup()
 
+    assert.is_nil(terms.get(term.id))
+  end)
+
+  it("does not remove sticky terminals from state unless force is true", function()
+    local term = terms.Terminal:new({ sticky = true })
+
+    term:cleanup()
+
+    assert.is_not_nil(terms.get(term.id))
+  end)
+
+  it("removes sticky terminals from state when force is true", function()
+    local term = terms.Terminal:new({ sticky = true })
+
+    term:cleanup({ force = true })
+
+    assert.is_nil(terms.get(term.id))
+  end)
+
+  it("accepts table argument with close option", function()
+    local term = terms.Terminal:new()
+    term:open()
+
+    term:cleanup({ close = false })
+
+    assert.is_true(term:is_open())
     assert.is_nil(terms.get(term.id))
   end)
 
@@ -1453,7 +1600,7 @@ describe(":delete", function()
     local term = terms.Terminal:new()
     term:focus()
 
-    term:delete()
+    term:cleanup()
 
     assert.is_nil(terms.get_last_focused())
   end)
@@ -1515,6 +1662,7 @@ describe(":send", function()
   it("sends text using selection type", function()
     local text_selector = require("ergoterm.text_selector")
     local original_select = text_selector.select
+    --- @diagnostic disable-next-line: duplicate-set-field
     text_selector.select = function(selection_type)
       assert.equal("single_line", selection_type)
       return { "selected text" }
@@ -1843,7 +1991,7 @@ describe(":on_win_leave", function()
 end)
 
 describe(":on_term_close", function()
-  it("deletes the terminal", function()
+  it("cleans up the terminal", function()
     local term = terms.Terminal:new()
     local original_schedule = vim.schedule
     ---@diagnostic disable-next-line: duplicate-set-field

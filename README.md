@@ -77,6 +77,7 @@ Create new terminals with `:TermNew` and customize them with options:
 - `persist_mode` - Remember terminal mode between visits (default: `false`)
 - `selectable` - Show in selection picker and allow as last focused (default: `true`)
 - `start_in_insert` - Start terminal in insert mode (default: `true`)
+- `sticky` - Keep terminals visible in picker even when stopped (requires `selectable` to also be `true`) (default: `false`)
 - `close_on_job_exit` - Close terminal window when process exits (default: `true`)
 
 ### 🎯 Selecting Terminals
@@ -241,6 +242,7 @@ All options default to values from your configuration:
 - `on_stop` - Called when the terminal job process stops. Receives the terminal instance as its only argument
 - `persist_mode` - Remember terminal mode between visits
 - `selectable` - Include terminal in selection picker and allow as last focused (can be overridden by universal selection mode)
+- `sticky` - Keep terminal visible in picker even when stopped (requires `selectable` to also be `true`)
 - `size` - Size configuration for different window layouts (table with `above`, `below`, `left`, `right` keys)
   - Each direction accepts either a string with percentage (e.g., `"30%"`) or a number for absolute size
   - Example: `{ below = 20, right = "40%" }` - 20 lines high for below splits, 40% width for right splits
@@ -282,7 +284,7 @@ term:open()   -- Just create the window (calls start() if needed)
 - `focus(layout?)` - Brings terminal into focus, cascades through start/open
 - `close()` - Closes window but keeps job running
 - `stop()` - Terminates job and cleans up buffer
-- `delete()` - Permanently removes terminal from session
+- `cleanup()` - Cleans up terminal resources
 - `toggle(layout?)` - Closes if open, focuses if closed
 - `send(input, opts)` - Sends text to terminal with various behaviors
 
@@ -419,6 +421,9 @@ require("ergoterm").setup({
     -- Show terminals in picker by default
     selectable = true,
     
+    -- Keep terminals visible in picker even when stopped, provided `selectable` is also true
+    sticky = false,
+
     -- Floating window options
     float_opts = {
       title_pos = "left",

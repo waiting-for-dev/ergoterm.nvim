@@ -45,7 +45,9 @@ end
 
 function M.previewer:populate_preview_buf(entry_str)
   local entry = self:parse_entry(entry_str)
-  self:set_preview_buf(entry.bufnr)
+  if entry.bufnr then
+    self:set_preview_buf(entry.bufnr)
+  end
   self.win:update_preview_title(" " .. entry.name .. " (" .. entry.layout .. ") ")
 end
 

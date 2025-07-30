@@ -63,6 +63,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field selectable boolean?
 ---@field size SizeOpts?
 ---@field start_in_insert boolean?
+---@field sticky boolean?
 
 ---@class PickerConfig
 ---@field picker PickerOption?
@@ -89,6 +90,7 @@ local config = {
     float_winblend = 10,
     persist_mode = false,
     selectable = true,
+    sticky = false,
     size = {
       below = "50%",
       above = "50%",

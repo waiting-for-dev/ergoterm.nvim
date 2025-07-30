@@ -21,7 +21,7 @@ local utils = lazy.require("ergoterm.utils")
 ---@class State
 ---@field last_focused Terminal? Last focused terminal
 ---@field last_focused_selectable Terminal? Last selectable focused terminal
----@field ids number[] All session terminal ids, even when deleted
+---@field ids number[] All used session terminal ids, even when deleted from session
 ---@field terminals Terminal[] All terminals
 ---@field universal_selection boolean Whether to ignore selectable flag in selection and last focused
 M._state = {
@@ -120,8 +120,9 @@ end
 
 ---Presents a picker interface for terminal selection
 ---
----Only shows started terminals with `selectable=true`, unless universal_selection is enabled.
----If universal_selection is true, shows all started terminals regardless of selectable flag.
+---Shows started terminals plus sticky terminals regardless of their state, as long as `selectable`
+---is `true` for them.
+---If universal_selection is enabled, shows all terminals regardless of selectable flag.
 ---If no terminals are available, displays an info notification instead of opening the picker.
 ---
 ---@param picker Picker the picker implementation to use
@@ -129,22 +130,25 @@ end
 ---@param callbacks table<string, PickerCallbackDefinition> actions to execute on terminal selection
 ---@return any result from the picker, or nil if no terminals available
 function M.select(picker, prompt, callbacks)
-  local terminals = M.filter(function(term)
-    ---@diagnostic disable-next-line: return-type-mismatch
-    return term:is_started() and (M._state.universal_selection or term.selectable)
-  end)
+  local terminals = M._state.universal_selection and M.get_all() or M._find_selectable_terminals_for_picker()
   if #terminals == 0 then return utils.notify("No ergoterms have been started yet", "info") end
   return picker.select(terminals, prompt, callbacks)
 end
 
----Removes all terminals from the session
+---@class CleanupOptions
+---@field close? boolean whether to close terminal window when stopping (default: true)
+---@field force? boolean whether to force removal of sticky terminals from the session (default: false)
+
+---Cleans up all terminals in the current session
 ---
----Automatically closes windows and stops jobs for all terminals before deletion.
 ---This is a destructive operation that cannot be undone.
-function M.delete_all()
+---
+---@param opts? CleanupOptions options for cleanup
+function M.cleanup_all(opts)
+  opts = opts or {}
   local terminals = M.get_all()
   for _, term in ipairs(terminals) do
-    term:delete()
+    term:cleanup(opts)
   end
 end
 
@@ -177,6 +181,14 @@ end
 ---testing.
 function M.reset_ids()
   M._state.ids = {}
+end
+
+---@private
+function M._find_selectable_terminals_for_picker()
+  return M.filter(function(term)
+    ---@diagnostic disable-next-line: return-type-mismatch
+    return term.selectable and (term:is_started() or term.sticky)
+  end)
 end
 
 ---@class ComputedSizeOpts
@@ -223,6 +235,7 @@ end
 ---@field selectable boolean? whether or not the terminal is visible in picker selections and can be last focused
 ---@field size SizeOpts? size configuration for different layouts
 ---@field start_in_insert boolean?
+---@field sticky boolean? whether or not the terminal remains visible in picker even when stopped
 
 ---@class Terminal : TermCreateArgs
 ---@field id number
@@ -253,6 +266,7 @@ function Terminal:new(args)
   term.selectable = vim.F.if_nil(term.selectable, config.get("terminal_defaults.selectable"))
   term.size = vim.tbl_deep_extend("keep", term.size or {}, config.get("terminal_defaults.size")) --@type SizeOpts
   term.start_in_insert = vim.F.if_nil(term.start_in_insert, config.get("terminal_defaults.start_in_insert"))
+  term.sticky = vim.F.if_nil(term.sticky, config.get("terminal_defaults.sticky"))
   term.on_close = vim.F.if_nil(term.on_close, config.get("terminal_defaults.on_close"))
   term.on_create = vim.F.if_nil(term.on_create, config.get("terminal_defaults.on_create"))
   term.on_focus = vim.F.if_nil(term.on_focus, config.get("terminal_defaults.on_focus"))
@@ -436,11 +450,11 @@ end
 ---windows. Triggers the `on_stop` callback. The terminal can be restarted
 ---later with `start()`.
 ---
----@param with_close? boolean whether to close the terminal window (default: true)
+---@param close? boolean whether to close the terminal window (default: true)
 ---@return Terminal self for method chaining
-function Terminal:stop(with_close)
-  with_close = vim.F.if_nil(with_close, true)
-  if with_close and self:is_open() then self:close() end
+function Terminal:stop(close)
+  close = vim.F.if_nil(close, true)
+  if close and self:is_open() then self:close() end
   if self:is_started() then
     self:on_stop()
     vim.fn.jobstop(self._state.job_id)
@@ -459,16 +473,20 @@ function Terminal:is_stopped()
   return self._state.job_id == nil
 end
 
----Permanently removes the terminal from the session
+---Cleans up the terminal and optionally deletes it from the session
 ---
----Stops the terminal if running and removes it from the module's terminal
----registry. This is irreversible - the terminal instance becomes unusable
----after deletion.
+---Always stops the terminal if running and cleans up resources. For sticky terminals,
+---only deletes from the session registry if force is true, otherwise they remain
+---available for future use. Non-sticky terminals are always deleted from the session.
 ---
----@param with_close? boolean whether to close the terminal window when stopping (default: true)
-function Terminal:delete(with_close)
+---@param opts? CleanupOptions options for cleanup
+function Terminal:cleanup(opts)
+  opts = opts or {}
+  local close = vim.F.if_nil(opts.close, true)
+  local force = vim.F.if_nil(opts.force, false)
+
   if not self:is_stopped() then
-    self:stop(with_close)
+    self:stop(close)
   end
   if M._state.last_focused == self then
     M._state.last_focused = nil
@@ -476,7 +494,9 @@ function Terminal:delete(with_close)
   if M._state.last_focused_selectable == self then
     M._state.last_focused_selectable = nil
   end
-  M._state.terminals[self.id] = nil
+  if not self.sticky or force then
+    M._state.terminals[self.id] = nil
+  end
 end
 
 ---Toggles terminal window visibility
@@ -499,7 +519,7 @@ end
 ---@field action? "interactive"|"visible"|"silent" terminal interaction mode (default: "interactive")
 ---@field trim? boolean remove leading/trailing whitespace (default: true)
 ---@field new_line? boolean append newline for command execution (default: true)
----@field decorator? fun(text: string[]): string[]|string transform text before sending
+---@field decorator? string | fun(text: string[]): string[] transform text before sending
 
 ---Sends text input to the terminal job
 ---
@@ -605,13 +625,13 @@ end
 
 ---Handles terminal close events
 ---
----Automatically deletes the terminal instance when the underlying terminal
+---Automatically cleans up the ergoterm instance when the underlying terminal
 ---process exits.
 ---
 ---Respects the `close_on_job_exit` setting to determine whether
 ---to close the terminal window.
 function Terminal:on_term_close()
-  vim.schedule(function() self:delete(self.close_on_job_exit) end)
+  vim.schedule(function() self:cleanup({ close = self.close_on_job_exit }) end)
 end
 
 ---Handles Vim resize events for the terminal

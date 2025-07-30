@@ -33,6 +33,7 @@ function M.new(args)
     persist_mode = { parsed.persist_mode, "boolean", true },
     selectable = { parsed.selectable, "boolean", true },
     start_in_insert = { parsed.start_in_insert, "boolean", true },
+    sticky = { parsed.sticky, "boolean", true },
     close_on_job_exit = { parsed.close_on_job_exit, "boolean", true },
   })
   return terms.Terminal:new({
@@ -44,6 +45,7 @@ function M.new(args)
     persist_mode = parsed.persist_mode,
     selectable = parsed.selectable,
     start_in_insert = parsed.start_in_insert,
+    sticky = parsed.sticky,
     close_on_job_exit = parsed.close_on_job_exit,
   }):focus()
 end
@@ -145,6 +147,7 @@ function M.update(args, bang, picker)
     persist_mode = { parsed.persist_mode, "boolean", true },
     selectable = { parsed.selectable, "boolean", true },
     start_in_insert = { parsed.start_in_insert, "boolean", true },
+    sticky = { parsed.sticky, "boolean", true },
     close_on_job_exit = { parsed.close_on_job_exit, "boolean", true },
   })
   local update_terminal = function(t)

@@ -26,6 +26,7 @@ local p = {
 ---@field persist_mode boolean?
 ---@field selectable boolean?
 ---@field start_in_insert boolean?
+---@field sticky boolean?
 ---@field close_on_job_exit boolean?
 ---@field text string?
 ---@field trailing string?
@@ -63,6 +64,7 @@ function M.parse(args)
       persist_mode = true,
       selectable = true,
       start_in_insert = true,
+      sticky = true,
       close_on_job_exit = true,
     }
 
@@ -217,6 +219,8 @@ M._all_options = {
 
   start_in_insert = M._boolean_options,
 
+  sticky = M._boolean_options,
+
   close_on_job_exit = M._boolean_options,
 }
 
@@ -229,6 +233,7 @@ M._term_new_options = {
   persist_mode = M._all_options.persist_mode,
   selectable = M._all_options.selectable,
   start_in_insert = M._all_options.start_in_insert,
+  sticky = M._all_options.sticky,
   close_on_job_exit = M._all_options.close_on_job_exit,
 }
 
@@ -239,6 +244,7 @@ M._term_update_options = {
   persist_mode = M._all_options.persist_mode,
   selectable = M._all_options.selectable,
   start_in_insert = M._all_options.start_in_insert,
+  sticky = M._all_options.sticky,
   close_on_job_exit = M._all_options.close_on_job_exit,
 }
 

@@ -129,6 +129,7 @@ Options:
     persist_mode={boolean}      Remember terminal mode between visits (default: false)
     selectable={boolean}        Show in selection picker and allow as last focused (default: true)
     start_in_insert={boolean}   Start terminal in insert mode (default: true)
+    sticky={boolean}            Keep terminal visible in picker even when stopped (default: false)
     close_on_job_exit={boolean} Close terminal window when process exits (default: true)
 
 Available layouts:
@@ -238,6 +239,7 @@ Updatable options:
     selectable={boolean}         Show in selection picker and allow as last focused
                                  (can be overridden by universal selection mode)
     start_in_insert={boolean}    Start in insert mode
+    sticky={boolean}             Keep terminal visible in picker even when stopped
     close_on_job_exit={boolean}  Close terminal window when job exits
 
 Examples: >vim
@@ -329,7 +331,7 @@ terminal_defaults.start_in_insert ~
 terminal_defaults.selectable ~
     Default: `true`
     Type: `boolean`
-    
+
     Show terminals in picker selection and allow as last focused by default.
     When set to false, the terminal:
     • Is not visible from the picker
@@ -337,6 +339,18 @@ terminal_defaults.selectable ~
 
     Note: This setting can be temporarily overridden by enabling universal
     selection mode with |ergoterm-termtoggleuniversalselection|.
+
+                                                            *ergoterm-sticky*
+terminal_defaults.sticky ~
+    Default: `false`
+    Type: `boolean`
+
+    Keep terminals visible in picker even when stopped. When set to true,
+    the terminal remains available for selection in pickers regardless of
+    whether it has been started or stopped, as long as `selectable` is also true.
+    This is useful for persistent terminal configurations that you want to
+    access quickly even when not currently running.
+
 
                                                                *ergoterm-size*
 terminal_defaults.size ~
@@ -444,7 +458,7 @@ picker.extra_select_actions ~
 
     Example: >lua
         extra_select_actions = {
-          ["<C-d>"] = { fn = function(term) term:delete() end, desc = "Delete terminal" },
+          ["<C-d>"] = { fn = function(term) term:cleanup() end, desc = "Cleans up terminal" },
           ["<C-r>"] = { fn = function(term) term:stop(); term:start() end, desc = "Restart terminal" }
         }
 
@@ -604,19 +618,25 @@ Terminal:close()                                        *Terminal:close()*
     Close terminal window but keep job running.
     Terminal can be reopened later.
 
-Terminal:stop({with_close})                             *Terminal:stop()*
+Terminal:stop({close})                             *Terminal:stop()*
     Terminate job process and clean up buffer.
     Terminal can be restarted later.
 
     Parameters:
-        {with_close} - boolean, whether to close the terminal window (default: true)
+        {close} - boolean, whether to close the terminal window (default: true)
 
-Terminal:delete({with_close})                           *Terminal:delete()*
-    Permanently remove terminal from session.
-    This is irreversible.
+Terminal:cleanup({opts})                                *Terminal:cleanup()*
+
+    Cleans up the terminal and optionally removes it from the session.
+    Always stops the terminal if running and cleans up resources. For sticky
+    terminals, only removes from the session registry if force is true,
+    otherwise they remain available for future use. Non-sticky terminals
+    are always removed from the session.
 
     Parameters:
-        {with_close} - boolean, whether to close the terminal window when stopping (default: true)
+        {opts} - table with cleanup options
+          close - boolean, whether to close the terminal window when stopping (default: true)
+          force - boolean, whether to force removal of sticky terminals from the session (default: false)
 
 Terminal:toggle({layout})                               *Terminal:toggle()*
     Close if open, focus if closed. Convenient show/hide toggle.
@@ -689,8 +709,9 @@ require("ergoterm.terminal").filter({predicate})                 *ergoterm.filte
 require("ergoterm.terminal").select({picker}, {prompt}, {callbacks}) *ergoterm.select()*
     Present picker interface for terminal selection.
 
-require("ergoterm.terminal").delete_all()                        *ergoterm.delete_all()*
-    Remove all terminals from session (destructive).
+require("ergoterm.terminal").cleanup_all()                       *ergoterm.cleanup_all()*
+    Clean up all terminals. Non-sticky terminals are removed from the session,
+    while sticky terminals are only removed if force option is true.
 
 require("ergoterm.terminal").toggle_universal_selection()         *ergoterm.toggle_universal_selection()*
     Toggle universal selection mode. Returns the new state (boolean).

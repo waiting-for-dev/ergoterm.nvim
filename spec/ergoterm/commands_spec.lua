@@ -5,7 +5,7 @@ local terms = require("ergoterm.terminal")
 local test_helpers = require("test_helpers")
 
 after_each(function()
-  terms.delete_all()
+  terms.cleanup_all({ close = true, force = true })
   terms.reset_ids()
 end)
 
@@ -152,8 +152,23 @@ describe("M.new", function()
     assert.is_false(term.close_on_job_exit)
   end)
 
+  it("creates a new terminal with sticky=false by default", function()
+    local term = commands.new("")
+
+    assert.is_not_nil(term)
+    assert.is_false(term.sticky)
+  end)
+
+  it("creates a new terminal with the given sticky option", function()
+    local term = commands.new("sticky=true")
+
+    assert.is_not_nil(term)
+    assert.is_true(term.sticky)
+  end)
+
   it("creates a new terminal with multiple configuration options", function()
-    local term = commands.new("layout=float auto_scroll=false persist_mode=true selectable=false start_in_insert=false close_on_job_exit=false")
+    local term = commands.new(
+    "layout=float auto_scroll=false persist_mode=true selectable=false start_in_insert=false sticky=true close_on_job_exit=false")
 
     assert.is_not_nil(term)
     assert.equal("float", term:get_state("layout"))
@@ -161,6 +176,7 @@ describe("M.new", function()
     assert.is_true(term.persist_mode)
     assert.is_false(term.selectable)
     assert.is_false(term.start_in_insert)
+    assert.is_true(term.sticky)
     assert.is_false(term.close_on_job_exit)
   end)
 end)
@@ -489,6 +505,14 @@ describe("M.update", function()
     commands.update("close_on_job_exit=false", false, select_only_picker)
 
     assert.is_false(term.close_on_job_exit)
+  end)
+
+  it("updates sticky option", function()
+    local term = terms.Terminal:new():start()
+
+    commands.update("sticky=true", false, select_only_picker)
+
+    assert.is_true(term.sticky)
   end)
 
   it("uses last focused terminal when called with the bang option", function()
