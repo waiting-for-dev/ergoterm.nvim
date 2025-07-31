@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-07-31
+
 - Allow last focused non selectable terminal to be focused when universal selection is turned on.
 - Add `size` option for split layouts, accepting both numeric and percentage values.
 - Make floating terminals resize
