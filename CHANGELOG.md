@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Fixed vim-ui-select picker not working as expected
+
 ## [0.2.0] - 2025-07-31
 
 - Allow last focused non selectable terminal to be focused when universal selection is turned on.

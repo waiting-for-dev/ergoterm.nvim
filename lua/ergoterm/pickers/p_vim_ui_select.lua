@@ -6,7 +6,7 @@ function M.select(terminals, prompt, callbacks)
     prompt = prompt,
     format_item = function(term) return term.id .. ": " .. term.name end,
   }, function(term)
-    callbacks.default(term)
+    callbacks.default.fn(term)
   end)
 end
 
