@@ -565,6 +565,35 @@ Example: >lua
     vim.keymap.set("n", "<leader>ss", function() server:toggle() end)
 <
 
+Project-Specific Terminals with .nvim.lua ~
+
+For project-specific terminal configurations, create a `.nvim.lua` file in your
+project root. This is especially useful with the `sticky` option to keep
+project terminals available even when stopped: >lua
+
+    local terms = require("ergoterm.terminal")
+    local term = require("ergoterm.terminal").Terminal
+
+    term:new({
+      name = "Phoenix Server",
+      cmd = "iex -S mix phx.server",
+      layout = "right",
+      sticky = true,
+      close_on_job_exit = false
+    })
+
+    term:new({
+      name = "DB Console",
+      cmd = "psql -U postgres my_database",
+      layout = "below",
+      sticky = true
+    })
+
+With `sticky = true`, these terminals remain visible in the picker
+(`:TermSelect`) even when stopped, making it easy to restart your development
+environment. The terminals are automatically loaded when you open the project
+in Neovim.
+
 All terminal creation options are available for standalone terminals.
 See |ergoterm-options| for the complete list.
 

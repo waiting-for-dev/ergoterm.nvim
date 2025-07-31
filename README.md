@@ -215,6 +215,31 @@ vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end, { desc = "Ope
 vim.keymap.set("n", "<leader>ai", function() aider:toggle() end, { desc = "Open aider" })
 ```
 
+### 📁 Project-Specific Terminals with `.nvim.lua`
+
+For project-specific terminal configurations, you can leverage a `.nvim.lua` file in your project root. This is especially useful with the `sticky` option to keep project terminals available even when stopped:
+
+```lua
+local term = require("ergoterm.terminal").Terminal
+
+term:new({
+  name = "Phoenix Server",
+  cmd = "iex -S mix phx.server",
+  layout = "right",
+  sticky = true,
+  close_on_job_exit = false
+})
+
+term:new({
+  name = "DB Console",
+  cmd = "psql -U postgres my_database",
+  layout = "below",
+  sticky = true
+})
+```
+
+With `sticky = true`, these terminals remain visible in the picker (`:TermSelect`) even when stopped, making it easy to restart your development environment. The terminals are automatically loaded when you open the project in Neovim.
+
 ### 🔧 Available Options
 
 All options default to values from your configuration:
