@@ -207,7 +207,8 @@ local aider = terms.Terminal:new({
   cmd = "aider",
   layout = "right",
   dir = "git_dir",
-  selectable = false
+  selectable = false,
+  auto_scroll = false
 })
 
 -- Map to keybindings for quick access
@@ -383,7 +384,8 @@ local aider = terms.Terminal:new({
   cmd = "aider",
   layout = "right",
   dir = "git_dir",
-  selectable = false
+  selectable = false,
+  auto_scroll = false
 })
 
 local map = vim.keymap.set

@@ -834,7 +834,8 @@ Example integration with Aider for AI-assisted development: >lua
       cmd = "aider",
       layout = "right", 
       dir = "git_dir",
-      selectable = false
+      selectable = false,
+      auto_scroll = false
     })
     
     local map = vim.keymap.set
