@@ -430,7 +430,7 @@ describe(":new", function()
   it("defaults to config's auto_scroll", function()
     local term = terms.Terminal:new()
 
-    assert.is_true(term.auto_scroll)
+    assert.is_false(term.auto_scroll)
   end)
 
   it("takes cmd option", function()

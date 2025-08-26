@@ -301,7 +301,7 @@ terminal_defaults.layout ~
 
                                                         *ergoterm-auto_scroll*
 terminal_defaults.auto_scroll ~
-    Default: `true`
+    Default: `false`
     Type: `boolean`
     
     Automatically scroll terminal output to bottom.

@@ -77,7 +77,7 @@ M.NULL_CALLBACK = function(...) end
 ---@type ErgoTermConfig
 local config = {
   terminal_defaults = {
-    auto_scroll = true,
+    auto_scroll = false,
     clear_env = false,
     close_on_job_exit = true,
     layout = "below",

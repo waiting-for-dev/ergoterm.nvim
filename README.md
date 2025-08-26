@@ -73,7 +73,7 @@ Create new terminals with `:TermNew` and customize them with options:
 - `dir` - Working directory (default: current directory)
   - Accepts absolute paths (`/home/user/project`), relative paths (`~/my-project`, `./subdir`), `"git_dir"` for auto-detected git repository root, or `nil` for current directory
 - `cmd` - Shell command to run (default: system shell)
-- `auto_scroll` - Automatically scroll terminal output to bottom (default: `true`)
+- `auto_scroll` - Automatically scroll terminal output to bottom (default: `false`)
 - `persist_mode` - Remember terminal mode between visits (default: `false`)
 - `selectable` - Show in selection picker and allow as last focused (default: `true`)
 - `start_in_insert` - Start terminal in insert mode (default: `true`)
@@ -434,7 +434,7 @@ require("ergoterm").setup({
     layout = "below",
     
     -- Auto-scroll terminal output
-    auto_scroll = true,
+    auto_scroll = false,
     
     -- Close terminal window when job exits
     close_on_job_exit = true,

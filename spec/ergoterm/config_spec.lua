@@ -40,7 +40,7 @@ describe("config.set", function()
     assert.equal(config.get("terminal_defaults.layout"), "left")
     assert.is_false(config.get("terminal_defaults.auto_scroll"))
 
-    config.set({ terminal_defaults = { layout = old_layout, auto_scroll = true } })
+    config.set({ terminal_defaults = { layout = old_layout, auto_scroll = false } })
   end)
 
   it("merges deeply into nested tables", function()

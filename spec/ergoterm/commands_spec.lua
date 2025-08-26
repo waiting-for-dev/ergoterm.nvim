@@ -82,11 +82,11 @@ describe("M.new", function()
     assert.is_true(term:is_focused())
   end)
 
-  it("creates a new terminal with auto_scroll=true by default", function()
+  it("creates a new terminal with auto_scroll=false by default", function()
     local term = commands.new("")
 
     assert.is_not_nil(term)
-    assert.is_true(term.auto_scroll)
+    assert.is_false(term.auto_scroll)
   end)
 
   it("creates a new terminal with the given auto_scroll option", function()
@@ -168,7 +168,7 @@ describe("M.new", function()
 
   it("creates a new terminal with multiple configuration options", function()
     local term = commands.new(
-    "layout=float auto_scroll=false persist_mode=true selectable=false start_in_insert=false sticky=true close_on_job_exit=false")
+      "layout=float auto_scroll=false persist_mode=true selectable=false start_in_insert=false sticky=true close_on_job_exit=false")
 
     assert.is_not_nil(term)
     assert.equal("float", term:get_state("layout"))

@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- BREAKING: `auto_scroll` is off by default now.
 - Fixed vim-ui-select picker not working as expected
 
 ## [0.2.0] - 2025-07-31
