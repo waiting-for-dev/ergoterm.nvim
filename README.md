@@ -316,7 +316,8 @@ term:open()   -- Just create the window (calls start() if needed)
 
 ### 🔍 State Queries
 
-- `is_started()` - Has active buffer and job
+- `is_started()` - Job is running
+- `is_active()` - Has active buffer
 - `is_open()` - Has visible window
 - `is_focused()` - Is currently active window
 - `is_stopped()` - Job has been terminated

@@ -1093,6 +1093,45 @@ describe(":is_started", function()
 
     assert.is_false(term:is_started())
   end)
+
+  it("returns false if terminal job is stopped", function()
+    local term = terms.Terminal:new():start()
+    term:stop()
+    vim.wait(100)
+
+    assert.is_false(term:is_started())
+  end)
+end)
+
+describe(":is_active", function()
+  it("returns true if terminal has active buffer", function()
+    local term = terms.Terminal:new():start()
+
+    assert.is_true(term:is_active())
+  end)
+
+  it("returns false if terminal has no buffer", function()
+    local term = terms.Terminal:new()
+
+    assert.is_false(term:is_active())
+  end)
+
+  it("returns false if terminal is stopped", function()
+    local term = terms.Terminal:new():start()
+    term:stop()
+    vim.wait(100)
+
+    assert.is_false(term:is_active())
+  end)
+
+  it("returns false if terminal buffer is deleted", function()
+    local term = terms.Terminal:new():start()
+    local bufnr = term:get_state("bufnr")
+
+    vim.api.nvim_buf_delete(bufnr, { force = true })
+
+    assert.is_false(term:is_active())
+  end)
 end)
 
 describe(":open", function()

@@ -698,7 +698,10 @@ Terminal:update({opts})                                 *Terminal:update()*
 7.3 State Queries                                          *ergoterm-queries*
 
 Terminal:is_started()                                   *Terminal:is_started()*
-    Returns true if terminal has active buffer and job.
+    Returns true if terminal job is running.
+
+Terminal:is_active()                                    *Terminal:is_active()*
+    Returns true if terminal has active buffer.
 
 Terminal:is_open()                                      *Terminal:is_open()*
     Returns true if terminal has visible window.

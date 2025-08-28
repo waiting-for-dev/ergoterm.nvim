@@ -186,7 +186,7 @@ end
 function M._find_selectable_terminals_for_picker()
   return M.filter(function(term)
     ---@diagnostic disable-next-line: return-type-mismatch
-    return term.selectable and (term:is_started() or term.sticky)
+    return term.selectable and (term:is_active() or term.sticky)
   end)
 end
 
@@ -331,11 +331,17 @@ end
 
 ---Checks if the terminal job is running
 ---
----A started terminal has an active buffer and job process, but may not have
----a visible window.
----
 ---@return boolean true if the terminal job is active
 function Terminal:is_started()
+  return self._state.job_id ~= nil
+end
+
+---Checks if the terminal has an active buffer
+---
+---An active terminal has a valid buffer, but the job may not be running.
+---
+---@return boolean true if the terminal has a valid buffer
+function Terminal:is_active()
   return self._state.bufnr ~= nil and vim.api.nvim_buf_is_valid(self._state.bufnr)
 end
 
