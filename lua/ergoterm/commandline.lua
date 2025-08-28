@@ -27,7 +27,7 @@ local p = {
 ---@field selectable boolean?
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
----@field close_on_job_exit boolean?
+---@field cleanup_on_job_exit boolean?
 ---@field text string?
 ---@field trailing string?
 
@@ -65,7 +65,7 @@ function M.parse(args)
       selectable = true,
       start_in_insert = true,
       sticky = true,
-      close_on_job_exit = true,
+      cleanup_on_job_exit = true
     }
 
     for _, part in ipairs(vim.split(args, " ")) do
@@ -221,7 +221,7 @@ M._all_options = {
 
   sticky = M._boolean_options,
 
-  close_on_job_exit = M._boolean_options,
+  cleanup_on_job_exit = M._boolean_options
 }
 
 M._term_new_options = {
@@ -234,7 +234,7 @@ M._term_new_options = {
   selectable = M._all_options.selectable,
   start_in_insert = M._all_options.start_in_insert,
   sticky = M._all_options.sticky,
-  close_on_job_exit = M._all_options.close_on_job_exit,
+  cleanup_on_job_exit = M._all_options.cleanup_on_job_exit
 }
 
 M._term_update_options = {
@@ -245,7 +245,7 @@ M._term_update_options = {
   selectable = M._all_options.selectable,
   start_in_insert = M._all_options.start_in_insert,
   sticky = M._all_options.sticky,
-  close_on_job_exit = M._all_options.close_on_job_exit,
+  cleanup_on_job_exit = M._all_options.cleanup_on_job_exit,
 }
 
 M._term_send_options = {

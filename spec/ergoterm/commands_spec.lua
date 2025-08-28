@@ -138,18 +138,11 @@ describe("M.new", function()
     assert.is_false(term.start_in_insert)
   end)
 
-  it("creates a new terminal with close_on_job_exit=true by default", function()
+  it("creates a new terminal with cleanup_on_job_exit=true by default", function()
     local term = commands.new("")
 
     assert.is_not_nil(term)
-    assert.is_true(term.close_on_job_exit)
-  end)
-
-  it("creates a new terminal with the given close_on_job_exit option", function()
-    local term = commands.new("close_on_job_exit=false")
-
-    assert.is_not_nil(term)
-    assert.is_false(term.close_on_job_exit)
+    assert.is_true(term.cleanup_on_job_exit)
   end)
 
   it("creates a new terminal with sticky=false by default", function()
@@ -168,7 +161,7 @@ describe("M.new", function()
 
   it("creates a new terminal with multiple configuration options", function()
     local term = commands.new(
-      "layout=float auto_scroll=false persist_mode=true selectable=false start_in_insert=false sticky=true close_on_job_exit=false")
+      "layout=float auto_scroll=false persist_mode=true selectable=false start_in_insert=false sticky=true cleanup_on_job_exit=false")
 
     assert.is_not_nil(term)
     assert.equal("float", term:get_state("layout"))
@@ -177,7 +170,7 @@ describe("M.new", function()
     assert.is_false(term.selectable)
     assert.is_false(term.start_in_insert)
     assert.is_true(term.sticky)
-    assert.is_false(term.close_on_job_exit)
+    assert.is_false(term.cleanup_on_job_exit)
   end)
 end)
 
@@ -497,14 +490,6 @@ describe("M.update", function()
     commands.update("start_in_insert=false", false, select_only_picker)
 
     assert.is_false(term.start_in_insert)
-  end)
-
-  it("updates close_on_job_exit option", function()
-    local term = terms.Terminal:new():start()
-
-    commands.update("close_on_job_exit=false", false, select_only_picker)
-
-    assert.is_false(term.close_on_job_exit)
   end)
 
   it("updates sticky option", function()

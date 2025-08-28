@@ -136,7 +136,6 @@ function M.select(picker, prompt, callbacks)
 end
 
 ---@class CleanupOptions
----@field close? boolean whether to close terminal window when stopping (default: true)
 ---@field force? boolean whether to force removal of sticky terminals from the session (default: false)
 
 ---Cleans up all terminals in the current session
@@ -215,7 +214,7 @@ end
 ---@field auto_scroll boolean? whether or not to scroll down on terminal output
 ---@field cmd? string command to run in the terminal
 ---@field clear_env? boolean use clean job environment, passed to jobstart()
----@field close_on_job_exit boolean? whether or not to close the terminal window when the process exits
+---@field cleanup_on_job_exit boolean? whether or not to cleanup the terminal when the process exits
 ---@field dir string? the directory for the terminal
 ---@field layout layout? the layout to open the terminal in the first time
 ---@field env? table<string, string> environmental variables passed to jobstart()
@@ -256,7 +255,7 @@ function Terminal:new(args)
   term.auto_scroll = vim.F.if_nil(term.auto_scroll, config.get("terminal_defaults.auto_scroll"))
   term.cmd = term.cmd or config.get("terminal_defaults.shell")
   term.clear_env = vim.F.if_nil(term.clear_env, config.get("terminal_defaults.clear_env"))
-  term.close_on_job_exit = vim.F.if_nil(term.close_on_job_exit, config.get("terminal_defaults.close_on_job_exit"))
+  term.cleanup_on_job_exit = vim.F.if_nil(term.cleanup_on_job_exit, config.get("terminal_defaults.cleanup_on_job_exit"))
   term.layout = term.layout or config.get("terminal_defaults.layout")
   term.env = term.env
   term.name = term.name or term.cmd
@@ -446,15 +445,13 @@ end
 
 ---Terminates the terminal job and cleans up resources
 ---
----Stops the underlying job process, deletes the buffer, and optionally closes any open
+---Stops the underlying job process, deletes the buffer, and closes any open
 ---windows. Triggers the `on_stop` callback. The terminal can be restarted
 ---later with `start()`.
 ---
----@param close? boolean whether to close the terminal window (default: true)
 ---@return Terminal self for method chaining
-function Terminal:stop(close)
-  close = vim.F.if_nil(close, true)
-  if close and self:is_open() then self:close() end
+function Terminal:stop()
+  if self:is_open() then self:close() end
   if self:is_started() then
     self:on_stop()
     vim.fn.jobstop(self._state.job_id)
@@ -481,11 +478,10 @@ end
 ---@param opts? CleanupOptions options for cleanup
 function Terminal:cleanup(opts)
   opts = opts or {}
-  local close = vim.F.if_nil(opts.close, true)
   local force = vim.F.if_nil(opts.force, false)
 
   if not self:is_stopped() then
-    self:stop(close)
+    self:stop()
   end
   if M._state.last_focused == self then
     M._state.last_focused = nil
@@ -627,10 +623,14 @@ end
 ---Automatically cleans up the ergoterm instance when the underlying terminal
 ---process exits.
 ---
----Respects the `close_on_job_exit` setting to determine whether
----to close the terminal window.
+---Respects the `cleanup_on_job_exit` setting to determine whether
+---to cleanup the terminal when the job exits.
 function Terminal:on_term_close()
-  vim.schedule(function() self:cleanup({ close = self.close_on_job_exit }) end)
+  vim.schedule(function()
+    if self.cleanup_on_job_exit then
+      self:cleanup()
+    end
+  end)
 end
 
 ---Handles Vim resize events for the terminal

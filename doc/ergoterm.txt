@@ -130,7 +130,7 @@ Options:
     selectable={boolean}        Show in selection picker and allow as last focused (default: true)
     start_in_insert={boolean}   Start terminal in insert mode (default: true)
     sticky={boolean}            Keep terminal visible in picker even when stopped (default: false)
-    close_on_job_exit={boolean} Close terminal window when process exits (default: true)
+    cleanup_on_job_exit={boolean} Cleanup terminal when process exits (default: true)
 
 Available layouts:
     above      Horizontal split above current window
@@ -240,7 +240,7 @@ Updatable options:
                                  (can be overridden by universal selection mode)
     start_in_insert={boolean}    Start in insert mode
     sticky={boolean}             Keep terminal visible in picker even when stopped
-    close_on_job_exit={boolean}  Close terminal window when job exits
+    cleanup_on_job_exit={boolean}  Cleanup terminal when job exits
 
 Examples: >vim
     :TermUpdate layout=float
@@ -306,8 +306,8 @@ terminal_defaults.auto_scroll ~
     
     Automatically scroll terminal output to bottom.
 
-                                                   *ergoterm-close_on_job_exit*
-terminal_defaults.close_on_job_exit ~
+                                                   *ergoterm-cleanup_on_job_exit*
+terminal_defaults.cleanup_on_job_exit ~
     Default: `true`
     Type: `boolean`
     
@@ -579,7 +579,7 @@ project terminals available even when stopped: >lua
       cmd = "iex -S mix phx.server",
       layout = "right",
       sticky = true,
-      close_on_job_exit = false
+      cleanup_on_job_exit = false
     })
 
     term:new({

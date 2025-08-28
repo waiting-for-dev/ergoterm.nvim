@@ -356,13 +356,13 @@ describe(".cleanup_all", function()
     assert.is_nil(terms.get(sticky_term.id))
   end)
 
-  it("passes close option to individual terminals", function()
+  it("removes terminals from the session", function()
     local term = terms.Terminal:new()
     term:open()
 
-    terms.cleanup_all({ close = false })
+    terms.cleanup_all()
 
-    assert.is_true(term:is_open())
+    assert.is_false(term:is_open())
     assert.is_nil(terms.get(term.id))
   end)
 end)
@@ -457,16 +457,16 @@ describe(":new", function()
     assert.is_false(term.clear_env)
   end)
 
-  it("takes close_on_job_exit option", function()
-    local term = terms.Terminal:new({ close_on_job_exit = false })
+  it("takes cleanup_on_job_exit option", function()
+    local term = terms.Terminal:new({ cleanup_on_job_exit = false })
 
-    assert.is_false(term.close_on_job_exit)
+    assert.is_false(term.cleanup_on_job_exit)
   end)
 
-  it("defaults to config's close_on_job_exit", function()
+  it("defaults to config's cleanup_on_job_exit", function()
     local term = terms.Terminal:new()
 
-    assert.is_true(term.close_on_job_exit)
+    assert.is_true(term.cleanup_on_job_exit)
   end)
 
   it("takes layout option", function()
@@ -1455,14 +1455,14 @@ describe(":stop", function()
     assert.is_false(term:is_open())
   end)
 
-  it("does not close the terminal if open when close is false", function()
+  it("closes the terminal window when stopping", function()
     local term = terms.Terminal:new()
     term:open()
 
     local spy_termclose = spy.on(term, "close")
-    term:stop(false)
+    term:stop()
 
-    assert.spy(spy_termclose).was_not_called()
+    assert.spy(spy_termclose).was_called()
   end)
 
   it("runs the on_stop callback", function()
@@ -1555,14 +1555,14 @@ describe(":cleanup", function()
     assert.is_false(term:is_open())
   end)
 
-  it("does not close the terminal window when close is false", function()
+  it("closes the terminal window when cleaning up", function()
     local term = terms.Terminal:new()
     term:open()
 
     local spy_termclose = spy.on(term, "close")
-    term:cleanup({ close = false })
+    term:cleanup()
 
-    assert.spy(spy_termclose).was_not_called()
+    assert.spy(spy_termclose).was_called()
   end)
 
   it("removes the terminal from the state", function()
@@ -1589,13 +1589,13 @@ describe(":cleanup", function()
     assert.is_nil(terms.get(term.id))
   end)
 
-  it("accepts table argument with close option", function()
+  it("removes the terminal from session when cleaning up", function()
     local term = terms.Terminal:new()
     term:open()
 
-    term:cleanup({ close = false })
+    term:cleanup()
 
-    assert.is_true(term:is_open())
+    assert.is_false(term:is_open())
     assert.is_nil(terms.get(term.id))
   end)
 
@@ -2008,8 +2008,8 @@ describe(":on_term_close", function()
     vim.schedule = original_schedule
   end)
 
-  it("closes the terminal window when close_on_job_exit is true", function()
-    local term = terms.Terminal:new({ close_on_job_exit = true })
+  it("cleans up the terminal when cleanup_on_job_exit is true", function()
+    local term = terms.Terminal:new({ cleanup_on_job_exit = true })
     term:open()
     local original_schedule = vim.schedule
     ---@diagnostic disable-next-line: duplicate-set-field
@@ -2020,11 +2020,12 @@ describe(":on_term_close", function()
     term:on_term_close()
 
     assert.is_false(term:is_open())
+    assert.is_nil(terms.get(term.id))
     vim.schedule = original_schedule
   end)
 
-  it("does not close the terminal window when close_on_job_exit is false", function()
-    local term = terms.Terminal:new({ close_on_job_exit = false })
+  it("does not cleanup the terminal when cleanup_on_job_exit is false", function()
+    local term = terms.Terminal:new({ cleanup_on_job_exit = false })
     term:open()
     local original_schedule = vim.schedule
     ---@diagnostic disable-next-line: duplicate-set-field
@@ -2032,10 +2033,10 @@ describe(":on_term_close", function()
       fn()
     end
 
-    local spy_term_close = spy.on(term, "close")
     term:on_term_close()
 
-    assert.spy(spy_term_close).was_not_called()
+    assert.is_true(term:is_open())
+    assert.is_not_nil(terms.get(term.id))
     vim.schedule = original_schedule
   end)
 end)
