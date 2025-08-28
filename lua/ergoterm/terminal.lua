@@ -458,7 +458,6 @@ function Terminal:stop(close)
   if self:is_started() then
     self:on_stop()
     vim.fn.jobstop(self._state.job_id)
-    self._state.job_id = nil
     if self._state.bufnr then
       self._state.bufnr = nil
     end
@@ -694,6 +693,7 @@ end
 function Terminal:_compute_exit_handler(callback)
   return function(job, exit_code, event)
     callback(self, job, exit_code, event)
+    self._state.job_id = nil
   end
 end
 

@@ -1493,6 +1493,7 @@ describe(":stop", function()
     term:start()
 
     term:stop()
+    vim.wait(100)
 
     assert.is_nil(term:get_state("job_id"))
   end)
@@ -1512,6 +1513,7 @@ describe(":is_stopped", function()
     local term = terms.Terminal:new()
     term:start()
     term:stop()
+    vim.wait(100)
 
     assert.is_true(term:is_stopped())
   end)
@@ -1530,6 +1532,7 @@ describe(":cleanup", function()
     term:start()
 
     term:cleanup()
+    vim.wait(100)
 
     assert.is_true(term:is_stopped())
   end)
