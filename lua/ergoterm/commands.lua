@@ -34,7 +34,8 @@ function M.new(args)
     selectable = { parsed.selectable, "boolean", true },
     start_in_insert = { parsed.start_in_insert, "boolean", true },
     sticky = { parsed.sticky, "boolean", true },
-    cleanup_on_job_exit = { parsed.cleanup_on_job_exit, "boolean", true }
+    cleanup_on_success = { parsed.cleanup_on_success, "boolean", true },
+    cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true }
   })
   return terms.Terminal:new({
     cmd = parsed.cmd,
@@ -46,7 +47,8 @@ function M.new(args)
     selectable = parsed.selectable,
     start_in_insert = parsed.start_in_insert,
     sticky = parsed.sticky,
-    cleanup_on_job_exit = parsed.cleanup_on_job_exit
+    cleanup_on_success = parsed.cleanup_on_success,
+    cleanup_on_failure = parsed.cleanup_on_failure
   }):focus()
 end
 
@@ -148,7 +150,8 @@ function M.update(args, bang, picker)
     selectable = { parsed.selectable, "boolean", true },
     start_in_insert = { parsed.start_in_insert, "boolean", true },
     sticky = { parsed.sticky, "boolean", true },
-    cleanup_on_job_exit = { parsed.cleanup_on_job_exit, "boolean", true }
+    cleanup_on_success = { parsed.cleanup_on_success, "boolean", true },
+    cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true }
   })
   local update_terminal = function(t)
     t:update(parsed)

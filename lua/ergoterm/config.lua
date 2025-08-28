@@ -45,7 +45,8 @@ M.NULL_CALLBACK = function(...) end
 ---@class TerminalDefaults
 ---@field auto_scroll boolean?
 ---@field clear_env boolean?
----@field cleanup_on_job_exit boolean?
+---@field cleanup_on_success boolean?
+---@field cleanup_on_failure boolean?
 ---@field layout layout?
 ---@field float_opts FloatOpts?
 ---@field float_winblend number?
@@ -79,7 +80,8 @@ local config = {
   terminal_defaults = {
     auto_scroll = false,
     clear_env = false,
-    cleanup_on_job_exit = true,
+    cleanup_on_success = true,
+    cleanup_on_failure = true,
     layout = "below",
     float_opts = {
       title_pos = "left",

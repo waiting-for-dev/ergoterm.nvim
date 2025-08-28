@@ -457,16 +457,28 @@ describe(":new", function()
     assert.is_false(term.clear_env)
   end)
 
-  it("takes cleanup_on_job_exit option", function()
-    local term = terms.Terminal:new({ cleanup_on_job_exit = false })
+  it("takes cleanup_on_success option", function()
+    local term = terms.Terminal:new({ cleanup_on_success = false })
 
-    assert.is_false(term.cleanup_on_job_exit)
+    assert.is_false(term.cleanup_on_success)
   end)
 
-  it("defaults to config's cleanup_on_job_exit", function()
+  it("defaults to config's cleanup_on_success", function()
     local term = terms.Terminal:new()
 
-    assert.is_true(term.cleanup_on_job_exit)
+    assert.is_true(term.cleanup_on_success)
+  end)
+
+  it("takes cleanup_on_failure option", function()
+    local term = terms.Terminal:new({ cleanup_on_failure = false })
+
+    assert.is_false(term.cleanup_on_failure)
+  end)
+
+  it("defaults to config's cleanup_on_failure", function()
+    local term = terms.Terminal:new()
+
+    assert.is_true(term.cleanup_on_failure)
   end)
 
   it("takes layout option", function()
@@ -1043,22 +1055,6 @@ describe(":start", function()
     assert.equal(initial_job_id, term:get_state("job_id"))
   end)
 
-  it("adds a new buffer autocommand", function()
-    local term = terms.Terminal:new()
-
-    term:start()
-
-    local bufnr = term:get_state("bufnr")
-    local aucmds = vim.api.nvim_get_autocmds({
-      event = "TermClose",
-      buffer = bufnr,
-      group = "ErgoTermBuffer",
-    })
-
-    assert.is_true(#aucmds > 0)
-    assert.is_true(aucmds[1].buffer == bufnr)
-    assert.is_true(aucmds[1].group_name == "ErgoTermBuffer")
-  end)
 
   it("recomputes dir on start", function()
     local original_termopen = vim.fn.termopen
@@ -2032,53 +2028,6 @@ describe(":on_win_leave", function()
   end)
 end)
 
-describe(":on_term_close", function()
-  it("cleans up the terminal", function()
-    local term = terms.Terminal:new()
-    local original_schedule = vim.schedule
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.schedule = function(fn)
-      fn()
-    end
-
-    term:on_term_close()
-
-    assert.is_nil(terms.get(term.id))
-    vim.schedule = original_schedule
-  end)
-
-  it("cleans up the terminal when cleanup_on_job_exit is true", function()
-    local term = terms.Terminal:new({ cleanup_on_job_exit = true })
-    term:open()
-    local original_schedule = vim.schedule
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.schedule = function(fn)
-      fn()
-    end
-
-    term:on_term_close()
-
-    assert.is_false(term:is_open())
-    assert.is_nil(terms.get(term.id))
-    vim.schedule = original_schedule
-  end)
-
-  it("does not cleanup the terminal when cleanup_on_job_exit is false", function()
-    local term = terms.Terminal:new({ cleanup_on_job_exit = false })
-    term:open()
-    local original_schedule = vim.schedule
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.schedule = function(fn)
-      fn()
-    end
-
-    term:on_term_close()
-
-    assert.is_true(term:is_open())
-    assert.is_not_nil(terms.get(term.id))
-    vim.schedule = original_schedule
-  end)
-end)
 
 describe(":on_vim_resized", function()
   it("updates state with new computed float options", function()
@@ -2134,6 +2083,83 @@ describe(":_setup_buffer_autocommands", function()
     assert.is_true(#aucmds > 0)
     assert.is_true(aucmds[1].buffer == bufnr)
     assert.is_true(aucmds[1].group_name == "ErgoTermBuffer")
+  end)
+end)
+
+describe("cleanup on job exit", function()
+  it("cleans up on successful exit when cleanup_on_success is true", function()
+    local term = terms.Terminal:new({ cleanup_on_success = true, cleanup_on_failure = false })
+    term:start()
+    local exit_handler = term:get_state("on_job_exit")
+    local original_schedule = vim.schedule
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.schedule = function(fn) fn() end
+
+    exit_handler(1, 0, "exit")
+    
+    assert.is_nil(terms.get(term.id))
+    vim.schedule = original_schedule
+  end)
+
+  it("does not clean up on successful exit when cleanup_on_success is false", function()
+    local term = terms.Terminal:new({ cleanup_on_success = false, cleanup_on_failure = true })
+    term:start()
+    local exit_handler = term:get_state("on_job_exit")
+    local original_schedule = vim.schedule
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.schedule = function(fn) fn() end
+
+    exit_handler(1, 0, "exit")
+    
+    assert.is_not_nil(terms.get(term.id))
+    vim.schedule = original_schedule
+  end)
+
+  it("cleans up on failed exit when cleanup_on_failure is true", function()
+    local term = terms.Terminal:new({ cleanup_on_success = false, cleanup_on_failure = true })
+    term:start()
+    local exit_handler = term:get_state("on_job_exit")
+    local original_schedule = vim.schedule
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.schedule = function(fn) fn() end
+
+    exit_handler(1, 1, "exit")
+    
+    assert.is_nil(terms.get(term.id))
+    vim.schedule = original_schedule
+  end)
+
+  it("does not clean up on failed exit when cleanup_on_failure is false", function()
+    local term = terms.Terminal:new({ cleanup_on_success = true, cleanup_on_failure = false })
+    term:start()
+    local exit_handler = term:get_state("on_job_exit")
+    local original_schedule = vim.schedule
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.schedule = function(fn) fn() end
+
+    exit_handler(1, 1, "exit")
+    
+    assert.is_not_nil(terms.get(term.id))
+    vim.schedule = original_schedule
+  end)
+
+  it("calls user's on_job_exit handler before cleanup", function()
+    local called = false
+    local term = terms.Terminal:new({ 
+      cleanup_on_success = true,
+      on_job_exit = function() called = true end
+    })
+    term:start()
+    local exit_handler = term:get_state("on_job_exit")
+    local original_schedule = vim.schedule
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.schedule = function(fn) fn() end
+
+    exit_handler(1, 0, "exit")
+    
+    assert.is_true(called)
+    assert.is_nil(terms.get(term.id))
+    vim.schedule = original_schedule
   end)
 end)
 

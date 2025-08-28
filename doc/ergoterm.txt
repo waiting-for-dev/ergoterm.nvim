@@ -130,7 +130,8 @@ Options:
     selectable={boolean}        Show in selection picker and allow as last focused (default: true)
     start_in_insert={boolean}   Start terminal in insert mode (default: true)
     sticky={boolean}            Keep terminal visible in picker even when stopped (default: false)
-    cleanup_on_job_exit={boolean} Cleanup terminal when process exits (default: true)
+    cleanup_on_success={boolean}   Cleanup terminal when process exits successfully (default: true)
+    cleanup_on_failure={boolean}   Cleanup terminal when process exits with failure (default: true)
 
 Available layouts:
     above      Horizontal split above current window
@@ -240,7 +241,8 @@ Updatable options:
                                  (can be overridden by universal selection mode)
     start_in_insert={boolean}    Start in insert mode
     sticky={boolean}             Keep terminal visible in picker even when stopped
-    cleanup_on_job_exit={boolean}  Cleanup terminal when job exits
+    cleanup_on_success={boolean}   Cleanup terminal when process exits successfully
+    cleanup_on_failure={boolean}   Cleanup terminal when process exits with failure
 
 Examples: >vim
     :TermUpdate layout=float
@@ -306,12 +308,19 @@ terminal_defaults.auto_scroll ~
     
     Automatically scroll terminal output to bottom.
 
-                                                   *ergoterm-cleanup_on_job_exit*
-terminal_defaults.cleanup_on_job_exit ~
+                                                 *ergoterm-cleanup_on_success*
+terminal_defaults.cleanup_on_success ~
     Default: `true`
     Type: `boolean`
     
-    Close terminal window when the job process exits.
+    Close terminal window when the job process exits successfully (exit code 0).
+
+                                                 *ergoterm-cleanup_on_failure*
+terminal_defaults.cleanup_on_failure ~
+    Default: `true`
+    Type: `boolean`
+
+    Close terminal window when the job process exits with failure (exit code non-zero).
 
                                                        *ergoterm-persist_mode*
 terminal_defaults.persist_mode ~
@@ -579,7 +588,7 @@ project terminals available even when stopped: >lua
       cmd = "iex -S mix phx.server",
       layout = "right",
       sticky = true,
-      cleanup_on_job_exit = false
+      cleanup_on_failure = false
     })
 
     term:new({

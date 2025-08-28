@@ -214,7 +214,8 @@ end
 ---@field auto_scroll boolean? whether or not to scroll down on terminal output
 ---@field cmd? string command to run in the terminal
 ---@field clear_env? boolean use clean job environment, passed to jobstart()
----@field cleanup_on_job_exit boolean? whether or not to cleanup the terminal when the process exits
+---@field cleanup_on_success boolean? whether or not to cleanup the terminal when the process exits successfully
+---@field cleanup_on_failure boolean? whether or not to cleanup the terminal when the process exits with failure
 ---@field dir string? the directory for the terminal
 ---@field layout layout? the layout to open the terminal in the first time
 ---@field env? table<string, string> environmental variables passed to jobstart()
@@ -255,7 +256,8 @@ function Terminal:new(args)
   term.auto_scroll = vim.F.if_nil(term.auto_scroll, config.get("terminal_defaults.auto_scroll"))
   term.cmd = term.cmd or config.get("terminal_defaults.shell")
   term.clear_env = vim.F.if_nil(term.clear_env, config.get("terminal_defaults.clear_env"))
-  term.cleanup_on_job_exit = vim.F.if_nil(term.cleanup_on_job_exit, config.get("terminal_defaults.cleanup_on_job_exit"))
+  term.cleanup_on_success = vim.F.if_nil(term.cleanup_on_success, config.get("terminal_defaults.cleanup_on_success"))
+  term.cleanup_on_failure = vim.F.if_nil(term.cleanup_on_failure, config.get("terminal_defaults.cleanup_on_failure"))
   term.layout = term.layout or config.get("terminal_defaults.layout")
   term.env = term.env
   term.name = term.name or term.cmd
@@ -624,21 +626,6 @@ function Terminal:on_win_leave()
   if self._state.layout == "float" then self:close() end
 end
 
----Handles terminal close events
----
----Automatically cleans up the ergoterm instance when the underlying terminal
----process exits.
----
----Respects the `cleanup_on_job_exit` setting to determine whether
----to cleanup the terminal when the job exits.
-function Terminal:on_term_close()
-  vim.schedule(function()
-    if self.cleanup_on_job_exit then
-      self:cleanup()
-    end
-  end)
-end
-
 ---Handles Vim resize events for the terminal
 ---
 ---Updates the floating window configuration if the terminal is in float layout.
@@ -700,6 +687,19 @@ function Terminal:_compute_exit_handler(callback)
   return function(job, exit_code, event)
     callback(self, job, exit_code, event)
     self._state.job_id = nil
+
+    local should_cleanup = false
+    if exit_code == 0 then
+      should_cleanup = self.cleanup_on_success
+    else
+      should_cleanup = self.cleanup_on_failure
+    end
+
+    if should_cleanup then
+      vim.schedule(function()
+        self:cleanup()
+      end)
+    end
   end
 end
 
@@ -844,11 +844,6 @@ end
 
 function Terminal:_setup_buffer_autocommands()
   local group = vim.api.nvim_create_augroup("ErgoTermBuffer", { clear = true })
-  vim.api.nvim_create_autocmd("TermClose", {
-    buffer = self._state.bufnr,
-    group = group,
-    callback = function() self:on_term_close() end
-  })
   vim.api.nvim_create_autocmd("VimResized", {
     buffer = self._state.bufnr,
     group = group,

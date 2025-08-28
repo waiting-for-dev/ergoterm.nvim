@@ -78,7 +78,8 @@ Create new terminals with `:TermNew` and customize them with options:
 - `selectable` - Show in selection picker and allow as last focused (default: `true`)
 - `start_in_insert` - Start terminal in insert mode (default: `true`)
 - `sticky` - Keep terminals visible in picker even when stopped (requires `selectable` to also be `true`) (default: `false`)
-- `cleanup_on_job_exit` - Cleanup terminal when process exits (default: `true`)
+- `cleanup_on_success` - Cleanup terminal when process exits successfully (exit code 0) (default: `true`)
+- `cleanup_on_failure` - Cleanup terminal when process exits with failure (exit code non-zero) (default: `true`)
 
 ### 🎯 Selecting Terminals
 
@@ -228,7 +229,7 @@ term:new({
   cmd = "iex -S mix phx.server",
   layout = "right",
   sticky = true,
-  cleanup_on_job_exit = false
+  cleanup_on_failure = false
 })
 
 term:new({
@@ -248,7 +249,8 @@ All options default to values from your configuration:
 - `auto_scroll` - Automatically scroll terminal output to bottom
 - `cmd` - Command to execute in the terminal
 - `clear_env` - Use clean environment for the job
-- `cleanup_on_job_exit` - Cleanup terminal when process exits
+- `cleanup_on_success` - Cleanup terminal when process exits successfully (exit code 0)
+- `cleanup_on_failure` - Cleanup terminal when process exits with failure (exit code non-zero)
 - `dir` - Working directory for the terminal
   - Accepts absolute paths, relative paths (with `~` expansion), `"git_dir"` for git repository root, or `nil` for current directory
 - `env` - Environment variables for the job (table of key-value pairs)
@@ -437,8 +439,11 @@ require("ergoterm").setup({
     -- Auto-scroll terminal output
     auto_scroll = false,
     
-    -- Cleanup terminal when job exits
-    cleanup_on_job_exit = true,
+    -- Cleanup terminal when process exits successfully (exit code 0)
+    cleanup_on_success = true,
+
+    -- Cleanup terminal when process exits with failure (exit code non-zero)
+    cleanup_on_failure = true,
     
     -- Remember terminal mode between visits
     persist_mode = false,
