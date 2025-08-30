@@ -673,7 +673,6 @@ Terminal:cleanup({opts})                                *Terminal:cleanup()*
 
     Parameters:
         {opts} - table with cleanup options
-          close - boolean, whether to close the terminal window when stopping (default: true)
           force - boolean, whether to force removal of sticky terminals from the session (default: false)
 
 Terminal:toggle({layout})                               *Terminal:toggle()*
