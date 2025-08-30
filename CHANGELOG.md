@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 - BREAKING: `auto_scroll` is off by default now.
-- Fixed vim-ui-select picker not working as expected
+- BREAKING: `cleanup_on_success` & `cleanup_on_failure` replace `close_on_job_exit`.
+- `cleanup_on_success` & `cleanup_on_failure` control not only closing the terminal window but also cleaning up the terminal instance.
+- Fixed vim-ui-select picker not working as expected.
 
 ## [0.2.0] - 2025-07-31
 
