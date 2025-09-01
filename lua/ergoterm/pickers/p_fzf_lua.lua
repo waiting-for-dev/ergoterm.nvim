@@ -47,6 +47,10 @@ function M.previewer:populate_preview_buf(entry_str)
   local entry = self:parse_entry(entry_str)
   if entry.bufnr then
     self:set_preview_buf(entry.bufnr)
+  else
+    local tmp_buf = self:get_tmp_buffer()
+    vim.api.nvim_buf_set_lines(tmp_buf, 0, -1, false, { "Terminal not active" })
+    self:set_preview_buf(tmp_buf)
   end
   self.win:update_preview_title(" " .. entry.name .. " (" .. entry.layout .. ") ")
 end

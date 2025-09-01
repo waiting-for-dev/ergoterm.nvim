@@ -44,6 +44,19 @@ function M.select(terminals, prompt, definitions)
             vim.api.nvim_win_set_option(preview_winid, "winhl", "")
           end
         end)
+      else
+        local tmp_buf = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_buf_set_lines(tmp_buf, 0, -1, false, { "Terminal not active" })
+        vim.bo[tmp_buf].bufhidden = "wipe"
+        self.state.bufnr = tmp_buf
+        self.state.bufname = tostring(tmp_buf)
+
+        vim.schedule(function()
+          if vim.api.nvim_win_is_valid(preview_winid) then
+            local utils = require("telescope.utils")
+            utils.win_set_buf_noautocmd(preview_winid, tmp_buf)
+          end
+        end)
       end
     end,
 
