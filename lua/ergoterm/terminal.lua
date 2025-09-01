@@ -453,9 +453,9 @@ end
 
 ---Terminates the terminal job and cleans up resources
 ---
----Stops the underlying job process, deletes the buffer, and closes any open
----windows. Triggers the `on_stop` callback. The terminal can be restarted
----later with `start()`.
+---Stops the underlying job process and closes any open windows. Triggers the 
+---`on_stop` callback. The terminal can be restarted later with `start()`. 
+---The buffer remains available until the terminal is cleaned up.
 ---
 ---@return Terminal self for method chaining
 function Terminal:stop()
@@ -463,9 +463,6 @@ function Terminal:stop()
   if self:is_started() then
     self:on_stop()
     vim.fn.jobstop(self._state.job_id)
-    if self._state.bufnr then
-      self._state.bufnr = nil
-    end
   end
   return self
 end
@@ -490,6 +487,9 @@ function Terminal:cleanup(opts)
 
   if not self:is_stopped() then
     self:stop()
+  end
+  if self._state.bufnr then
+    self._state.bufnr = nil
   end
   if M._state.last_focused == self then
     M._state.last_focused = nil

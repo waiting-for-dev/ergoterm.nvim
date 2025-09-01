@@ -1533,13 +1533,14 @@ describe(":stop", function()
     assert.is_nil(term:get_state("job_id"))
   end)
 
-  it("resets the buffer id in the state", function()
+  it("preserves the buffer id in the state", function()
     local term = terms.Terminal:new()
     term:start()
+    local bufnr = term:get_state("bufnr")
 
     term:stop()
 
-    assert.is_nil(term:get_state("bufnr"))
+    assert.equal(bufnr, term:get_state("bufnr"))
   end)
 end)
 
@@ -1641,6 +1642,15 @@ describe(":cleanup", function()
     term:cleanup()
 
     assert.is_nil(terms.get_last_focused())
+  end)
+
+  it("resets the buffer id in the state", function()
+    local term = terms.Terminal:new()
+    term:start()
+
+    term:cleanup()
+
+    assert.is_nil(term:get_state("bufnr"))
   end)
 end)
 
