@@ -13,10 +13,6 @@ function M.on_buf_enter()
   term:on_buf_enter()
 end
 
-function M.on_win_enter()
-  local term = terms.identify()
-  term:on_win_enter()
-end
 
 function M.on_win_leave()
   local term = terms.identify()
@@ -41,11 +37,6 @@ function M.setup()
     callback = M.on_buf_enter
   })
 
-  vim.api.nvim_create_autocmd("WinEnter", {
-    group = AUGROUP,
-    pattern = ergoterm_pattern,
-    callback = M.on_win_enter
-  })
 
   vim.api.nvim_create_autocmd("WinLeave", {
     group = AUGROUP,

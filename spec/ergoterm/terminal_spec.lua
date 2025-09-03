@@ -1966,13 +1966,11 @@ describe(":on_buf_enter", function()
 
     assert.spy(spy_mode_set_initial).was_called_with(false)
   end)
-end)
 
-describe(":on_win_enter", function()
-  it("sets the terminal as last focused if it applies", function()
+  it("sets the terminal as last focused", function()
     local term = terms.Terminal:new():start()
 
-    term:on_win_enter()
+    term:on_buf_enter()
 
     assert.equal(term, terms.get_last_focused())
   end)

@@ -602,17 +602,10 @@ end
 
 ---Handles buffer enter events for the terminal
 ---
----Restores the appropriate terminal mode.
+---Restores the appropriate terminal mode and sets the last focused terminal.
 ---Called automatically when entering the terminal buffer.
 function Terminal:on_buf_enter()
   self:_set_return_mode()
-end
-
----Handles window enter events for the terminal
----
----Sets the last focused terminal to this instance if universal selection is enabled
----or if the terminal is selectable.
-function Terminal:on_win_enter()
   self:_set_last_focused()
 end
 
