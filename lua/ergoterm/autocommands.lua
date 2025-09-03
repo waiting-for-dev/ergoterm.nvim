@@ -29,11 +29,6 @@ function M.on_filetype(ev)
   vim.api.nvim_buf_set_option(bufnr, "foldtext", "foldtext()")
 end
 
-function M.on_term_close()
-  local term = terms.identify()
-  term:on_term_close()
-end
-
 -- Setup autocommands for the plugin.
 function M.setup()
   vim.api.nvim_create_augroup(AUGROUP, { clear = true })
