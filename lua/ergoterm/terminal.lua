@@ -602,10 +602,9 @@ end
 
 ---Handles buffer enter events for the terminal
 ---
----Sets up filetype-specific options and restores the appropriate terminal mode.
+---Restores the appropriate terminal mode.
 ---Called automatically when entering the terminal buffer.
 function Terminal:on_buf_enter()
-  self:_set_ft_options()
   self:_set_return_mode()
 end
 

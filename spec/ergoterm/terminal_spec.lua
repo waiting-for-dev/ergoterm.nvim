@@ -1939,21 +1939,6 @@ describe(":clear", function()
 end)
 
 describe(":on_buf_enter", function()
-  it("sets the filetype", function()
-    local term = terms.Terminal:new():start()
-
-    term:on_buf_enter()
-
-    assert.equal("ErgoTerm", vim.bo[term:get_state("bufnr")].filetype)
-  end)
-
-  it("sets buflisted to false", function()
-    local term = terms.Terminal:new():start()
-
-    term:on_buf_enter()
-
-    assert.is_false(vim.bo[term:get_state("bufnr")].buflisted)
-  end)
 
   it("restores last mode if persist_mode is true", function()
     local term = terms.Terminal:new({ persist_mode = true, start_in_insert = false }):start()
