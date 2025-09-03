@@ -8,7 +8,10 @@ All notable changes to this project will be documented in this file.
 - BREAKING: `cleanup_on_success` & `cleanup_on_failure` replace `close_on_job_exit`.
 - `cleanup_on_success` & `cleanup_on_failure` control not only closing the terminal window but also cleaning up the terminal instance.
 - Fixed vim-ui-select picker not working as expected.
+- Remove `WinEnter` event listener and do everything on `BufEnter` instead.
+- Cleanup terminals on `BufWipeout`.
 - Fix previewing non-active sticky terminals
+- Fix autocommands not working
 
 ## [0.2.0] - 2025-07-31
 
