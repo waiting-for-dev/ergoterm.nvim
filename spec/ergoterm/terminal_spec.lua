@@ -38,6 +38,28 @@ describe(".get_focused", function()
   end)
 end)
 
+describe(".identify", function()
+  it("returns terminal when current buffer matches terminal buffer", function()
+    local term = terms.Terminal:new()
+    term:focus()
+
+    local result = terms.identify()
+
+    assert.equal(result, term)
+  end)
+
+  it("returns nil when current buffer doesn't match any terminal buffer", function()
+    local term = terms.Terminal:new()
+    term:start()
+    local other_bufnr = vim.api.nvim_create_buf(false, false)
+    vim.api.nvim_set_current_buf(other_bufnr)
+
+    local result = terms.identify()
+
+    assert.is_nil(result)
+  end)
+end)
+
 describe(".get_last_focused", function()
   it("returns last focused selectable terminal when universal selection is disabled", function()
     local term1 = terms.Terminal:new({ selectable = false })

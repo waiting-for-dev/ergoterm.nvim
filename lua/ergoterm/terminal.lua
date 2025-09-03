@@ -44,6 +44,17 @@ function M.get_focused()
   return nil
 end
 
+---Identifies the terminal associated with the current buffer
+---
+---Searches through all terminals to find one whose buffer matches the current buffer.
+---
+---@return Terminal? the identified terminal, or nil if no terminal is identified
+function M.identify()
+  return M.find(function(term)
+    return term._state.bufnr == vim.api.nvim_get_current_buf()
+  end)
+end
+
 ---Returns the most recently focused terminal
 ---
 ---If `universal_selection` is enabled, returns the last focused terminal regardless
@@ -453,8 +464,8 @@ end
 
 ---Terminates the terminal job and cleans up resources
 ---
----Stops the underlying job process and closes any open windows. Triggers the 
----`on_stop` callback. The terminal can be restarted later with `start()`. 
+---Stops the underlying job process and closes any open windows. Triggers the
+---`on_stop` callback. The terminal can be restarted later with `start()`.
 ---The buffer remains available until the terminal is cleaned up.
 ---
 ---@return Terminal self for method chaining
