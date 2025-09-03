@@ -849,6 +849,11 @@ function Terminal:_setup_buffer_autocommands()
     group = group,
     callback = function() self:on_vim_resized() end
   })
+  vim.api.nvim_create_autocmd("BufWipeout", {
+    buffer = self._state.bufnr,
+    group = group,
+    callback = function() self:cleanup() end
+  })
 end
 
 ---@private

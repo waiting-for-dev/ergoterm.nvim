@@ -2094,6 +2094,23 @@ describe(":_setup_buffer_autocommands", function()
     assert.is_true(aucmds[1].buffer == bufnr)
     assert.is_true(aucmds[1].group_name == "ErgoTermBuffer")
   end)
+
+  it("adds a BufWipeout autocommand", function()
+    local term = terms.Terminal:new()
+
+    term:start()
+
+    local bufnr = term:get_state("bufnr")
+    local aucmds = vim.api.nvim_get_autocmds({
+      event = "BufWipeout",
+      buffer = bufnr,
+      group = "ErgoTermBuffer",
+    })
+
+    assert.is_true(#aucmds > 0)
+    assert.is_true(aucmds[1].buffer == bufnr)
+    assert.is_true(aucmds[1].group_name == "ErgoTermBuffer")
+  end)
 end)
 
 describe("cleanup on job exit", function()
@@ -2106,7 +2123,7 @@ describe("cleanup on job exit", function()
     vim.schedule = function(fn) fn() end
 
     exit_handler(1, 0, "exit")
-    
+
     assert.is_nil(terms.get(term.id))
     vim.schedule = original_schedule
   end)
@@ -2120,7 +2137,7 @@ describe("cleanup on job exit", function()
     vim.schedule = function(fn) fn() end
 
     exit_handler(1, 0, "exit")
-    
+
     assert.is_not_nil(terms.get(term.id))
     vim.schedule = original_schedule
   end)
@@ -2134,7 +2151,7 @@ describe("cleanup on job exit", function()
     vim.schedule = function(fn) fn() end
 
     exit_handler(1, 1, "exit")
-    
+
     assert.is_nil(terms.get(term.id))
     vim.schedule = original_schedule
   end)
@@ -2148,14 +2165,14 @@ describe("cleanup on job exit", function()
     vim.schedule = function(fn) fn() end
 
     exit_handler(1, 1, "exit")
-    
+
     assert.is_not_nil(terms.get(term.id))
     vim.schedule = original_schedule
   end)
 
   it("calls user's on_job_exit handler before cleanup", function()
     local called = false
-    local term = terms.Terminal:new({ 
+    local term = terms.Terminal:new({
       cleanup_on_success = true,
       on_job_exit = function() called = true end
     })
@@ -2166,7 +2183,7 @@ describe("cleanup on job exit", function()
     vim.schedule = function(fn) fn() end
 
     exit_handler(1, 0, "exit")
-    
+
     assert.is_true(called)
     assert.is_nil(terms.get(term.id))
     vim.schedule = original_schedule
