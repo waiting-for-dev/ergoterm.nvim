@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-09-04
+
 - BREAKING: `auto_scroll` is off by default now.
 - BREAKING: `cleanup_on_success` & `cleanup_on_failure` replace `close_on_job_exit`.
 - Add `watch_files` option to refresh buffer on stdout
