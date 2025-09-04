@@ -74,6 +74,7 @@ Create new terminals with `:TermNew` and customize them with options:
   - Accepts absolute paths (`/home/user/project`), relative paths (`~/my-project`, `./subdir`), `"git_dir"` for auto-detected git repository root, or `nil` for current directory
 - `cmd` - Shell command to run (default: system shell)
 - `auto_scroll` - Automatically scroll terminal output to bottom (default: `false`)
+- `watch_files` - Watch for file changes when terminal produces output (requires vim's `autoread` option) (default: `false`)
 - `persist_mode` - Remember terminal mode between visits (default: `false`)
 - `selectable` - Show in selection picker and allow as last focused (default: `true`)
 - `start_in_insert` - Start terminal in insert mode (default: `true`)
@@ -139,6 +140,7 @@ Modify existing terminal configuration:
 - `layout` - Change window layout
 - `name` - Rename terminal
 - `auto_scroll` - Auto-scroll behavior
+- `watch_files` - Watch for file changes when terminal produces output (requires vim's `autoread` option)
 - `persist_mode` - Remember terminal mode when revisiting
 - `selectable` - Show in selection picker and allow as last focused (can be overridden by universal selection mode)
 - `start_in_insert` - Start in insert mode
@@ -203,18 +205,18 @@ local lazygit = terms.Terminal:new({
   selectable = false
 })
 
-local aider = terms.Terminal:new({
-  name = "aider",
-  cmd = "aider",
+local claude = terms.Terminal:new({
+  name = "claude",
+  cmd = "claude",
   layout = "right",
   dir = "git_dir",
   selectable = false,
-  auto_scroll = false
+  watch_files = true
 })
 
 -- Map to keybindings for quick access
 vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end, { desc = "Open lazygit" })
-vim.keymap.set("n", "<leader>ai", function() aider:toggle() end, { desc = "Open aider" })
+vim.keymap.set("n", "<leader>ci", function() claude:toggle() end, { desc = "Open claude" })
 ```
 
 ### 📁 Project-Specific Terminals with `.nvim.lua`
@@ -247,6 +249,7 @@ With `sticky = true`, these terminals remain visible in the picker (`:TermSelect
 All options default to values from your configuration:
 
 - `auto_scroll` - Automatically scroll terminal output to bottom
+- `watch_files` - Watch for file changes when terminal produces output (requires vim's `autoread` option)
 - `cmd` - Command to execute in the terminal
 - `clear_env` - Use clean environment for the job
 - `cleanup_on_success` - Cleanup terminal when process exits successfully (exit code 0)
@@ -374,51 +377,51 @@ end
 terminal:send({"echo hello"}, { decorator = timestamp_decorator })
 ```
 
-### 🤖 Example: AI-Assisted Development with Aider
+### 🤖 Example: AI-Assisted Development with Claude Code
 
-Here's an example showing how to integrate [Aider](https://aider.chat/) for AI-assisted coding:
+Here's an example showing how to integrate [Claude Code](https://claude.ai/) for AI-assisted coding:
 
 ```lua
 local terms = require("ergoterm.terminal")
 
--- Create persistent Aider terminal
-local aider = terms.Terminal:new({
-  name = "aider",
-  cmd = "aider",
+-- Create persistent Claude terminal
+local claude = terms.Terminal:new({
+  name = "claude",
+  cmd = "claude",
   layout = "right",
   dir = "git_dir",
   selectable = false,
-  auto_scroll = false
+  watch_files = true
 })
 
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 
--- Toggle Aider terminal
-map("n", "<leader>ai", function() aider:toggle() end, { desc = "Toggle Aider" })
+-- Toggle Claude terminal
+map("n", "<leader>ai", function() claude:toggle() end, { desc = "Toggle Claude" })
 
--- Add current file to Aider session
+-- Reference current file to Claude
 map("n", "<leader>aa", function()
   local file = vim.fn.expand("%:p")
-  aider:send({ "/add " .. file })
+  claude:send({ "@" .. file .. " " }, { new_line = false })
 end, opts)
 
--- Sends current line to Aider session
+-- Sends current line to Claude session
 map("n", "<leader>as", function()
-  aider:send("single_line")
+  claude:send("single_line")
 end, opts)
 
--- Sends current visual selection to Aider session
+-- Sends current visual selection to Claude session
 map("v", "<leader>as", function()
-  aider:send("visual_selection", { trim = false })
+  claude:send("visual_selection", { trim = false })
 end, opts)
 
--- Send code to Aider as markdown (preserves formatting)
+-- Send code to Claude as markdown (preserves formatting)
 map("n", "<leader>aS", function()
-  aider:send("single_line", { trim = false, decorator = "markdown_code" })
+  claude:send("single_line", { trim = false, decorator = "markdown_code" })
 end, opts)
 map("v", "<leader>aS", function()
-  aider:send("visual_selection", { trim = false, decorator = "markdown_code" })
+  claude:send("visual_selection", { trim = false, decorator = "markdown_code" })
 end, opts)
 ```
 
@@ -438,6 +441,9 @@ require("ergoterm").setup({
     
     -- Auto-scroll terminal output
     auto_scroll = false,
+    
+    -- Watch for file changes when terminal produces output (requires vim's autoread option)
+    watch_files = false,
     
     -- Cleanup terminal when process exits successfully (exit code 0)
     cleanup_on_success = true,

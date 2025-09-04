@@ -23,6 +23,7 @@ local p = {
 ---@field trim boolean?
 ---@field new_line boolean?
 ---@field auto_scroll boolean?
+---@field watch_files boolean?
 ---@field persist_mode boolean?
 ---@field selectable boolean?
 ---@field start_in_insert boolean?
@@ -62,6 +63,7 @@ function M.parse(args)
       trim = true,
       new_line = true,
       auto_scroll = true,
+      watch_files = true,
       persist_mode = true,
       selectable = true,
       start_in_insert = true,
@@ -215,6 +217,8 @@ M._all_options = {
 
   auto_scroll = M._boolean_options,
 
+  watch_files = M._boolean_options,
+
   persist_mode = M._boolean_options,
 
   selectable = M._boolean_options,
@@ -234,6 +238,7 @@ M._term_new_options = {
   layout = M._all_options.layout,
   name = M._all_options.name,
   auto_scroll = M._all_options.auto_scroll,
+  watch_files = M._all_options.watch_files,
   persist_mode = M._all_options.persist_mode,
   selectable = M._all_options.selectable,
   start_in_insert = M._all_options.start_in_insert,
@@ -246,6 +251,7 @@ M._term_update_options = {
   layout = M._all_options.layout,
   name = M._all_options.name,
   auto_scroll = M._all_options.auto_scroll,
+  watch_files = M._all_options.watch_files,
   persist_mode = M._all_options.persist_mode,
   selectable = M._all_options.selectable,
   start_in_insert = M._all_options.start_in_insert,

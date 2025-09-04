@@ -126,6 +126,7 @@ Options:
                         • nil - Use current working directory
     cmd={command}       Shell command to run (default: system shell)
     auto_scroll={boolean}       Auto-scroll terminal output (default: true)
+    watch_files={boolean}       Watch for file changes when terminal produces output (default: false)
     persist_mode={boolean}      Remember terminal mode between visits (default: false)
     selectable={boolean}        Show in selection picker and allow as last focused (default: true)
     start_in_insert={boolean}   Start terminal in insert mode (default: true)
@@ -236,6 +237,7 @@ Updatable options:
     layout={layout}              Change window layout
     name={name}                  Rename terminal
     auto_scroll={boolean}        Auto-scroll behavior
+    watch_files={boolean}        Watch for file changes when terminal produces output
     persist_mode={boolean}       Remember terminal mode
     selectable={boolean}         Show in selection picker and allow as last focused
                                  (can be overridden by universal selection mode)
@@ -307,6 +309,17 @@ terminal_defaults.auto_scroll ~
     Type: `boolean`
     
     Automatically scroll terminal output to bottom.
+
+                                                         *ergoterm-watch_files*
+terminal_defaults.watch_files ~
+    Default: `false`
+    Type: `boolean`
+
+    Watch for file changes when terminal produces output. Useful when 
+    terminal commands modify files that are open in Neovim.
+
+    Note: Requires Vim's `autoread` option to be enabled for file changes 
+    to be detected.
 
                                                  *ergoterm-cleanup_on_success*
 terminal_defaults.cleanup_on_success ~
@@ -836,47 +849,47 @@ Useful keymaps to get started: >lua
 ------------------------------------------------------------------------------
 8.2 AI Integration                                             *ergoterm-ai*
 
-Example integration with Aider for AI-assisted development: >lua
+Example integration with Claude for AI-assisted development: >lua
     local terms = require("ergoterm.terminal")
     
-    -- Create persistent Aider terminal
-    local aider = terms.Terminal:new({
-      name = "aider",
-      cmd = "aider",
+    -- Create persistent Claude terminal
+    local claude = terms.Terminal:new({
+      name = "claude",
+      cmd = "claude",
       layout = "right", 
       dir = "git_dir",
       selectable = false,
-      auto_scroll = false
+      watch_files = true
     })
     
     local map = vim.keymap.set
     local opts = { noremap = true, silent = true }
     
-    -- Toggle Aider terminal
-    map("n", "<leader>ai", function() aider:toggle() end, { desc = "Toggle Aider" })
+    -- Toggle Claude terminal
+    map("n", "<leader>ai", function() claude:toggle() end, { desc = "Toggle Claude" })
     
-    -- Add current file to Aider session
+    -- Reference current file to Claude session
     map("n", "<leader>aa", function()
       local file = vim.fn.expand("%:p")
-      aider:send({ "/add " .. file })
+      claude:send({ "@" .. file .. " " }, { new_line = false })
     end, opts)
 
-    -- Sends current line to Aider session
+    -- Sends current line to Claude session
     map("n", "<leader>as", function()
-      aider:send("single_line")
+      claude:send("single_line")
     end, opts)
 
-    -- Sends current visual selection to Aider session
+    -- Sends current visual selection to Claude session
     map("v", "<leader>as", function()
-      aider:send("visual_selection", { trim = false })
+      claude:send("visual_selection", { trim = false })
     end, opts)
 
-    -- Send code to Aider as markdown (preserves formatting)
+    -- Send code to Claude as markdown (preserves formatting)
     map("n", "<leader>aS", function()
-      aider:send("single_line", { trim = false, decorator = "markdown_code" })
+      claude:send("single_line", { trim = false, decorator = "markdown_code" })
     end, opts)
     map("v", "<leader>aS", function()
-      aider:send("visual_selection", { trim = false, decorator = "markdown_code" })
+      claude:send("visual_selection", { trim = false, decorator = "markdown_code" })
     end, opts)
 
 ==============================================================================

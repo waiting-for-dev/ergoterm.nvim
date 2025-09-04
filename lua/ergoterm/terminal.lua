@@ -224,6 +224,7 @@ end
 
 ---@class TermCreateArgs
 ---@field auto_scroll boolean? whether or not to scroll down on terminal output
+---@field watch_files boolean? whether or not run `checktime` on terminal output
 ---@field cmd? string command to run in the terminal
 ---@field clear_env? boolean use clean job environment, passed to jobstart()
 ---@field cleanup_on_success boolean? whether or not to cleanup the terminal when the process exits successfully
@@ -266,6 +267,7 @@ function Terminal:new(args)
   local term = args or {} ---@cast term Terminal
   setmetatable(term, self)
   term.auto_scroll = vim.F.if_nil(term.auto_scroll, config.get("terminal_defaults.auto_scroll"))
+  term.watch_files = vim.F.if_nil(term.watch_files, config.get("terminal_defaults.watch_files"))
   term.cmd = term.cmd or config.get("terminal_defaults.shell")
   term.clear_env = vim.F.if_nil(term.clear_env, config.get("terminal_defaults.clear_env"))
   term.cleanup_on_success = vim.F.if_nil(term.cleanup_on_success, config.get("terminal_defaults.cleanup_on_success"))
@@ -740,6 +742,11 @@ end
 function Terminal:_compute_output_handler(callback)
   return function(channel_id, data, name)
     if self.auto_scroll then self:_scroll_bottom() end
+    if self.watch_files then
+      vim.schedule(function()
+        vim.cmd('checktime')
+      end)
+    end
     callback(self, channel_id, data, name)
   end
 end

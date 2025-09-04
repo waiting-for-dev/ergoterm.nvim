@@ -606,6 +606,18 @@ describe(":new", function()
     assert.is_false(term.sticky)
   end)
 
+  it("takes watch_files option", function()
+    local term = terms.Terminal:new({ watch_files = true })
+
+    assert.is_true(term.watch_files)
+  end)
+
+  it("defaults to config's watch_files", function()
+    local term = terms.Terminal:new()
+
+    assert.is_false(term.watch_files)
+  end)
+
   it("takes size option", function()
     local term = terms.Terminal:new({ size = { below = 20, right = "30%" } })
 
@@ -1076,7 +1088,6 @@ describe(":start", function()
     assert.equal(initial_bufnr, term:get_state("bufnr"))
     assert.equal(initial_job_id, term:get_state("job_id"))
   end)
-
 
   it("recomputes dir on start", function()
     local original_termopen = vim.fn.termopen
@@ -2089,7 +2100,7 @@ describe(":_setup_buffer_autocommands", function()
   end)
 end)
 
-describe("cleanup on job exit", function()
+describe("on job exit", function()
   it("cleans up on successful exit when cleanup_on_success is true", function()
     local term = terms.Terminal:new({ cleanup_on_success = true, cleanup_on_failure = false })
     term:start()
@@ -2210,5 +2221,61 @@ describe(":get_status_icon", function()
     local term = terms.Terminal:new({ sticky = false })
 
     assert.equal("", term:get_status_icon())
+  end)
+end)
+
+describe("on stdout", function()
+  it("calls checktime after stdout when watch_files is true", function()
+    local term = terms.Terminal:new({ watch_files = true })
+    term:start()
+    local stdout_handler = term:get_state("on_job_stdout")
+    local spy_cmd = spy.on(vim, "cmd")
+    local original_schedule = vim.schedule
+    local scheduled_fn
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.schedule = function(fn) scheduled_fn = fn end
+
+    stdout_handler(1, { "data" }, "stdout")
+    scheduled_fn()
+
+    assert.spy(spy_cmd).was_called_with("checktime")
+
+    vim.schedule = original_schedule
+  end)
+
+  it("calls checktime after stderr when watch_files is true", function()
+    local term = terms.Terminal:new({ watch_files = true })
+    term:start()
+    local stderr_handler = term:get_state("on_job_stderr")
+    local spy_cmd = spy.on(vim, "cmd")
+    local original_schedule = vim.schedule
+    local scheduled_fn
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.schedule = function(fn) scheduled_fn = fn end
+
+    stderr_handler(1, { "data" }, "stderr")
+    scheduled_fn()
+
+    assert.spy(spy_cmd).was_called_with("checktime")
+
+    vim.schedule = original_schedule
+  end)
+
+  it("does not call checktime when watch_files is false", function()
+    local term = terms.Terminal:new({ watch_files = false })
+    term:start()
+    local stdout_handler = term:get_state("on_job_stdout")
+    local spy_cmd = spy.on(vim, "cmd")
+    local original_schedule = vim.schedule
+    local scheduled_fn
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.schedule = function(fn) scheduled_fn = fn end
+
+    stdout_handler(1, { "data" }, "stdout")
+    if scheduled_fn then scheduled_fn() end
+
+    assert.spy(spy_cmd).was_not_called_with("checktime")
+
+    vim.schedule = original_schedule
   end)
 end)
