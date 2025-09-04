@@ -6,10 +6,12 @@ All notable changes to this project will be documented in this file.
 
 - BREAKING: `auto_scroll` is off by default now.
 - BREAKING: `cleanup_on_success` & `cleanup_on_failure` replace `close_on_job_exit`.
+- Add `watch_files` option to refresh buffer on stdout
 - `cleanup_on_success` & `cleanup_on_failure` control not only closing the terminal window but also cleaning up the terminal instance.
 - Fixed vim-ui-select picker not working as expected.
 - Remove `WinEnter` event listener and do everything on `BufEnter` instead.
 - Cleanup terminals on `BufWipeout`.
+- Remove id from picker display and add status icons
 - Fix previewing non-active sticky terminals
 - Fix autocommands not working
 
