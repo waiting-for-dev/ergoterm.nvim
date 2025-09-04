@@ -2179,7 +2179,7 @@ describe(":get_status_icon", function()
     local term = terms.Terminal:new()
     term:start()
 
-    assert.equal("▶️", term:get_status_icon())
+    assert.equal("▶", term:get_status_icon())
   end)
 
   it("returns success icon when stopped but active with exit code 0", function()
@@ -2188,7 +2188,7 @@ describe(":get_status_icon", function()
     local exit_handler = term:get_state("on_job_exit")
     exit_handler(1, 0, "exit")
 
-    assert.equal("✅", term:get_status_icon())
+    assert.equal("✓", term:get_status_icon())
   end)
 
   it("returns failure icon when stopped but active with non-zero exit code", function()
@@ -2197,13 +2197,13 @@ describe(":get_status_icon", function()
     local exit_handler = term:get_state("on_job_exit")
     exit_handler(1, 1, "exit")
 
-    assert.equal("❌", term:get_status_icon())
+    assert.equal("✗", term:get_status_icon())
   end)
 
   it("returns inactive icon for sticky terminals that are not active", function()
     local term = terms.Terminal:new({ sticky = true })
 
-    assert.equal("⭕", term:get_status_icon())
+    assert.equal("○", term:get_status_icon())
   end)
 
   it("returns empty string for non-sticky terminals that are not active", function()

@@ -657,23 +657,23 @@ end
 ---Gets the status icon for the terminal
 ---
 ---Returns an appropriate UTF icon based on the current terminal state:
----• ⭕ Not active (only for sticky terminals)
----• ▶️ Started and running
----• ✅ Stopped but active, process succeeded
----• ❌ Stopped but active, process failed
+---• ○ Not active (only for sticky terminals)
+---• ▶ Started and running
+---• ✓ Stopped but active, process succeeded
+---• ✗ Stopped but active, process failed
 ---
 ---@return string the status icon
 function Terminal:get_status_icon()
   if self:is_started() then
-    return "▶️"
+    return "▶"
   elseif self:is_active() then
     if self._state.last_exit_code == 0 then
-      return "✅"
+      return "✓"
     else
-      return "❌"
+      return "✗"
     end
   elseif self.sticky then
-    return "⭕"
+    return "○"
   else
     return ""
   end
