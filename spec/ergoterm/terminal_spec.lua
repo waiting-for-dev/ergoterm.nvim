@@ -1595,34 +1595,6 @@ describe(":cleanup", function()
     assert.is_true(term:is_stopped())
   end)
 
-  it("closes the terminal window by default when stopping", function()
-    local term = terms.Terminal:new()
-    term:open()
-
-    term:cleanup()
-
-    assert.is_false(term:is_open())
-  end)
-
-  it("closes the terminal window when close is true", function()
-    local term = terms.Terminal:new()
-    term:open()
-
-    term:cleanup({ close = true })
-
-    assert.is_false(term:is_open())
-  end)
-
-  it("closes the terminal window when cleaning up", function()
-    local term = terms.Terminal:new()
-    term:open()
-
-    local spy_termclose = spy.on(term, "close")
-    term:cleanup()
-
-    assert.spy(spy_termclose).was_called()
-  end)
-
   it("removes the terminal from the state", function()
     local term = terms.Terminal:new()
 

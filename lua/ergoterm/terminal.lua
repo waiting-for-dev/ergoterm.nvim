@@ -500,6 +500,9 @@ function Terminal:cleanup(opts)
   if not self:is_stopped() then
     self:stop()
   end
+  if self:is_open() then
+    self:close()
+  end
   if self._state.bufnr then
     self._state.bufnr = nil
   end
