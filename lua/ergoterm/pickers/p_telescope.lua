@@ -83,9 +83,11 @@ function M.select(terminals, prompt, definitions)
     finder = finders.new_table({
       results = terminals,
       entry_maker = function(term)
+        local status_icon = term:get_status_icon()
+        local display_name = status_icon .. " " .. term.name
         return {
           value = term,
-          display = term.name,
+          display = display_name,
           ordinal = term.name,
         }
       end,

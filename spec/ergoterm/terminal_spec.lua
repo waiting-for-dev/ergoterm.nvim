@@ -1961,7 +1961,6 @@ describe(":clear", function()
 end)
 
 describe(":on_buf_enter", function()
-
   it("restores last mode if persist_mode is true", function()
     local term = terms.Terminal:new({ persist_mode = true, start_in_insert = false }):start()
     local spy_mode_set = spy.on(mode, "set")
@@ -2200,5 +2199,44 @@ describe(":get_state", function()
     local term = terms.Terminal:new()
 
     assert.equal("below", term:get_state("layout"))
+  end)
+end)
+
+describe(":get_status_icon", function()
+  it("returns play icon when terminal is started", function()
+    local term = terms.Terminal:new()
+    term:start()
+
+    assert.equal("▶️", term:get_status_icon())
+  end)
+
+  it("returns success icon when stopped but active with exit code 0", function()
+    local term = terms.Terminal:new()
+    term:start()
+    local exit_handler = term:get_state("on_job_exit")
+    exit_handler(1, 0, "exit")
+
+    assert.equal("✅", term:get_status_icon())
+  end)
+
+  it("returns failure icon when stopped but active with non-zero exit code", function()
+    local term = terms.Terminal:new()
+    term:start()
+    local exit_handler = term:get_state("on_job_exit")
+    exit_handler(1, 1, "exit")
+
+    assert.equal("❌", term:get_status_icon())
+  end)
+
+  it("returns inactive icon for sticky terminals that are not active", function()
+    local term = terms.Terminal:new({ sticky = true })
+
+    assert.equal("⭕", term:get_status_icon())
+  end)
+
+  it("returns empty string for non-sticky terminals that are not active", function()
+    local term = terms.Terminal:new({ sticky = false })
+
+    assert.equal("", term:get_status_icon())
   end)
 end)

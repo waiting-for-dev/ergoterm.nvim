@@ -91,20 +91,22 @@ function M._group_terminals_by_name(terminals)
 end
 
 function M._create_unique_display_name(term, name_groups)
+  local status_icon = term:get_status_icon()
   local name = term.name
+  local base_display_name = status_icon .. " " .. name
   local group = name_groups[name]
 
   if #group == 1 then
-    return name
+    return base_display_name
   end
 
   for i, terminal in ipairs(group) do
     if terminal == term then
-      return name .. " (" .. i .. ")"
+      return base_display_name .. " (" .. i .. ")"
     end
   end
 
-  return name
+  return base_display_name
 end
 
 function M.get_options(terminals)

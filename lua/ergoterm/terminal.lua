@@ -214,6 +214,7 @@ end
 ---@field float_opts FloatOpts
 ---@field mode Mode
 ---@field job_id? number
+---@field last_exit_code? number
 ---@field on_job_exit on_job_exit
 ---@field on_job_stdout on_job_stdout
 ---@field on_job_stderr on_job_stderr
@@ -650,6 +651,31 @@ function Terminal:get_state(key)
   return self._state[key]
 end
 
+---Gets the status icon for the terminal
+---
+---Returns an appropriate UTF icon based on the current terminal state:
+---• ⭕ Not active (only for sticky terminals)
+---• ▶️ Started and running
+---• ✅ Stopped but active, process succeeded
+---• ❌ Stopped but active, process failed
+---
+---@return string the status icon
+function Terminal:get_status_icon()
+  if self:is_started() then
+    return "▶️"
+  elseif self:is_active() then
+    if self._state.last_exit_code == 0 then
+      return "✅"
+    else
+      return "❌"
+    end
+  elseif self.sticky then
+    return "⭕"
+  else
+    return ""
+  end
+end
+
 ---@private
 function Terminal:_set_ft_options()
   local buf = vim.bo[self._state.bufnr]
@@ -690,6 +716,7 @@ function Terminal:_compute_exit_handler(callback)
   return function(job, exit_code, event)
     callback(self, job, exit_code, event)
     self._state.job_id = nil
+    self._state.last_exit_code = exit_code
 
     local should_cleanup = false
     if exit_code == 0 then
@@ -722,6 +749,7 @@ function Terminal:_initialize_state()
     layout = self.layout,
     float_opts = self:_compute_float_opts(),
     job_id = nil,
+    last_exit_code = nil,
     mode = mode.get_initial(self.start_in_insert),
     on_job_exit = self:_compute_exit_handler(self.on_job_exit),
     on_job_stdout = self:_compute_output_handler(self.on_job_stdout),
