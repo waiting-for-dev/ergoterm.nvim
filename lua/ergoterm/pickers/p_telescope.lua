@@ -85,8 +85,8 @@ function M.select(terminals, prompt, definitions)
       entry_maker = function(term)
         return {
           value = term,
-          display = term.id .. "-" .. term.name,
-          ordinal = term.id .. "-" .. term.name,
+          display = term.name,
+          ordinal = term.name,
         }
       end,
     }),

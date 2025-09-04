@@ -2,11 +2,15 @@ local terms = require("ergoterm.terminal")
 
 local M = {}
 
+M._state = {
+  display_to_terminal = {}
+}
+
 local fzf_lua = require("fzf-lua")
 local fzf_lua_builtin_previewer = require("fzf-lua.previewer.builtin")
 
-function M.get_term_id_from_selected(selected)
-  return tonumber(selected:match("(%d+)-"))
+function M.get_terminal_from_selected(selected)
+  return M._state.display_to_terminal[selected]
 end
 
 M.previewer = fzf_lua_builtin_previewer.buffer_or_file:extend()
@@ -18,8 +22,7 @@ function M.previewer:new(o, opts, fzf_win)
 end
 
 function M.previewer:parse_entry(entry_str)
-  local term_id = M.get_term_id_from_selected(entry_str)
-  local term = terms.get(term_id)
+  local term = M.get_terminal_from_selected(entry_str)
   if term then
     local bufnr = term:get_state("bufnr")
     local name = term.name
@@ -64,11 +67,55 @@ function M.previewer:gen_winopts()
   return vim.tbl_extend("keep", winopts, self.winopts)
 end
 
+function M._build_display_name_mapping(terminals)
+  M._state.display_to_terminal = {}
+
+  local name_groups = M._group_terminals_by_name(terminals)
+
+  for _, term in pairs(terminals) do
+    local display_name = M._create_unique_display_name(term, name_groups)
+    M._state.display_to_terminal[display_name] = term
+  end
+end
+
+function M._group_terminals_by_name(terminals)
+  local groups = {}
+  for _, term in pairs(terminals) do
+    local name = term.name
+    if not groups[name] then
+      groups[name] = {}
+    end
+    table.insert(groups[name], term)
+  end
+  return groups
+end
+
+function M._create_unique_display_name(term, name_groups)
+  local name = term.name
+  local group = name_groups[name]
+
+  if #group == 1 then
+    return name
+  end
+
+  for i, terminal in ipairs(group) do
+    if terminal == term then
+      return name .. " (" .. i .. ")"
+    end
+  end
+
+  return name
+end
+
 function M.get_options(terminals)
+  M._build_display_name_mapping(terminals)
+
   local options = {}
   for _, term in pairs(terminals) do
-    table.insert(options, term.id .. "-" .. term.name)
+    local display_name = M._create_unique_display_name(term, M._group_terminals_by_name(terminals))
+    table.insert(options, display_name)
   end
+
   return options
 end
 
@@ -80,8 +127,7 @@ function M.get_actions(definitions)
     actions[transformed_key] = {
       desc = transformed_desc,
       fn = function(selected)
-        local id = M.get_term_id_from_selected(selected[1])
-        local term = terms.get(id)
+        local term = M.get_terminal_from_selected(selected[1])
         definition.fn(term)
       end
     }
