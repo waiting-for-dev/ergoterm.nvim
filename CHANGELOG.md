@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Fix autocommands not being working because of not matching the pattern correctly.
+
 ## [0.3.0] - 2025-09-04
 
 - BREAKING: `auto_scroll` is off by default now.

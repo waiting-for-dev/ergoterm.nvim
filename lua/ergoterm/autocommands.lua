@@ -15,7 +15,6 @@ function M.on_buf_enter()
   end
 end
 
-
 function M.on_win_leave()
   local term = terms.identify()
   if term then
@@ -32,7 +31,7 @@ end
 -- Setup autocommands for the plugin.
 function M.setup()
   vim.api.nvim_create_augroup(AUGROUP, { clear = true })
-  local ergoterm_pattern = { "term://*#ergoterm#*", "term://*::ergoterm::*" }
+  local ergoterm_pattern = { "term://*" }
 
   vim.api.nvim_create_autocmd("BufEnter", {
     group = AUGROUP,
