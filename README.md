@@ -10,6 +10,7 @@ A Neovim plugin for seamless terminal workflow integration. Smart picker-based t
 - 🎯 **Smart terminal selection** - Pick from active terminals using your favorite picker (Telescope, fzf-lua, or built-in)
 - 📤 **Seamless text sending** - Send code, commands, or selections directly to any terminal
 - 💾 **Saved terminals** - Reuse terminal configurations across Neovim sessions
+- 🤖 **Perfect AI coding companion** - The most flexible plugin for any AI-assisted coding tools
 - ⚡ **Powerful API** - Extensive Lua API for custom workflows and integrations
 
 ## 📦 Installation

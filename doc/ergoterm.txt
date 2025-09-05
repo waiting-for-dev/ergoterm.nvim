@@ -41,6 +41,7 @@ Key Features:
 • Smart terminal selection using your favorite picker
 • Seamless text sending from buffers to terminals
 - Reuse terminal configurations across Neovim sessions
+- The most flexible plugin for any AI-assisted coding tools
 • Powerful Lua API for custom workflows
 
 ErgoTerm started as a fork of toggleterm.nvim but has evolved into a 
