@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.3] - 2025-09-14
+
 - Actually fix invalid win ID when opening a floating terminal
 
 ## [0.3.2] - 2025-09-14
