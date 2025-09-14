@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Fix invalid win ID when opening a floating terminal
+
 ## [0.3.1] - 2025-09-05
 
 - Fix autocommands not being working because of not matching the pattern correctly.
