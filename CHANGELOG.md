@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Fix fully refresh float window when focusing
+
 ## [0.3.3] - 2025-09-14
 
 - Actually fix invalid win ID when opening a floating terminal

@@ -451,7 +451,9 @@ function Terminal:focus(layout)
   if not self:is_focused() then
     vim.api.nvim_set_current_tabpage(self._state.tabpage)
     if self._state.layout == "float" then
-      vim.api.nvim_open_win(self._state.bufnr, true, self._state.float_opts)
+      local win_id = vim.api.nvim_open_win(self._state.bufnr, true, self._state.float_opts)
+      self._state.window = win_id
+      self._state.tabpage = vim.api.nvim_get_current_tabpage()
     else
       vim.api.nvim_set_current_win(self._state.window)
     end
