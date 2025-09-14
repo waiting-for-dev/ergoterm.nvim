@@ -383,7 +383,6 @@ function Terminal:open(layout)
   if not self:is_started() then self:start() end
   if not self:is_open() then
     local current_win = vim.api.nvim_get_current_win()
-    local float_win_id = nil
     local computed_layout = layout or self._state.layout
     if computed_layout == "above" then
       vim.cmd(self._state.size.above .. "split")
@@ -397,10 +396,10 @@ function Terminal:open(layout)
       vim.cmd("tabnew")
       vim.bo.bufhidden = "wipe"
     elseif computed_layout == "float" then
-      float_win_id = vim.api.nvim_open_win(self._state.bufnr, true, self._state.float_opts)
+      vim.api.nvim_open_win(self._state.bufnr, true, self._state.float_opts)
     end
     self._state.layout = computed_layout
-    self._state.window = float_win_id or vim.api.nvim_get_current_win()
+    self._state.window = vim.api.nvim_get_current_win()
     self._state.tabpage = vim.api.nvim_get_current_tabpage()
     vim.api.nvim_win_set_buf(self._state.window, self._state.bufnr)
     self:_set_options()
@@ -451,7 +450,11 @@ function Terminal:focus(layout)
   if not self:is_open() then self:open(layout) end
   if not self:is_focused() then
     vim.api.nvim_set_current_tabpage(self._state.tabpage)
-    vim.api.nvim_set_current_win(self._state.window)
+    if self._state.layout == "float" then
+      vim.api.nvim_open_win(self._state.bufnr, true, self._state.float_opts)
+    else
+      vim.api.nvim_set_current_win(self._state.window)
+    end
     self:_set_last_focused()
     self:_set_return_mode()
     self:on_focus()
