@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Fix opening picker from float terminal
+- Fix opening float terminal from another float terminal
+
 ## [0.3.4] - 2025-09-14
 
 - Fix fully refresh float window when focusing

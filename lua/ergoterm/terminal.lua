@@ -382,29 +382,22 @@ end
 function Terminal:open(layout)
   if not self:is_started() then self:start() end
   if not self:is_open() then
-    local current_win = vim.api.nvim_get_current_win()
+    local window = nil
     local computed_layout = layout or self._state.layout
-    if computed_layout == "above" then
-      vim.cmd(self._state.size.above .. "split")
-    elseif computed_layout == "below" then
-      vim.cmd("botright " .. self._state.size.below .. "split")
-    elseif computed_layout == "left" then
-      vim.cmd(self._state.size.left .. "vsplit")
-    elseif computed_layout == "right" then
-      vim.cmd("botright " .. self._state.size.right .. "vsplit")
+    if vim.tbl_contains({ "above", "below", "left", "right" }, computed_layout) then
+      window = self:_open_in_split(computed_layout)
     elseif computed_layout == "tab" then
-      vim.cmd("tabnew")
-      vim.bo.bufhidden = "wipe"
+      window = self:_open_in_tab()
     elseif computed_layout == "float" then
-      vim.api.nvim_open_win(self._state.bufnr, true, self._state.float_opts)
+      window = self:_open_in_float()
+    else
+      window = self:_open_in_window()
     end
     self._state.layout = computed_layout
-    self._state.window = vim.api.nvim_get_current_win()
-    self._state.tabpage = vim.api.nvim_get_current_tabpage()
-    vim.api.nvim_win_set_buf(self._state.window, self._state.bufnr)
+    self._state.window = window
+    self._state.tabpage = vim.api.nvim_win_get_tabpage(window)
     self:_set_options()
     self:on_open()
-    vim.api.nvim_set_current_win(current_win)
   end
   return self
 end
@@ -449,14 +442,7 @@ end
 function Terminal:focus(layout)
   if not self:is_open() then self:open(layout) end
   if not self:is_focused() then
-    vim.api.nvim_set_current_tabpage(self._state.tabpage)
-    if self._state.layout == "float" then
-      local win_id = vim.api.nvim_open_win(self._state.bufnr, true, self._state.float_opts)
-      self._state.window = win_id
-      self._state.tabpage = vim.api.nvim_get_current_tabpage()
-    else
-      vim.api.nvim_set_current_win(self._state.window)
-    end
+    vim.api.nvim_set_current_win(self._state.window)
     self:_set_last_focused()
     self:_set_return_mode()
     self:on_focus()
@@ -688,6 +674,47 @@ function Terminal:get_status_icon()
 end
 
 ---@private
+function Terminal:_open_in_split(layout)
+  local win_config
+  if layout == "above" then
+    win_config = { height = self._state.size.above, vertical = false, split = "above" }
+  elseif layout == "below" then
+    win_config = { height = self._state.size.below, vertical = false, split = "below" }
+  elseif layout == "left" then
+    win_config = { width = self._state.size.left, vertical = true, split = "left" }
+  elseif layout == "right" then
+    win_config = { width = self._state.size.right, vertical = true, split = "right" }
+  end
+  return vim.api.nvim_open_win(self._state.bufnr, false, win_config)
+end
+
+---@private
+function Terminal:_open_in_tab()
+  local current_window = vim.api.nvim_get_current_win()
+  vim.cmd("tabnew")
+  vim.bo.bufhidden = "wipe"
+  vim.api.nvim_set_current_buf(self._state.bufnr)
+  local window = vim.api.nvim_get_current_win()
+  vim.api.nvim_set_current_win(current_window)
+  vim.defer_fn(function() vim.cmd("stopinsert") end, 100)
+  return window
+end
+
+---@private
+function Terminal:_open_in_float()
+  local current_window_zindex = vim.api.nvim_win_get_config(0).zindex or 0
+  return vim.api.nvim_open_win(self._state.bufnr, false, vim.tbl_extend("force", self._state.float_opts, {
+    zindex = current_window_zindex + 1
+  }))
+end
+
+---@private
+function Terminal:_open_in_window()
+  vim.api.nvim_set_current_buf(self._state.bufnr)
+  return vim.api.nvim_get_current_win()
+end
+
+---@private
 function Terminal:_set_ft_options()
   local buf = vim.bo[self._state.bufnr]
   buf.filetype = FILETYPE
@@ -697,9 +724,10 @@ end
 
 ---@private
 function Terminal:_set_win_options()
-  vim.api.nvim_set_option_value("number", false, { scope = "local", win = self._state.window })
-  vim.api.nvim_set_option_value("signcolumn", "no", { scope = "local", win = self._state.window })
-  vim.api.nvim_set_option_value("relativenumber", false, { scope = "local", win = self._state.window })
+  local window = self._state.window
+  vim.api.nvim_set_option_value("number", false, { scope = "local", win = window })
+  vim.api.nvim_set_option_value("signcolumn", "no", { scope = "local", win = window })
+  vim.api.nvim_set_option_value("relativenumber", false, { scope = "local", win = window })
   if self._state.layout == "float" then
     self:_set_float_options()
   end
@@ -883,10 +911,11 @@ function Terminal:_set_initial_mode()
   return self
 end
 
----Sets the floating terminal options
+---@private
 function Terminal:_set_float_options()
-  vim.api.nvim_set_option_value("sidescrolloff", 0, { scope = "local", win = self._state.window })
-  vim.api.nvim_set_option_value("winblend", self.float_winblend, { scope = "local", win = self._state.window })
+  local window = self._state.window
+  vim.api.nvim_set_option_value("sidescrolloff", 0, { scope = "local", win = window })
+  vim.api.nvim_set_option_value("winblend", self.float_winblend, { scope = "local", win = window })
 end
 
 function Terminal:_setup_buffer_autocommands()
