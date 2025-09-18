@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- BREAKING: `cleanup_on_failure` defaults to `false` now.
+
 ## [0.3.5] - 2025-09-18
 
 - Fix opening picker from float terminal

@@ -145,11 +145,11 @@ describe("M.new", function()
     assert.is_true(term.cleanup_on_success)
   end)
 
-  it("creates a new terminal with cleanup_on_failure=true by default", function()
+  it("creates a new terminal with cleanup_on_failure=false by default", function()
     local term = commands.new("")
 
     assert.is_not_nil(term)
-    assert.is_true(term.cleanup_on_failure)
+    assert.is_false(term.cleanup_on_failure)
   end)
 
   it("creates a new terminal with sticky=false by default", function()
@@ -168,7 +168,7 @@ describe("M.new", function()
 
   it("creates a new terminal with multiple configuration options", function()
     local term = commands.new(
-      "layout=float auto_scroll=false persist_mode=true selectable=false start_in_insert=false sticky=true cleanup_on_success=false cleanup_on_failure=false")
+      "layout=float auto_scroll=false persist_mode=true selectable=false start_in_insert=false sticky=true cleanup_on_success=false cleanup_on_failure=true")
 
     assert.is_not_nil(term)
     assert.equal("float", term:get_state("layout"))
@@ -178,7 +178,7 @@ describe("M.new", function()
     assert.is_false(term.start_in_insert)
     assert.is_true(term.sticky)
     assert.is_false(term.cleanup_on_success)
-    assert.is_false(term.cleanup_on_failure)
+    assert.is_true(term.cleanup_on_failure)
   end)
 end)
 

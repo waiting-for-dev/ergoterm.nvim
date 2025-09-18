@@ -492,15 +492,15 @@ describe(":new", function()
   end)
 
   it("takes cleanup_on_failure option", function()
-    local term = terms.Terminal:new({ cleanup_on_failure = false })
+    local term = terms.Terminal:new({ cleanup_on_failure = true })
 
-    assert.is_false(term.cleanup_on_failure)
+    assert.is_true(term.cleanup_on_failure)
   end)
 
   it("defaults to config's cleanup_on_failure", function()
     local term = terms.Terminal:new()
 
-    assert.is_true(term.cleanup_on_failure)
+    assert.is_false(term.cleanup_on_failure)
   end)
 
   it("takes layout option", function()
@@ -1145,8 +1145,8 @@ describe(":is_active", function()
     assert.is_false(term:is_active())
   end)
 
-  it("returns false if terminal is stopped", function()
-    local term = terms.Terminal:new():start()
+  it("returns false if terminal has been cleaned up", function()
+    local term = terms.Terminal:new({ cleanup_on_failure = true }):start()
     term:stop()
     vim.wait(100)
 

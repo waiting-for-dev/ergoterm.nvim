@@ -133,7 +133,7 @@ Options:
     start_in_insert={boolean}   Start terminal in insert mode (default: true)
     sticky={boolean}            Keep terminal visible in picker even when stopped (default: false)
     cleanup_on_success={boolean}   Cleanup terminal when process exits successfully (default: true)
-    cleanup_on_failure={boolean}   Cleanup terminal when process exits with failure (default: true)
+    cleanup_on_failure={boolean}   Cleanup terminal when process exits with failure (default: false)
 
 Available layouts:
     above      Horizontal split above current window
@@ -331,7 +331,7 @@ terminal_defaults.cleanup_on_success ~
 
                                                  *ergoterm-cleanup_on_failure*
 terminal_defaults.cleanup_on_failure ~
-    Default: `true`
+    Default: `false`
     Type: `boolean`
 
     Close terminal window when the job process exits with failure (exit code non-zero).
@@ -601,8 +601,7 @@ project terminals available even when stopped: >lua
       name = "Phoenix Server",
       cmd = "iex -S mix phx.server",
       layout = "right",
-      sticky = true,
-      cleanup_on_failure = false
+      sticky = true
     })
 
     term:new({

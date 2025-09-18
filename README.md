@@ -81,7 +81,7 @@ Create new terminals with `:TermNew` and customize them with options:
 - `start_in_insert` - Start terminal in insert mode (default: `true`)
 - `sticky` - Keep terminals visible in picker even when stopped (requires `selectable` to also be `true`) (default: `false`)
 - `cleanup_on_success` - Cleanup terminal when process exits successfully (exit code 0) (default: `true`)
-- `cleanup_on_failure` - Cleanup terminal when process exits with failure (exit code non-zero) (default: `true`)
+- `cleanup_on_failure` - Cleanup terminal when process exits with failure (exit code non-zero) (default: `false`)
 
 ### 🎯 Selecting Terminals
 
@@ -231,8 +231,7 @@ term:new({
   name = "Phoenix Server",
   cmd = "iex -S mix phx.server",
   layout = "right",
-  sticky = true,
-  cleanup_on_failure = false
+  sticky = true
 })
 
 term:new({
@@ -450,7 +449,7 @@ require("ergoterm").setup({
     cleanup_on_success = true,
 
     -- Cleanup terminal when process exits with failure (exit code non-zero)
-    cleanup_on_failure = true,
+    cleanup_on_failure = false,
     
     -- Remember terminal mode between visits
     persist_mode = false,
