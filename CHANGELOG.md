@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.5] - 2025-09-18
+
 - Fix opening picker from float terminal
 - Fix opening float terminal from another float terminal
 
