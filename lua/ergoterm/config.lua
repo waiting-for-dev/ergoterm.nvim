@@ -66,6 +66,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field size SizeOpts?
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
+---@field tags string[]?
 
 ---@class PickerConfig
 ---@field picker PickerOption?
@@ -112,6 +113,7 @@ local config = {
     on_job_stdout = M.NULL_CALLBACK,
     shell = vim.o.shell,
     start_in_insert = true,
+    tags = {},
   },
   picker = {
     picker = nil,

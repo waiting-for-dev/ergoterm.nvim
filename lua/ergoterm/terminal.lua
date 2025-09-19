@@ -129,6 +129,16 @@ function M.filter(predicate)
   return result
 end
 
+---Returns all terminals that have the specified tag
+---
+---@param tag string the tag to search for
+---@return Terminal[] array of terminals that have the specified tag
+function M.with_tag(tag)
+  return M.filter(function(term)
+    return vim.tbl_contains(term.tags, tag)
+  end)
+end
+
 ---Presents a picker interface for terminal selection
 ---
 ---Shows started terminals plus sticky terminals regardless of their state, as long as `selectable`
@@ -249,6 +259,7 @@ end
 ---@field size SizeOpts? size configuration for different layouts
 ---@field start_in_insert boolean?
 ---@field sticky boolean? whether or not the terminal remains visible in picker even when stopped
+---@field tags string[]? tags for categorizing and filtering terminals
 
 ---@class Terminal : TermCreateArgs
 ---@field id number
@@ -291,6 +302,7 @@ function Terminal:new(args)
   term.on_open = vim.F.if_nil(term.on_open, config.get("terminal_defaults.on_open"))
   term.on_start = vim.F.if_nil(term.on_start, config.get("terminal_defaults.on_start"))
   term.on_stop = vim.F.if_nil(term.on_stop, config.get("terminal_defaults.on_stop"))
+  term.tags = term.tags or vim.tbl_deep_extend("keep", {}, config.get("terminal_defaults.tags") or {})
   term.id = M._compute_id()
   term:_initialize_state()
   term:_add_to_state()
@@ -300,7 +312,7 @@ end
 ---Updates terminal configuration after creation
 ---
 ---Most options can be changed, but 'cmd' and 'dir' are immutable after creation.
----Float and size options are merged with existing values rather than replaced entirely.
+---Float, size and tag options are merged with existing values rather than replaced entirely.
 ---
 ---@param opts TermCreateArgs configuration changes to apply
 ---@return Terminal? self for method chaining, or nil on error
@@ -310,6 +322,10 @@ function Terminal:update(opts)
       self[key] = vim.tbl_deep_extend("keep", opts[key], self[key])
       opts[key] = nil
     end
+  end
+  if opts.tags then
+    self.tags = vim.list_extend(vim.deepcopy(self.tags), opts.tags)
+    opts.tags = nil
   end
   for k, v in pairs(opts) do
     if k == "cmd" or k == "dir" then

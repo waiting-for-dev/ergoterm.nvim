@@ -192,6 +192,38 @@ describe(".filter", function()
   end)
 end)
 
+describe(".with_tag", function()
+  it("returns all terminals with the specified tag", function()
+    local term1 = terms.Terminal:new({ name = "test1", tags = { "dev", "backend" } })
+    local term2 = terms.Terminal:new({ name = "test2", tags = { "dev", "frontend" } })
+    terms.Terminal:new({ name = "test3", tags = { "production", "backend" } })
+
+    local result = terms.with_tag("dev")
+
+    assert.equal(2, #result)
+    assert.is_true(vim.tbl_contains(result, term1))
+    assert.is_true(vim.tbl_contains(result, term2))
+  end)
+
+  it("returns empty table when no terminals have the specified tag", function()
+    terms.Terminal:new({ name = "test1", tags = { "dev" } })
+    terms.Terminal:new({ name = "test2", tags = { "frontend" } })
+
+    local result = terms.with_tag("production")
+
+    assert.equal(0, #result)
+  end)
+
+  it("returns empty table when terminals have no tags", function()
+    terms.Terminal:new({ name = "test1" })
+    terms.Terminal:new({ name = "test2" })
+
+    local result = terms.with_tag("dev")
+
+    assert.equal(0, #result)
+  end)
+end)
+
 describe(".select", function()
   it("returns result of calling given picker with started terminal and given prompt and callbacks", function()
     local picker = {
@@ -618,6 +650,32 @@ describe(":new", function()
     assert.is_false(term.watch_files)
   end)
 
+  it("takes tags option", function()
+    local term = terms.Terminal:new({ tags = { "dev", "backend" } })
+
+    assert.equal(2, #term.tags)
+    assert.is_true(vim.tbl_contains(term.tags, "dev"))
+    assert.is_true(vim.tbl_contains(term.tags, "backend"))
+  end)
+
+  it("defaults to config's tags", function()
+    local term = terms.Terminal:new()
+
+    assert.equal(0, #term.tags)
+  end)
+
+  it("merges tags with defaults for non-given options", function()
+    local original_set = config.set
+    config.set({ terminal_defaults = { tags = { "default" } } })
+
+    local term = terms.Terminal:new({ tags = { "custom" } })
+
+    assert.equal(1, #term.tags)
+    assert.is_true(vim.tbl_contains(term.tags, "custom"))
+
+    config.set({})
+  end)
+
   it("takes size option", function()
     local term = terms.Terminal:new({ size = { below = 20, right = "30%" } })
 
@@ -1034,6 +1092,16 @@ describe(":update", function()
     term:update({ sticky = true })
 
     assert.is_true(term.sticky)
+  end)
+
+  it("merges tags without overriding existing ones", function()
+    local term = terms.Terminal:new({ tags = { "dev", "backend" } })
+    term:update({ tags = { "production" } })
+
+    assert.equal(3, #term.tags)
+    assert.is_true(vim.tbl_contains(term.tags, "dev"))
+    assert.is_true(vim.tbl_contains(term.tags, "backend"))
+    assert.is_true(vim.tbl_contains(term.tags, "production"))
   end)
 end)
 

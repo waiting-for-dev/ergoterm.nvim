@@ -82,6 +82,7 @@ Create new terminals with `:TermNew` and customize them with options:
 - `sticky` - Keep terminals visible in picker even when stopped (requires `selectable` to also be `true`) (default: `false`)
 - `cleanup_on_success` - Cleanup terminal when process exits successfully (exit code 0) (default: `true`)
 - `cleanup_on_failure` - Cleanup terminal when process exits with failure (exit code non-zero) (default: `false`)
+- `tags` - List of tags for categorizing and filtering terminals (default: `{}`)
 
 ### 🎯 Selecting Terminals
 
@@ -145,6 +146,7 @@ Modify existing terminal configuration:
 - `persist_mode` - Remember terminal mode when revisiting
 - `selectable` - Show in selection picker and allow as last focused (can be overridden by universal selection mode)
 - `start_in_insert` - Start in insert mode
+- `tags` - List of tags for categorizing and filtering terminals
 
 ### 🌐 Universal Selection Mode
 
@@ -278,6 +280,7 @@ All options default to values from your configuration:
   - Each direction accepts either a string with percentage (e.g., `"30%"`) or a number for absolute size
   - Example: `{ below = 20, right = "40%" }` - 20 lines high for below splits, 40% width for right splits
 - `start_in_insert` - Start terminal in insert mode
+- `tags` - List of tags for categorizing and filtering terminals
 
 ## ⚡ API Overview
 
@@ -462,6 +465,9 @@ require("ergoterm").setup({
     
     -- Keep terminals visible in picker even when stopped, provided `selectable` is also true
     sticky = false,
+
+    -- Default tags for categorizing and filtering terminals
+    tags = {},
 
     -- Floating window options
     float_opts = {
