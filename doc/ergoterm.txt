@@ -127,9 +127,10 @@ Options:
                         • nil - Use current working directory
     cmd={command}       Shell command to run (default: system shell)
     auto_scroll={boolean}       Auto-scroll terminal output (default: true)
+    bang_target={boolean}       Allow terminal to be targeted by bang commands (default: true)
     watch_files={boolean}       Watch for file changes when terminal produces output (default: false)
     persist_mode={boolean}      Remember terminal mode between visits (default: false)
-    selectable={boolean}        Show in selection picker and allow as last focused (default: true)
+    selectable={boolean}        Show in selection picker (default: true)
     start_in_insert={boolean}   Start terminal in insert mode (default: true)
     sticky={boolean}            Keep terminal visible in picker even when stopped (default: false)
     cleanup_on_success={boolean}   Cleanup terminal when process exits successfully (default: true)
@@ -239,9 +240,11 @@ Updatable options:
     layout={layout}              Change window layout
     name={name}                  Rename terminal
     auto_scroll={boolean}        Auto-scroll behavior
+    bang_target={boolean}        Allow terminal to be targeted by bang commands
+                                 (can be overridden by universal selection mode)
     watch_files={boolean}        Watch for file changes when terminal produces output
     persist_mode={boolean}       Remember terminal mode
-    selectable={boolean}         Show in selection picker and allow as last focused
+    selectable={boolean}         Show in selection picker
                                  (can be overridden by universal selection mode)
     start_in_insert={boolean}    Start in insert mode
     sticky={boolean}             Keep terminal visible in picker even when stopped
@@ -265,9 +268,10 @@ Syntax: >vim
 <
 
 When universal selection is enabled, all terminals become selectable and can
-be set as last focused, regardless of their individual `selectable` setting.
-This provides a temporary override for accessing non-selectable terminals
-through pickers and bang commands.
+be targeted by bang commands, regardless of their individual `selectable` and
+`bang_target` settings. This provides a temporary override for accessing
+non-selectable terminals through pickers and non-bang-target terminals through
+bang commands.
 
 ==============================================================================
 5. CONFIGURATION                                       *ergoterm-configuration*
@@ -310,18 +314,30 @@ terminal_defaults.layout ~
 terminal_defaults.auto_scroll ~
     Default: `false`
     Type: `boolean`
-    
+
     Automatically scroll terminal output to bottom.
+
+                                                         *ergoterm-bang_target*
+terminal_defaults.bang_target ~
+    Default: `true`
+    Type: `boolean`
+
+    Allow terminal to be targeted by bang commands. When set to false,
+    the terminal will not be considered for bang commands (e.g., `:TermSend!`,
+    `:TermUpdate!`).
+
+    Note: This setting can be temporarily overridden by enabling universal
+    selection mode with |ergoterm-termtoggleuniversalselection|.
 
                                                          *ergoterm-watch_files*
 terminal_defaults.watch_files ~
     Default: `false`
     Type: `boolean`
 
-    Watch for file changes when terminal produces output. Useful when 
+    Watch for file changes when terminal produces output. Useful when
     terminal commands modify files that are open in Neovim.
 
-    Note: Requires Vim's `autoread` option to be enabled for file changes 
+    Note: Requires Vim's `autoread` option to be enabled for file changes
     to be detected.
 
                                                  *ergoterm-cleanup_on_success*
@@ -357,10 +373,8 @@ terminal_defaults.selectable ~
     Default: `true`
     Type: `boolean`
 
-    Show terminals in picker selection and allow as last focused by default.
-    When set to false, the terminal:
-    • Is not visible from the picker
-    • Is not marked as last focused and therefore bang commands don't take it into account
+    Show terminals in picker selection by default. When set to false, the
+    terminal is not visible from the picker.
 
     Note: This setting can be temporarily overridden by enabling universal
     selection mode with |ergoterm-termtoggleuniversalselection|.
@@ -582,7 +596,8 @@ Example: >lua
       cmd = "lazygit", 
       layout = "float",
       dir = "git_dir",
-      selectable = false
+      selectable = false,
+      bang_target = false
     })
   
     local server = terms.Terminal:new({

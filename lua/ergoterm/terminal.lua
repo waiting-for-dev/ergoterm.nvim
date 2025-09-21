@@ -20,13 +20,13 @@ local utils = lazy.require("ergoterm.utils")
 
 ---@class State
 ---@field last_focused Terminal? Last focused terminal
----@field last_focused_selectable Terminal? Last selectable focused terminal
+---@field last_focused_bang_target Terminal? Last bang_target focused terminal
 ---@field ids number[] All used session terminal ids, even when deleted from session
 ---@field terminals Terminal[] All terminals
 ---@field universal_selection boolean Whether to ignore selectable flag in selection and last focused
 M._state = {
   last_focused = nil,
-  last_focused_selectable = nil,
+  last_focused_bang_target = nil,
   ids = {},
   terminals = {},
   universal_selection = false
@@ -58,14 +58,14 @@ end
 ---Returns the most recently focused terminal
 ---
 ---If `universal_selection` is enabled, returns the last focused terminal regardless
----of its `selectable` flag. Otherwise, returns the last focused terminal that is `selectable`.
+---of its `bang_target` flag. Otherwise, returns the last focused terminal that is a bang target.
 ---
 ---@return Terminal? the last focused terminal, or nil if none have been focused
 function M.get_last_focused()
   if M._state.universal_selection then
     return M._state.last_focused
   else
-    return M._state.last_focused_selectable
+    return M._state.last_focused_bang_target
   end
 end
 
@@ -234,6 +234,7 @@ end
 
 ---@class TermCreateArgs
 ---@field auto_scroll boolean? whether or not to scroll down on terminal output
+---@field bang_target boolean? whether or not the terminal can be targeted by bang commands
 ---@field watch_files boolean? whether or not run `checktime` on terminal output
 ---@field cmd? string command to run in the terminal
 ---@field clear_env? boolean use clean job environment, passed to jobstart()
@@ -278,6 +279,7 @@ function Terminal:new(args)
   local term = args or {} ---@cast term Terminal
   setmetatable(term, self)
   term.auto_scroll = vim.F.if_nil(term.auto_scroll, config.get("terminal_defaults.auto_scroll"))
+  term.bang_target = vim.F.if_nil(term.bang_target, config.get("terminal_defaults.bang_target"))
   term.watch_files = vim.F.if_nil(term.watch_files, config.get("terminal_defaults.watch_files"))
   term.cmd = term.cmd or config.get("terminal_defaults.shell")
   term.clear_env = vim.F.if_nil(term.clear_env, config.get("terminal_defaults.clear_env"))
@@ -519,8 +521,8 @@ function Terminal:cleanup(opts)
   if M._state.last_focused == self then
     M._state.last_focused = nil
   end
-  if M._state.last_focused_selectable == self then
-    M._state.last_focused_selectable = nil
+  if M._state.last_focused_bang_target == self then
+    M._state.last_focused_bang_target = nil
   end
   if not self.sticky or force then
     M._state.terminals[self.id] = nil
@@ -899,8 +901,8 @@ end
 ---@private
 function Terminal:_set_last_focused()
   M._state.last_focused = self
-  if self.selectable then
-    M._state.last_focused_selectable = self
+  if self.bang_target then
+    M._state.last_focused_bang_target = self
   end
   return self
 end

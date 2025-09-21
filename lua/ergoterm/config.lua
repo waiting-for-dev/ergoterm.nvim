@@ -44,6 +44,7 @@ M.NULL_CALLBACK = function(...) end
 
 ---@class TerminalDefaults
 ---@field auto_scroll boolean?
+---@field bang_target boolean?
 ---@field watch_files boolean?
 ---@field clear_env boolean?
 ---@field cleanup_on_success boolean?
@@ -81,6 +82,7 @@ M.NULL_CALLBACK = function(...) end
 local config = {
   terminal_defaults = {
     auto_scroll = false,
+    bang_target = true,
     watch_files = false,
     clear_env = false,
     cleanup_on_success = true,

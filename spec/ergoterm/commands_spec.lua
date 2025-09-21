@@ -96,6 +96,20 @@ describe("M.new", function()
     assert.is_false(term.auto_scroll)
   end)
 
+  it("creates a new terminal with bang_target=true by default", function()
+    local term = commands.new("")
+
+    assert.is_not_nil(term)
+    assert.is_true(term.bang_target)
+  end)
+
+  it("creates a new terminal with the given bang_target option", function()
+    local term = commands.new("bang_target=false")
+
+    assert.is_not_nil(term)
+    assert.is_false(term.bang_target)
+  end)
+
   it("creates a new terminal with persist_mode=false by default", function()
     local term = commands.new("")
 
@@ -213,9 +227,9 @@ describe("M.select", function()
     assert.is_true(result)
   end)
 
-  it("ignores non selectable terminals when called with bang", function()
+  it("ignores non bang target terminals when called with bang", function()
     local term = terms.Terminal:new():start()
-    local term_not_selectable = terms.Terminal:new({ selectable = false }):start()
+    local term_not_selectable = terms.Terminal:new({ bang_target = false }):start()
     term:focus()
     term_not_selectable:focus()
     local spy_focus = spy.on(term, "focus")
@@ -346,11 +360,11 @@ describe("M.send", function()
     })
   end)
 
-  it("ignores non selectable terminals when called with the bang option", function()
+  it("ignores non bang target terminals when called with the bang option", function()
     local term = terms.Terminal:new():start()
-    local term_not_selectable = terms.Terminal:new({ selectable = false }):start()
+    local term_not_bang_target = terms.Terminal:new({ bang_target = false }):start()
     term:focus()
-    term_not_selectable:focus()
+    term_not_bang_target:focus()
     local spy_send = spy.on(term, "send")
 
     commands.send("text='bang test'", 0, true, null_picker)
@@ -517,16 +531,16 @@ describe("M.update", function()
     assert.equal("right", term.layout)
   end)
 
-  it("ignores non selectable terminals when called with the bang option", function()
+  it("ignores non bang target terminals when called with the bang option", function()
     local term = terms.Terminal:new():start()
-    local term_not_selectable = terms.Terminal:new({ selectable = false }):start()
+    local term_not_bang_target = terms.Terminal:new({ bang_target = false }):start()
     term:focus()
-    term_not_selectable:focus()
+    term_not_bang_target:focus()
 
     commands.update("layout=right", true, null_picker)
 
     assert.equal("right", term.layout)
-    assert.equal("below", term_not_selectable.layout)
+    assert.equal("below", term_not_bang_target.layout)
   end)
 
   it("notifies when bang is given but no last focused terminal exists", function()

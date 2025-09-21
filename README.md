@@ -75,9 +75,10 @@ Create new terminals with `:TermNew` and customize them with options:
   - Accepts absolute paths (`/home/user/project`), relative paths (`~/my-project`, `./subdir`), `"git_dir"` for auto-detected git repository root, or `nil` for current directory
 - `cmd` - Shell command to run (default: system shell)
 - `auto_scroll` - Automatically scroll terminal output to bottom (default: `false`)
+- `bang_target` - Allow terminal to be targeted by bang commands (default: `true`)
 - `watch_files` - Watch for file changes when terminal produces output (requires vim's `autoread` option) (default: `false`)
 - `persist_mode` - Remember terminal mode between visits (default: `false`)
-- `selectable` - Show in selection picker and allow as last focused (default: `true`)
+- `selectable` - Show in selection picker (default: `true`)
 - `start_in_insert` - Start terminal in insert mode (default: `true`)
 - `sticky` - Keep terminals visible in picker even when stopped (requires `selectable` to also be `true`) (default: `false`)
 - `cleanup_on_success` - Cleanup terminal when process exits successfully (exit code 0) (default: `true`)
@@ -142,21 +143,22 @@ Modify existing terminal configuration:
 - `layout` - Change window layout
 - `name` - Rename terminal
 - `auto_scroll` - Auto-scroll behavior
+- `bang_target` - Allow terminal to be targeted by bang commands (can be overridden by universal selection mode)
 - `watch_files` - Watch for file changes when terminal produces output (requires vim's `autoread` option)
 - `persist_mode` - Remember terminal mode when revisiting
-- `selectable` - Show in selection picker and allow as last focused (can be overridden by universal selection mode)
+- `selectable` - Show in selection picker (can be overridden by universal selection mode)
 - `start_in_insert` - Start in insert mode
 - `tags` - List of tags for categorizing and filtering terminals
 
 ### 🌐 Universal Selection Mode
 
-Toggle universal selection mode to temporarily override the `selectable` setting:
+Toggle universal selection mode to temporarily override the `selectable` and `bang_target` settings for all terminals:
 
 ```vim
 :TermToggleUniversalSelection
 ```
 
-When enabled, all terminals become selectable and can be set as last focused, regardless of their individual `selectable` setting. This provides a way to access non-selectable terminals through pickers and bang commands when needed.
+When enabled, all terminals become selectable and can be targeted by bang commands, regardless of their individual `selectable` and `bang_target` settings. This provides a way to access any terminals through pickers and bang commands when needed.
 
 ## ⌨️ Example Keymaps
 
@@ -205,7 +207,8 @@ local lazygit = terms.Terminal:new({
   cmd = "lazygit",
   layout = "float",
   dir = "git_dir",
-  selectable = false
+  selectable = false,
+  bang_target = false
 })
 
 local claude = terms.Terminal:new({
@@ -251,6 +254,7 @@ With `sticky = true`, these terminals remain visible in the picker (`:TermSelect
 All options default to values from your configuration:
 
 - `auto_scroll` - Automatically scroll terminal output to bottom
+- `bang_target` - Allow terminal to be targeted by bang commands (can be overridden by universal selection mode)
 - `watch_files` - Watch for file changes when terminal produces output (requires vim's `autoread` option)
 - `cmd` - Command to execute in the terminal
 - `clear_env` - Use clean environment for the job
@@ -274,7 +278,7 @@ All options default to values from your configuration:
 - `on_start` - Called when the terminal job process starts. Receives the terminal instance as its only argument
 - `on_stop` - Called when the terminal job process stops. Receives the terminal instance as its only argument
 - `persist_mode` - Remember terminal mode between visits
-- `selectable` - Include terminal in selection picker and allow as last focused (can be overridden by universal selection mode)
+- `selectable` - Include terminal in selection picker (can be overridden by universal selection mode)
 - `sticky` - Keep terminal visible in picker even when stopped (requires `selectable` to also be `true`)
 - `size` - Size configuration for different window layouts (table with `above`, `below`, `left`, `right` keys)
   - Each direction accepts either a string with percentage (e.g., `"30%"`) or a number for absolute size
@@ -438,31 +442,34 @@ require("ergoterm").setup({
   terminal_defaults = {
     -- Default shell command
     shell = vim.o.shell,
-    
+
     -- Default window layout
     layout = "below",
-    
+
     -- Auto-scroll terminal output
     auto_scroll = false,
-    
+
+    -- Allow terminals to be targeted by bang commands by default
+    bang_target = true,
+
     -- Watch for file changes when terminal produces output (requires vim's autoread option)
     watch_files = false,
-    
+
     -- Cleanup terminal when process exits successfully (exit code 0)
     cleanup_on_success = true,
 
     -- Cleanup terminal when process exits with failure (exit code non-zero)
     cleanup_on_failure = false,
-    
+
     -- Remember terminal mode between visits
     persist_mode = false,
-    
+
     -- Start terminals in insert mode
     start_in_insert = true,
-    
+
     -- Show terminals in picker by default
     selectable = true,
-    
+
     -- Keep terminals visible in picker even when stopped, provided `selectable` is also true
     sticky = false,
 

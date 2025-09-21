@@ -61,8 +61,8 @@ describe(".identify", function()
 end)
 
 describe(".get_last_focused", function()
-  it("returns last focused selectable terminal when universal selection is disabled", function()
-    local term1 = terms.Terminal:new({ selectable = false })
+  it("returns last focused bang target terminal when universal selection is disabled", function()
+    local term1 = terms.Terminal:new({ bang_target = false })
     local term2 = terms.Terminal:new()
     term2:focus()
     term1:focus()
@@ -72,8 +72,8 @@ describe(".get_last_focused", function()
     assert.equal(result, term2)
   end)
 
-  it("returns last focused terminal regardless of selectable option when universal selection is enabled", function()
-    local term1 = terms.Terminal:new({ selectable = false })
+  it("returns last focused terminal regardless of bang_target option when universal selection is enabled", function()
+    local term1 = terms.Terminal:new({ bang_target = false })
     local term2 = terms.Terminal:new()
     term2:focus()
     term1:focus()
@@ -485,6 +485,18 @@ describe(":new", function()
     local term = terms.Terminal:new()
 
     assert.is_false(term.auto_scroll)
+  end)
+
+  it("takes bang_target option", function()
+    local term = terms.Terminal:new({ bang_target = false })
+
+    assert.is_false(term.bang_target)
+  end)
+
+  it("defaults to config's bang_target", function()
+    local term = terms.Terminal:new()
+
+    assert.is_true(term.bang_target)
   end)
 
   it("takes cmd option", function()
