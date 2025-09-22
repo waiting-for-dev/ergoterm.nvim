@@ -799,6 +799,25 @@ require("ergoterm.terminal").toggle_universal_selection()         *ergoterm.togg
     When enabled, all terminals are selectable regardless of their
     individual selectable setting.
 
+require("ergoterm.terminal").with_defaults({custom_defaults})      *ergoterm.with_defaults()*
+    Create a terminal factory with custom defaults.
+    Returns a factory table with a new() method that creates terminals
+    with the provided defaults merged with global configuration.
+
+    Parameters:
+        {custom_defaults} - Table of default values to apply to new terminals
+
+    Returns:
+        Factory table with new() method
+
+    Example: >lua
+        local task = require("ergoterm.terminal").with_defaults({
+          tags = { "task" },
+          selectable = false
+        })
+        local term = task:new({ name = "foo" })
+    <
+
 ------------------------------------------------------------------------------
 7.4 Custom Text Decorators                             *ergoterm-decorators*
 

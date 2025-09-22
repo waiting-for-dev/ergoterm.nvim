@@ -474,6 +474,55 @@ describe(".reset_ids", function()
   end)
 end)
 
+describe(".with_defaults", function()
+  it("returns a factory with a new method", function()
+    local factory = terms.with_defaults({ tags = { "test" } })
+
+    assert.is_not_nil(factory.new)
+    assert.equal("function", type(factory.new))
+  end)
+
+  it("creates terminals with custom defaults merged with provided args", function()
+    local factory = terms.with_defaults({ tags = { "task" }, selectable = false })
+    local term = factory:new({ name = "foo" })
+
+    assert.equal("foo", term.name)
+    assert.is_false(term.selectable)
+    assert.equal(1, #term.tags)
+    assert.is_true(vim.tbl_contains(term.tags, "task"))
+  end)
+
+  it("allows provided args to override custom defaults", function()
+    local factory = terms.with_defaults({ selectable = false, name = "default" })
+    local term = factory:new({ selectable = true, name = "override" })
+
+    assert.is_true(term.selectable)
+    assert.equal("override", term.name)
+  end)
+
+  it("deep merges nested tables settings", function()
+    local factory = terms.with_defaults({
+      float_opts = { width = 100, height = 50 }
+    })
+    local term = factory:new({
+      float_opts = { title = "custom" }
+    })
+
+    assert.equal(100, term.float_opts.width)
+    assert.equal(50, term.float_opts.height)
+    assert.equal("custom", term.float_opts.title)
+  end)
+
+  it("still applies global config defaults", function()
+    local factory = terms.with_defaults({ tags = { "custom" } })
+    local term = factory:new({ name = "test" })
+
+    assert.is_true(term.bang_target)
+    assert.equal("below", term.layout)
+    assert.equal(vim.o.shell, term.cmd)
+  end)
+end)
+
 describe(":new", function()
   it("takes auto_scroll option", function()
     local term = terms.Terminal:new({ auto_scroll = false })

@@ -971,6 +971,20 @@ function Terminal:_scroll_bottom()
   end
 end
 
+---Creates a terminal factory with custom defaults
+---
+---@param custom_defaults TermCreateArgs custom default values
+---@return table factory with a new() method that uses custom defaults
+function M.with_defaults(custom_defaults)
+  return {
+    new = function(_, args)
+      args = args or {}
+      local merged_args = vim.tbl_deep_extend("force", custom_defaults, args)
+      return Terminal:new(merged_args)
+    end
+  }
+end
+
 M.Terminal = Terminal
 
 return M

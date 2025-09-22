@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Add `.with_defaults()` as a factory builder for terminals with custom defaults.
+
 ## 0.4.0 - 2025-09-22
 
 - BREAKING: `cleanup_on_failure` defaults to `false` now.
