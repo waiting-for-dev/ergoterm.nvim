@@ -2,7 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-## 0.3.6 - 2025-09-22
+## [Unreleased]
+
+## 0.4.0 - 2025-09-22
 
 - BREAKING: `cleanup_on_failure` defaults to `false` now.
 - BREAKING: `selectable` only controls picker visibility, while new `bang_target` controls a terminal being a target for bang commands.
