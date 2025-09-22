@@ -696,10 +696,8 @@ function Terminal:get_status_icon()
     else
       return "✗"
     end
-  elseif self.sticky then
-    return "○"
   else
-    return ""
+    return "○"
   end
 end
 

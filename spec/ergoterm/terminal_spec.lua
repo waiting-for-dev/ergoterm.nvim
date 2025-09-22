@@ -2291,16 +2291,10 @@ describe(":get_status_icon", function()
     assert.equal("✗", term:get_status_icon())
   end)
 
-  it("returns inactive icon for sticky terminals that are not active", function()
+  it("returns inactive icon otherwise", function()
     local term = terms.Terminal:new({ sticky = true })
 
     assert.equal("○", term:get_status_icon())
-  end)
-
-  it("returns empty string for non-sticky terminals that are not active", function()
-    local term = terms.Terminal:new({ sticky = false })
-
-    assert.equal("", term:get_status_icon())
   end)
 end)
 
