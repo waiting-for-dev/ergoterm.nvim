@@ -148,12 +148,13 @@ end
 ---
 ---@param picker Picker the picker implementation to use
 ---@param prompt string text to display in the picker
----@param callbacks table<string, PickerCallbackDefinition> actions to execute on terminal selection
+---@param callbacks? table<string, PickerCallbackDefinition> actions to execute on terminal selection
 ---@return any result from the picker, or nil if no terminals available
 function M.select(picker, prompt, callbacks)
   local terminals = M._state.universal_selection and M.get_all() or M._find_selectable_terminals_for_picker()
   if #terminals == 0 then return utils.notify("No ergoterms have been started yet", "info") end
-  return picker.select(terminals, prompt, callbacks)
+  local computed_callbacks = callbacks or M._get_default_picker_callbacks()
+  return picker.select(terminals, prompt, computed_callbacks)
 end
 
 ---@class CleanupOptions
@@ -209,6 +210,13 @@ function M._find_selectable_terminals_for_picker()
     ---@diagnostic disable-next-line: return-type-mismatch
     return term.selectable and (term:is_active() or term.sticky)
   end)
+end
+
+---@private
+function M._get_default_picker_callbacks()
+  local select_actions = config.get("picker.select_actions")
+  local extra_select_actions = config.get("picker.extra_select_actions")
+  return vim.tbl_extend("force", select_actions, extra_select_actions)
 end
 
 ---@class ComputedSizeOpts

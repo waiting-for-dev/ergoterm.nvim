@@ -70,10 +70,7 @@ function M.select(bang, picker)
   if bang then
     return M._execute_on_last_focused(function(t) t:focus() end)
   else
-    local select_actions = config.get("picker.select_actions")
-    local extra_select_actions = config.get("picker.extra_select_actions")
-    local all_actions = vim.tbl_extend("force", select_actions, extra_select_actions)
-    return terms.select(picker, "Please select a terminal to open (or focus): ", all_actions)
+    return terms.select(picker, "Please select a terminal to open (or focus): ")
   end
 end
 
