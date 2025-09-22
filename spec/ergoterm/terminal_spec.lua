@@ -235,7 +235,7 @@ describe(".select", function()
     terms.Terminal:new()
     local callbacks = {}
 
-    local result = terms.select(nil, picker, "prompt", callbacks)
+    local result = terms.select(nil, "prompt", callbacks, picker)
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -254,7 +254,7 @@ describe(".select", function()
     local term = terms.Terminal:new({ selectable = true }):start()
     local callbacks = {}
 
-    local result = terms.select(nil, picker, "prompt", callbacks)
+    local result = terms.select(nil, "prompt", callbacks, picker)
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -272,7 +272,7 @@ describe(".select", function()
     local term2 = terms.Terminal:new({ selectable = true })
     local callbacks = {}
 
-    local result = terms.select(nil, picker, "prompt", callbacks)
+    local result = terms.select(nil, "prompt", callbacks, picker)
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -290,7 +290,7 @@ describe(".select", function()
     local term = terms.Terminal:new({ selectable = true, sticky = true })
     local callbacks = {}
 
-    local result = terms.select(nil, picker, "prompt", callbacks)
+    local result = terms.select(nil, "prompt", callbacks, picker)
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -308,7 +308,7 @@ describe(".select", function()
     local hidden_term = terms.Terminal:new({ selectable = false }):start()
     local callbacks = {}
 
-    local result = terms.select(nil, picker, "prompt", callbacks)
+    local result = terms.select(nil, "prompt", callbacks, picker)
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -327,7 +327,7 @@ describe(".select", function()
     local sticky_term = terms.Terminal:new({ selectable = false, sticky = true })
     local callbacks = {}
 
-    local result = terms.select(nil, picker, "prompt", callbacks)
+    local result = terms.select(nil, "prompt", callbacks, picker)
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -347,7 +347,7 @@ describe(".select", function()
     local callbacks = {}
     terms.toggle_universal_selection()
 
-    local result = terms.select(nil, picker, "prompt", callbacks)
+    local result = terms.select(nil, "prompt", callbacks, picker)
 
     ---@diagnostic disable: need-check-nil
     assert.equal(2, #result[1])
@@ -363,7 +363,7 @@ describe(".select", function()
       end
     }
     local result = test_helpers.mocking_notify(function()
-      terms.select(nil, picker, "prompt", {})
+      terms.select(nil, "prompt", {}, picker)
     end)
 
     ---@diagnostic disable: need-check-nil
