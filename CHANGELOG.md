@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - BREAKING: `cleanup_on_failure` defaults to `false` now.
 - BREAKING: `selectable` only controls picker visibility, while new `bang_target` controls a terminal being a target for bang commands.
 - Add `tags` option to terminals and filtering by specific tag.
+- Fix splits not being at the top level.
 
 ## [0.3.5] - 2025-09-18
 

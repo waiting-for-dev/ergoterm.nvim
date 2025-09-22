@@ -705,13 +705,13 @@ end
 function Terminal:_open_in_split(layout)
   local win_config
   if layout == "above" then
-    win_config = { height = self._state.size.above, vertical = false, split = "above" }
+    win_config = { height = self._state.size.above, vertical = false, split = "above", win = -1 }
   elseif layout == "below" then
-    win_config = { height = self._state.size.below, vertical = false, split = "below" }
+    win_config = { height = self._state.size.below, vertical = false, split = "below", win = -1 }
   elseif layout == "left" then
-    win_config = { width = self._state.size.left, vertical = true, split = "left" }
+    win_config = { width = self._state.size.left, vertical = true, split = "left", win = -1 }
   elseif layout == "right" then
-    win_config = { width = self._state.size.right, vertical = true, split = "right" }
+    win_config = { width = self._state.size.right, vertical = false, split = "right", win = -1 }
   end
   return vim.api.nvim_open_win(self._state.bufnr, false, win_config)
 end
