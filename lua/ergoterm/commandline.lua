@@ -31,6 +31,8 @@ local p = {
 ---@field sticky boolean?
 ---@field cleanup_on_success boolean?
 ---@field cleanup_on_failure boolean?
+---@field open_on_success boolean?
+---@field open_on_failure boolean?
 ---@field text string?
 ---@field trailing string?
 
@@ -71,7 +73,9 @@ function M.parse(args)
       start_in_insert = true,
       sticky = true,
       cleanup_on_success = true,
-      cleanup_on_failure = true
+      cleanup_on_failure = true,
+      open_on_success = true,
+      open_on_failure = true
     }
 
     for _, part in ipairs(vim.split(args, " ")) do
@@ -233,7 +237,11 @@ M._all_options = {
 
   cleanup_on_success = M._boolean_options,
 
-  cleanup_on_failure = M._boolean_options
+  cleanup_on_failure = M._boolean_options,
+
+  open_on_success = M._boolean_options,
+
+  open_on_failure = M._boolean_options
 }
 
 M._term_new_options = {
@@ -249,7 +257,9 @@ M._term_new_options = {
   start_in_insert = M._all_options.start_in_insert,
   sticky = M._all_options.sticky,
   cleanup_on_success = M._all_options.cleanup_on_success,
-  cleanup_on_failure = M._all_options.cleanup_on_failure
+  cleanup_on_failure = M._all_options.cleanup_on_failure,
+  open_on_success = M._all_options.open_on_success,
+  open_on_failure = M._all_options.open_on_failure
 }
 
 M._term_update_options = {
@@ -264,6 +274,8 @@ M._term_update_options = {
   sticky = M._all_options.sticky,
   cleanup_on_success = M._all_options.cleanup_on_success,
   cleanup_on_failure = M._all_options.cleanup_on_failure,
+  open_on_success = M._all_options.open_on_success,
+  open_on_failure = M._all_options.open_on_failure,
 }
 
 M._term_send_options = {

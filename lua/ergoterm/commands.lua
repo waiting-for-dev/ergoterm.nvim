@@ -37,7 +37,9 @@ function M.new(args)
     start_in_insert = { parsed.start_in_insert, "boolean", true },
     sticky = { parsed.sticky, "boolean", true },
     cleanup_on_success = { parsed.cleanup_on_success, "boolean", true },
-    cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true }
+    cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true },
+    open_on_success = { parsed.open_on_success, "boolean", true },
+    open_on_failure = { parsed.open_on_failure, "boolean", true }
   })
   return terms.Terminal:new({
     cmd = parsed.cmd,
@@ -52,7 +54,9 @@ function M.new(args)
     start_in_insert = parsed.start_in_insert,
     sticky = parsed.sticky,
     cleanup_on_success = parsed.cleanup_on_success,
-    cleanup_on_failure = parsed.cleanup_on_failure
+    cleanup_on_failure = parsed.cleanup_on_failure,
+    open_on_success = parsed.open_on_success,
+    open_on_failure = parsed.open_on_failure
   }):focus()
 end
 
@@ -154,7 +158,9 @@ function M.update(args, bang, picker)
     start_in_insert = { parsed.start_in_insert, "boolean", true },
     sticky = { parsed.sticky, "boolean", true },
     cleanup_on_success = { parsed.cleanup_on_success, "boolean", true },
-    cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true }
+    cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true },
+    open_on_success = { parsed.open_on_success, "boolean", true },
+    open_on_failure = { parsed.open_on_failure, "boolean", true }
   })
   local update_terminal = function(t)
     t:update(parsed)

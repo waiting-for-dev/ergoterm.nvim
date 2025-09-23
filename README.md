@@ -83,6 +83,8 @@ Create new terminals with `:TermNew` and customize them with options:
 - `sticky` - Keep terminals visible in picker even when stopped (requires `selectable` to also be `true`) (default: `false`)
 - `cleanup_on_success` - Cleanup terminal when process exits successfully (exit code 0) (default: `true`)
 - `cleanup_on_failure` - Cleanup terminal when process exits with failure (exit code non-zero) (default: `false`)
+- `open_on_success` - Open terminal window when process exits successfully (exit code 0) (default: `false`)
+- `open_on_failure` - Open terminal window when process exits with failure (exit code non-zero) (default: `false`)
 
 ### 🎯 Selecting Terminals
 
@@ -259,6 +261,8 @@ All options default to values from your configuration:
 - `clear_env` - Use clean environment for the job
 - `cleanup_on_success` - Cleanup terminal when process exits successfully (exit code 0)
 - `cleanup_on_failure` - Cleanup terminal when process exits with failure (exit code non-zero)
+- `open_on_success` - Open terminal window when process exits successfully (exit code 0)
+- `open_on_failure` - Open terminal window when process exits with failure (exit code non-zero)
 - `default_action` - Function to invoke when selecting terminal in picker with `<Enter>`
 - `dir` - Working directory for the terminal
   - Accepts absolute paths, relative paths (with `~` expansion), `"git_dir"` for git repository root, or `nil` for current directory
@@ -460,6 +464,12 @@ require("ergoterm").setup({
 
     -- Cleanup terminal when process exits with failure (exit code non-zero)
     cleanup_on_failure = false,
+
+    -- Open terminal window when process exits successfully (exit code 0)
+    open_on_success = false,
+
+    -- Open terminal window when process exits with failure (exit code non-zero)
+    open_on_failure = false,
 
     -- Default action to invoke when selecting terminal in picker
     default_action = function(term) term:focus() end,

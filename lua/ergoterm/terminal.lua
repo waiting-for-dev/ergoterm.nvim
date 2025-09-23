@@ -268,6 +268,8 @@ end
 ---@field on_open on_open?
 ---@field on_stop on_stop?
 ---@field on_start on_start?
+---@field open_on_success boolean? whether to open terminal when process exits successfully
+---@field open_on_failure boolean? whether to open terminal when process exits with failure
 ---@field persist_mode boolean? whether or not to persist the mode of the terminal on return
 ---@field selectable boolean? whether or not the terminal is visible in picker selections and can be last focused
 ---@field size SizeOpts? size configuration for different layouts
@@ -318,6 +320,8 @@ function Terminal:new(args)
   term.on_open = vim.F.if_nil(term.on_open, config.get("terminal_defaults.on_open"))
   term.on_start = vim.F.if_nil(term.on_start, config.get("terminal_defaults.on_start"))
   term.on_stop = vim.F.if_nil(term.on_stop, config.get("terminal_defaults.on_stop"))
+  term.open_on_success = vim.F.if_nil(term.open_on_success, config.get("terminal_defaults.open_on_success"))
+  term.open_on_failure = vim.F.if_nil(term.open_on_failure, config.get("terminal_defaults.open_on_failure"))
   term.tags = term.tags or vim.tbl_deep_extend("keep", {}, config.get("terminal_defaults.tags") or {})
   term.id = M._compute_id()
   term:_initialize_state()
@@ -788,10 +792,19 @@ function Terminal:_compute_exit_handler(callback)
     self._state.last_exit_code = exit_code
 
     local should_cleanup = false
+    local should_open = false
     if exit_code == 0 then
       should_cleanup = self.cleanup_on_success
+      should_open = self.open_on_success
     else
       should_cleanup = self.cleanup_on_failure
+      should_open = self.open_on_failure
+    end
+
+    if should_open then
+      vim.schedule(function()
+        self:open()
+      end)
     end
 
     if should_cleanup then

@@ -62,6 +62,8 @@ M.NULL_CALLBACK = function(...) end
 ---@field on_open on_open?
 ---@field on_stop on_stop?
 ---@field on_start on_start?
+---@field open_on_success boolean?
+---@field open_on_failure boolean?
 ---@field persist_mode boolean?
 ---@field shell string|fun():string?
 ---@field selectable boolean?
@@ -115,6 +117,8 @@ local config = {
     on_start = M.NULL_CALLBACK,
     on_job_stderr = M.NULL_CALLBACK,
     on_job_stdout = M.NULL_CALLBACK,
+    open_on_success = false,
+    open_on_failure = false,
     shell = vim.o.shell,
     start_in_insert = true,
     tags = {},
