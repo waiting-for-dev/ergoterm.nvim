@@ -596,6 +596,19 @@ describe(":new", function()
     assert.is_false(term.cleanup_on_failure)
   end)
 
+  it("takes default_action option", function()
+    local custom_action = function(term) term:close() end
+    local term = terms.Terminal:new({ default_action = custom_action })
+
+    assert.equal(custom_action, term.default_action)
+  end)
+
+  it("defaults to config's default_action", function()
+    local term = terms.Terminal:new()
+
+    assert.is_function(term.default_action)
+  end)
+
   it("takes layout option", function()
     local term = terms.Terminal:new({ layout = "right" })
 

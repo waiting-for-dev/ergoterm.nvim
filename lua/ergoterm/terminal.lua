@@ -252,6 +252,7 @@ end
 ---@field clear_env? boolean use clean job environment, passed to jobstart()
 ---@field cleanup_on_success boolean? whether or not to cleanup the terminal when the process exits successfully
 ---@field cleanup_on_failure boolean? whether or not to cleanup the terminal when the process exits with failure
+---@field default_action fun(term: Terminal)? the default action to invoke when selecting the terminal in picker
 ---@field dir string? the directory for the terminal
 ---@field layout layout? the layout to open the terminal in the first time
 ---@field env? table<string, string> environmental variables passed to jobstart()
@@ -297,6 +298,7 @@ function Terminal:new(args)
   term.clear_env = vim.F.if_nil(term.clear_env, config.get("terminal_defaults.clear_env"))
   term.cleanup_on_success = vim.F.if_nil(term.cleanup_on_success, config.get("terminal_defaults.cleanup_on_success"))
   term.cleanup_on_failure = vim.F.if_nil(term.cleanup_on_failure, config.get("terminal_defaults.cleanup_on_failure"))
+  term.default_action = vim.F.if_nil(term.default_action, config.get("terminal_defaults.default_action"))
   term.layout = term.layout or config.get("terminal_defaults.layout")
   term.env = term.env
   term.name = term.name or term.cmd

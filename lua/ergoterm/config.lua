@@ -49,6 +49,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field clear_env boolean?
 ---@field cleanup_on_success boolean?
 ---@field cleanup_on_failure boolean?
+---@field default_action fun(term: Terminal)?
 ---@field layout layout?
 ---@field float_opts FloatOpts?
 ---@field float_winblend number?
@@ -87,6 +88,7 @@ local config = {
     clear_env = false,
     cleanup_on_success = true,
     cleanup_on_failure = false,
+    default_action = function(term) term:focus() end,
     layout = "below",
     float_opts = {
       title_pos = "left",
@@ -120,7 +122,7 @@ local config = {
   picker = {
     picker = nil,
     select_actions = {
-      default = { fn = function(term) term:focus() end, desc = "Open" },
+      default = { fn = function(term) term.default_action(term) end, desc = "Default action" },
       ["<C-s>"] = { fn = function(term) term:focus("below") end, desc = "Open in horizontal split" },
       ["<C-v>"] = { fn = function(term) term:focus("right") end, desc = "Open in vertical split" },
       ["<C-t>"] = { fn = function(term) term:focus("tab") end, desc = "Open in tab" },

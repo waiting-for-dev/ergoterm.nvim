@@ -135,7 +135,6 @@ Options:
     sticky={boolean}            Keep terminal visible in picker even when stopped (default: false)
     cleanup_on_success={boolean}   Cleanup terminal when process exits successfully (default: true)
     cleanup_on_failure={boolean}   Cleanup terminal when process exits with failure (default: false)
-    tags={table}                List of tags for categorizing and filtering terminals (default: {})
 
 Available layouts:
     above      Horizontal split above current window
@@ -250,6 +249,7 @@ Updatable options:
     sticky={boolean}             Keep terminal visible in picker even when stopped
     cleanup_on_success={boolean}   Cleanup terminal when process exits successfully
     cleanup_on_failure={boolean}   Cleanup terminal when process exits with failure
+    default_action={function}      Function to invoke when selecting terminal in picker with <Enter>
     tags={table}                 List of tags for categorizing and filtering terminals
 
 Examples: >vim
@@ -353,6 +353,13 @@ terminal_defaults.cleanup_on_failure ~
     Type: `boolean`
 
     Close terminal window when the job process exits with failure (exit code non-zero).
+
+                                                    *ergoterm-default_action*
+terminal_defaults.default_action ~
+    Default: `function(term) term:focus() end`
+    Type: `function(term: Terminal)`
+
+    Function to invoke when selecting the terminal in picker with <Enter>.
 
                                                        *ergoterm-persist_mode*
 terminal_defaults.persist_mode ~
