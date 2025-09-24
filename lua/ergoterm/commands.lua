@@ -38,8 +38,8 @@ function M.new(args)
     sticky = { parsed.sticky, "boolean", true },
     cleanup_on_success = { parsed.cleanup_on_success, "boolean", true },
     cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true },
-    open_on_success = { parsed.open_on_success, "boolean", true },
-    open_on_failure = { parsed.open_on_failure, "boolean", true }
+    show_on_success = { parsed.show_on_success, "boolean", true },
+    show_on_failure = { parsed.show_on_failure, "boolean", true }
   })
   return terms.Terminal:new({
     cmd = parsed.cmd,
@@ -55,8 +55,8 @@ function M.new(args)
     sticky = parsed.sticky,
     cleanup_on_success = parsed.cleanup_on_success,
     cleanup_on_failure = parsed.cleanup_on_failure,
-    open_on_success = parsed.open_on_success,
-    open_on_failure = parsed.open_on_failure
+    show_on_success = parsed.show_on_success,
+    show_on_failure = parsed.show_on_failure
   }):focus()
 end
 
@@ -159,8 +159,8 @@ function M.update(args, bang, picker)
     sticky = { parsed.sticky, "boolean", true },
     cleanup_on_success = { parsed.cleanup_on_success, "boolean", true },
     cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true },
-    open_on_success = { parsed.open_on_success, "boolean", true },
-    open_on_failure = { parsed.open_on_failure, "boolean", true }
+    show_on_success = { parsed.show_on_success, "boolean", true },
+    show_on_failure = { parsed.show_on_failure, "boolean", true }
   })
   local update_terminal = function(t)
     t:update(parsed)

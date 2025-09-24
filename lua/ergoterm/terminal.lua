@@ -268,8 +268,8 @@ end
 ---@field on_open on_open?
 ---@field on_stop on_stop?
 ---@field on_start on_start?
----@field open_on_success boolean? whether to open terminal when process exits successfully
----@field open_on_failure boolean? whether to open terminal when process exits with failure
+---@field show_on_success boolean? whether to show terminal when process exits successfully
+---@field show_on_failure boolean? whether to show terminal when process exits with failure
 ---@field persist_mode boolean? whether or not to persist the mode of the terminal on return
 ---@field selectable boolean? whether or not the terminal is visible in picker selections and can be last focused
 ---@field size SizeOpts? size configuration for different layouts
@@ -320,8 +320,8 @@ function Terminal:new(args)
   term.on_open = vim.F.if_nil(term.on_open, config.get("terminal_defaults.on_open"))
   term.on_start = vim.F.if_nil(term.on_start, config.get("terminal_defaults.on_start"))
   term.on_stop = vim.F.if_nil(term.on_stop, config.get("terminal_defaults.on_stop"))
-  term.open_on_success = vim.F.if_nil(term.open_on_success, config.get("terminal_defaults.open_on_success"))
-  term.open_on_failure = vim.F.if_nil(term.open_on_failure, config.get("terminal_defaults.open_on_failure"))
+  term.show_on_success = vim.F.if_nil(term.show_on_success, config.get("terminal_defaults.show_on_success"))
+  term.show_on_failure = vim.F.if_nil(term.show_on_failure, config.get("terminal_defaults.show_on_failure"))
   term.tags = term.tags or vim.tbl_deep_extend("keep", {}, config.get("terminal_defaults.tags") or {})
   term.id = M._compute_id()
   term:_initialize_state()
@@ -418,22 +418,7 @@ end
 function Terminal:open(layout)
   if not self:is_started() then self:start() end
   if not self:is_open() then
-    local window = nil
-    local computed_layout = layout or self._state.layout
-    if vim.tbl_contains({ "above", "below", "left", "right" }, computed_layout) then
-      window = self:_open_in_split(computed_layout)
-    elseif computed_layout == "tab" then
-      window = self:_open_in_tab()
-    elseif computed_layout == "float" then
-      window = self:_open_in_float()
-    else
-      window = self:_open_in_window()
-    end
-    self._state.layout = computed_layout
-    self._state.window = window
-    self._state.tabpage = vim.api.nvim_win_get_tabpage(window)
-    self:_set_options()
-    self:on_open()
+    self:_show(layout)
   end
   return self
 end
@@ -708,6 +693,26 @@ function Terminal:get_status_icon()
 end
 
 ---@private
+function Terminal:_show(layout)
+  local window = nil
+  local computed_layout = layout or self._state.layout
+  if vim.tbl_contains({ "above", "below", "left", "right" }, computed_layout) then
+    window = self:_open_in_split(computed_layout)
+  elseif computed_layout == "tab" then
+    window = self:_open_in_tab()
+  elseif computed_layout == "float" then
+    window = self:_open_in_float()
+  else
+    window = self:_open_in_window()
+  end
+  self._state.layout = computed_layout
+  self._state.window = window
+  self._state.tabpage = vim.api.nvim_win_get_tabpage(window)
+  self:_set_options()
+  self:on_open()
+end
+
+---@private
 function Terminal:_open_in_split(layout)
   local win_config
   if layout == "above" then
@@ -792,18 +797,18 @@ function Terminal:_compute_exit_handler(callback)
     self._state.last_exit_code = exit_code
 
     local should_cleanup = false
-    local should_open = false
+    local should_show = false
     if exit_code == 0 then
       should_cleanup = self.cleanup_on_success
-      should_open = self.open_on_success
+      should_show = self.show_on_success
     else
       should_cleanup = self.cleanup_on_failure
-      should_open = self.open_on_failure
+      should_show = self.show_on_failure
     end
 
-    if should_open then
+    if should_show then
       vim.schedule(function()
-        self:open()
+        self:_show()
       end)
     end
 

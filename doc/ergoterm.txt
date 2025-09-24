@@ -135,8 +135,8 @@ Options:
     sticky={boolean}            Keep terminal visible in picker even when stopped (default: false)
     cleanup_on_success={boolean}   Cleanup terminal when process exits successfully (default: true)
     cleanup_on_failure={boolean}   Cleanup terminal when process exits with failure (default: false)
-    open_on_success={boolean}       Open terminal window when process exits successfully (default: false)
-    open_on_failure={boolean}       Open terminal window when process exits with failure (default: false)
+    show_on_success={boolean}       Open terminal window when process exits successfully (default: false, requires `cleanup_on_success` to be false)
+    show_on_failure={boolean}       Open terminal window when process exits with failure (default: false, requires `cleanup_on_failure` to be false)
 
 Available layouts:
     above      Horizontal split above current window
@@ -251,8 +251,8 @@ Updatable options:
     sticky={boolean}             Keep terminal visible in picker even when stopped
     cleanup_on_success={boolean}   Cleanup terminal when process exits successfully
     cleanup_on_failure={boolean}   Cleanup terminal when process exits with failure
-    open_on_success={boolean}       Open terminal window when process exits successfully
-    open_on_failure={boolean}       Open terminal window when process exits with failure
+    show_on_success={boolean}       Open terminal window when process exits successfully. Requires `cleanup_on_success` to be false.
+    show_on_failure={boolean}       Open terminal window when process exits with failure. Requires `cleanup_on_failure` to be false.
     default_action={function}      Function to invoke when selecting terminal in picker with <Enter>
     tags={table}                 List of tags for categorizing and filtering terminals
 
@@ -358,19 +358,21 @@ terminal_defaults.cleanup_on_failure ~
 
     Close terminal window when the job process exits with failure (exit code non-zero).
 
-                                                      *ergoterm-open_on_success*
-terminal_defaults.open_on_success ~
+                                                      *ergoterm-show_on_success*
+terminal_defaults.show_on_success ~
     Default: `false`
     Type: `boolean`
 
     Open terminal window when the job process exits successfully (exit code 0).
+    Requires `cleanup_on_success` to be false.
 
-                                                      *ergoterm-open_on_failure*
-terminal_defaults.open_on_failure ~
+                                                      *ergoterm-show_on_failure*
+terminal_defaults.show_on_failure ~
     Default: `false`
     Type: `boolean`
 
     Open terminal window when the job process exits with failure (exit code non-zero).
+    Requires `cleanup_on_failure` to be false.
 
                                                     *ergoterm-default_action*
 terminal_defaults.default_action ~

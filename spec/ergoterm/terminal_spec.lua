@@ -609,28 +609,28 @@ describe(":new", function()
     assert.is_function(term.default_action)
   end)
 
-  it("takes open_on_success option", function()
-    local term = terms.Terminal:new({ open_on_success = true })
+  it("takes show_on_success option", function()
+    local term = terms.Terminal:new({ show_on_success = true })
 
-    assert.is_true(term.open_on_success)
+    assert.is_true(term.show_on_success)
   end)
 
-  it("defaults to config's open_on_success", function()
+  it("defaults to config's show_on_success", function()
     local term = terms.Terminal:new()
 
-    assert.is_false(term.open_on_success)
+    assert.is_false(term.show_on_success)
   end)
 
-  it("takes open_on_failure option", function()
-    local term = terms.Terminal:new({ open_on_failure = true })
+  it("takes show_on_failure option", function()
+    local term = terms.Terminal:new({ show_on_failure = true })
 
-    assert.is_true(term.open_on_failure)
+    assert.is_true(term.show_on_failure)
   end)
 
-  it("defaults to config's open_on_failure", function()
+  it("defaults to config's show_on_failure", function()
     local term = terms.Terminal:new()
 
-    assert.is_false(term.open_on_failure)
+    assert.is_false(term.show_on_failure)
   end)
 
   it("takes layout option", function()
@@ -2342,8 +2342,8 @@ describe("on job exit", function()
     vim.schedule = original_schedule
   end)
 
-  it("opens on successful exit when open_on_success is true", function()
-    local term = terms.Terminal:new({ cleanup_on_success = false, open_on_success = true })
+  it("opens on successful exit when show_on_success is true", function()
+    local term = terms.Terminal:new({ cleanup_on_success = false, show_on_success = true })
     term:start()
     local exit_handler = term:get_state("on_job_exit")
 
@@ -2353,8 +2353,8 @@ describe("on job exit", function()
     assert.is_true(term:is_open())
   end)
 
-  it("does not open on successful exit when open_on_success is false", function()
-    local term = terms.Terminal:new({ cleanup_on_success = false, open_on_success = false })
+  it("does not open on successful exit when show_on_success is false", function()
+    local term = terms.Terminal:new({ cleanup_on_success = false, show_on_success = false })
     term:start()
     local exit_handler = term:get_state("on_job_exit")
 
@@ -2364,8 +2364,8 @@ describe("on job exit", function()
     assert.is_false(term:is_open())
   end)
 
-  it("opens on failed exit when open_on_failure is true", function()
-    local term = terms.Terminal:new({ cleanup_on_failure = false, open_on_failure = true })
+  it("opens on failed exit when show_on_failure is true", function()
+    local term = terms.Terminal:new({ cleanup_on_failure = false, show_on_failure = true })
     term:start()
     local exit_handler = term:get_state("on_job_exit")
 
@@ -2375,8 +2375,8 @@ describe("on job exit", function()
     assert.is_true(term:is_open())
   end)
 
-  it("does not open on failed exit when open_on_failure is false", function()
-    local term = terms.Terminal:new({ open_on_success = true, open_on_failure = false })
+  it("does not open on failed exit when show_on_failure is false", function()
+    local term = terms.Terminal:new({ show_on_success = true, show_on_failure = false })
     term:start()
     local exit_handler = term:get_state("on_job_exit")
 
@@ -2384,6 +2384,34 @@ describe("on job exit", function()
     vim.wait(100)
 
     assert.is_false(term:is_open())
+  end)
+
+  it("does not restart process when show_on_success triggers", function()
+    local term = terms.Terminal:new({ cleanup_on_success = false, show_on_success = true })
+    term:start()
+    local initial_job_id = term:get_state("job_id")
+    local exit_handler = term:get_state("on_job_exit")
+
+    exit_handler(1, 0, "exit")
+    vim.wait(100)
+
+    assert.is_nil(term:get_state("job_id"))
+    assert.is_true(term:is_open())
+    assert.is_false(term:is_started())
+  end)
+
+  it("does not restart process when show_on_failure triggers", function()
+    local term = terms.Terminal:new({ cleanup_on_failure = false, show_on_failure = true })
+    term:start()
+    local initial_job_id = term:get_state("job_id")
+    local exit_handler = term:get_state("on_job_exit")
+
+    exit_handler(1, 1, "exit")
+    vim.wait(100)
+
+    assert.is_nil(term:get_state("job_id"))
+    assert.is_true(term:is_open())
+    assert.is_false(term:is_started())
   end)
 end)
 
