@@ -1574,6 +1574,28 @@ describe(":close", function()
 
     assert.is_false(term:is_open())
   end)
+
+  it("doesn't crash if terminal windows is last one", function()
+    local term = terms.Terminal:new()
+    term:open("window")
+
+    assert.has_no.errors(function()
+      term:close()
+    end)
+  end)
+
+  it("replaces the terminal window with an empty buffer if it is the last window", function()
+    local term = terms.Terminal:new()
+    term:open("window")
+    local win_id = term:get_state("window")
+    local initial_bufnr = term:get_state("bufnr")
+
+    term:close()
+
+    local bufnr = vim.api.nvim_win_get_buf(win_id)
+    assert.is_true(vim.api.nvim_buf_is_valid(bufnr))
+    assert.not_equal(initial_bufnr, bufnr)
+  end)
 end)
 
 describe(":focus", function()

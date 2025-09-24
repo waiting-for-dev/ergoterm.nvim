@@ -447,7 +447,12 @@ end
 function Terminal:close()
   if self:is_open() then
     self:on_close()
-    vim.api.nvim_win_close(self._state.window, true)
+    if #vim.api.nvim_list_wins() == 1 then
+      local empty_buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_win_set_buf(self._state.window, empty_buf)
+    else
+      vim.api.nvim_win_close(self._state.window, true)
+    end
   end
   return self
 end
