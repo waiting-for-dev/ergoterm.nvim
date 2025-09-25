@@ -417,9 +417,7 @@ end
 ---@return self for method chaining
 function Terminal:open(layout)
   if not self:is_started() then self:start() end
-  if not self:is_open() then
-    self:_show(layout)
-  end
+  self:_show(layout)
   return self
 end
 
@@ -699,22 +697,24 @@ end
 
 ---@private
 function Terminal:_show(layout)
-  local window = nil
-  local computed_layout = layout or self._state.layout
-  if vim.tbl_contains({ "above", "below", "left", "right" }, computed_layout) then
-    window = self:_open_in_split(computed_layout)
-  elseif computed_layout == "tab" then
-    window = self:_open_in_tab()
-  elseif computed_layout == "float" then
-    window = self:_open_in_float()
-  else
-    window = self:_open_in_window()
+  if not self:is_open() then
+    local window = nil
+    local computed_layout = layout or self._state.layout
+    if vim.tbl_contains({ "above", "below", "left", "right" }, computed_layout) then
+      window = self:_open_in_split(computed_layout)
+    elseif computed_layout == "tab" then
+      window = self:_open_in_tab()
+    elseif computed_layout == "float" then
+      window = self:_open_in_float()
+    else
+      window = self:_open_in_window()
+    end
+    self._state.layout = computed_layout
+    self._state.window = window
+    self._state.tabpage = vim.api.nvim_win_get_tabpage(window)
+    self:_set_options()
+    self:on_open()
   end
-  self._state.layout = computed_layout
-  self._state.window = window
-  self._state.tabpage = vim.api.nvim_win_get_tabpage(window)
-  self:_set_options()
-  self:on_open()
 end
 
 ---@private
