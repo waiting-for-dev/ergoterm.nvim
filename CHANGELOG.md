@@ -4,8 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## 0.5.0 - 2025-09-27
+
 - Add `.with_defaults()` as a factory builder for terminals with custom defaults.
-- Add `default_action` setting to configure what the picker on selecting with `<Enter>`.
+- Add `default_action` setting to configure what the picker does on selecting with `<Enter>`.
 - Add `show_on_success` & `show_on_failure` settings.
 - Fix closing terminal window when it is the last one.
 
