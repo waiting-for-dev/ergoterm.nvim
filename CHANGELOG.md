@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Add `:prompt()` text decorator.
+
 ## 0.5.0 - 2025-09-27
 
 - Add `.with_defaults()` as a factory builder for terminals with custom defaults.

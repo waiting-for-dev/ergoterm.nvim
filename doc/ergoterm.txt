@@ -855,6 +855,9 @@ Built-in Decorators:
     "identity"         Send text unchanged (default)
     "markdown_code"    Wrap in markdown code block with filetype
 
+Built-in Decorator Builders:
+    "prompt"           Prefix with given text and an empty line
+
 Creating Custom Decorators ~
 
 A decorator is a function that takes an array of text lines and returns

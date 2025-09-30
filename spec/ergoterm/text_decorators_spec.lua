@@ -103,4 +103,29 @@ describe("text_decorators", function()
       }, result)
     end)
   end)
+
+  describe(".prompt", function()
+    it("adds prefix and empty line before text", function()
+      local decorator = decorators.prompt(">>> ")
+      local input = { "line1", "line2" }
+
+      local result = decorator(input)
+
+      assert.same({
+        ">>> ",
+        "",
+        "line1",
+        "line2"
+      }, result)
+    end)
+
+    it("handles empty input", function()
+      local decorator = decorators.prompt(">>> ")
+      local input = {}
+
+      local result = decorator(input)
+
+      assert.same({}, result)
+    end)
+  end)
 end)
