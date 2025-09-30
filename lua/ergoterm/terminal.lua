@@ -574,6 +574,11 @@ end
 ---@param opts? SendOptions options for sending text
 ---@return self for method chaining
 function Terminal:send(input, opts)
+  if not self:is_started() then
+    utils.notify(string.format("%s terminal has not been started yet", self.name), "error")
+    return self
+  end
+
   opts = opts or {}
   local computed_action = opts.action or "interactive"
   local computed_trim = opts.trim == nil or opts.trim

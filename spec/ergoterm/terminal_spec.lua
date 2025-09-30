@@ -2093,6 +2093,19 @@ describe(":send", function()
     assert.equal("error", result.level)
     ---@diagnostic enable: need-check-nil
   end)
+
+  it("notifies error when terminal has not been started", function()
+    local term = terms.Terminal:new({ name = "test_terminal" })
+
+    local result = test_helpers.mocking_notify(function()
+      term:send({ "foo" })
+    end)
+
+    ---@diagnostic disable: need-check-nil
+    assert.equal("test_terminal terminal has not been started yet", result.msg)
+    assert.equal("error", result.level)
+    ---@diagnostic enable: need-check-nil
+  end)
 end)
 
 describe(":clear", function()

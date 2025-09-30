@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 - Add `:prompt()` text decorator.
+- Notify when trying to send to a terminal that hasn't been started yet.
 
 ## 0.5.0 - 2025-09-27
 
