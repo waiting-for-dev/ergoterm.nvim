@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Add `:prompt()` text decorator.
 - Notify when trying to send to a terminal that hasn't been started yet.
+- Available text decorators by name can be configured in `config.text_decorators`.
 
 ## 0.5.0 - 2025-09-27
 

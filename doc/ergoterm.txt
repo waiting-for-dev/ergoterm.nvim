@@ -215,6 +215,7 @@ Action modes:
 Text decorators:
     identity         Send text as-is (default)
     markdown_code    Wrap in markdown code block
+    Custom decorators can be registered in configuration (see |ergoterm-text_decorators|)
 
 Examples: >vim
     :TermSend
@@ -537,6 +538,50 @@ picker.extra_select_actions ~
         }
 
 
+**text_decorators** - Text decorator configuration:
+
+                                                    *ergoterm-text_decorators*
+text_decorators.default ~
+    Default: See below
+    Type: `table<string, function>`
+
+    Default text decorators available by name. These completely replace the
+    built-in decorators. Each key is a decorator name, and the value is a
+    function that takes an array of text lines and returns a transformed array.
+
+    Default decorators: >lua
+        text_decorators = {
+          default = {
+            identity = function(text) return text end,
+            markdown_code = function(text)
+              -- Wraps text in markdown code block with filetype
+            end
+          }
+        }
+<
+
+text_decorators.extra ~
+    Default: `{}` (empty)
+    Type: `table<string, function>`
+
+    Additional decorators to append to `default`. These are merged with
+    the default decorators, allowing you to add custom decorators without
+    replacing the built-in ones.
+
+    Example: >lua
+        text_decorators = {
+          extra = {
+            timestamp = function(text)
+              local timestamp = os.date("%H:%M:%S")
+              local result = {}
+              for _, line in ipairs(text) do
+                table.insert(result, string.format("[%s] %s", timestamp, line))
+              end
+              return result
+            end
+          }
+        }
+<
 
 ------------------------------------------------------------------------------
 5.3 Callbacks                                             *ergoterm-callbacks*
@@ -870,7 +915,9 @@ a transformed array: >lua
     end
 <
 
-Example - Add timestamp to each line: >lua
+You can use decorators in two ways:
+
+Option 1 - Pass decorator function directly: >lua
     local function timestamp_decorator(text)
       local timestamp = os.date("%H:%M:%S")
       local result = {}
@@ -880,15 +927,31 @@ Example - Add timestamp to each line: >lua
       return result
     end
 
-    require("ergoterm.terminal")
-    
-    -- Use with TermSend
-    vim.keymap.set("n", "<leader>ct", function()
-      local term = terms.get_last_focused()
-      term:send("single_line", {
-        decorator = timestamp_decorator,
-      })
-    end)
+    local terms = require("ergoterm.terminal")
+    local term = terms.get_last_focused()
+    term:send("single_line", { decorator = timestamp_decorator })
+<
+
+Option 2 - Register named decorator in configuration: >lua
+    require("ergoterm").setup({
+      text_decorators = {
+        extra = {
+          timestamp = function(text)
+            local timestamp = os.date("%H:%M:%S")
+            local result = {}
+            for _, line in ipairs(text) do
+              table.insert(result, string.format("[%s] %s", timestamp, line))
+            end
+            return result
+          end
+        }
+      }
+    })
+
+    -- Then use by name
+    term:send("single_line", { decorator = "timestamp" })
+    -- Or from command line
+    :TermSend decorator=timestamp
 <
 
 ==============================================================================

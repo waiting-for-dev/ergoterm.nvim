@@ -77,11 +77,10 @@ describe("commandline.term_send_complete", function()
   end)
 
   it("completes decorator values", function()
-    local decorators = require("ergoterm.text_decorators")
     local result = commandline.term_send_complete("decorator=", "decorator=", 10)
 
-    assert.is_true(vim.tbl_contains(result, "decorator=" .. decorators.DECORATORS.IDENTITY))
-    assert.is_true(vim.tbl_contains(result, "decorator=" .. decorators.DECORATORS.MARKDOWN_CODE))
+    assert.is_true(vim.tbl_contains(result, "decorator=identity"))
+    assert.is_true(vim.tbl_contains(result, "decorator=markdown_code"))
   end)
 end)
 

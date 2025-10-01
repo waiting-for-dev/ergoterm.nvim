@@ -12,6 +12,9 @@
 
 local M = {}
 
+---@module "ergoterm.text_decorators"
+local text_decorators = require("ergoterm.text_decorators")
+
 M.NULL_CALLBACK = function(...) end
 
 ---@alias layout "window" | "below" | "left" | "right" | "tab" | "above" | "float"
@@ -77,9 +80,14 @@ M.NULL_CALLBACK = function(...) end
 ---@field select_actions table<string, PickerCallbackDefinition>?
 ---@field extra_select_actions table<string, PickerCallbackDefinition>?
 
+---@class TextDecoratorsConfig
+---@field default table<string, fun(text: string[]): string[]>?
+---@field extra table<string, fun(text: string[]): string[]>?
+
 ---@class ErgoTermConfig
 ---@field terminal_defaults TerminalDefaults?
 ---@field picker PickerConfig?
+---@field text_decorators TextDecoratorsConfig?
 
 ---@type ErgoTermConfig
 local config = {
@@ -133,6 +141,13 @@ local config = {
       ["<C-f>"] = { fn = function(term) term:focus("float") end, desc = "Open in float window" }
     },
     extra_select_actions = {}
+  },
+  text_decorators = {
+    default = {
+      identity = text_decorators.identity,
+      markdown_code = text_decorators.markdown_code
+    },
+    extra = {}
   }
 }
 
@@ -195,6 +210,15 @@ function M.get(key)
   end
 
   return current
+end
+
+---Get all available text decorators (default + extra)
+---@return table<string, fun(text: string[]): string[]>
+function M.get_text_decorators()
+  return vim.tbl_extend("force",
+    M.get("text_decorators.default") or {},
+    M.get("text_decorators.extra") or {}
+  )
 end
 
 ---@param user_conf ErgoTermConfig

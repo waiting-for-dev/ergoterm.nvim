@@ -585,7 +585,8 @@ function Terminal:send(input, opts)
   local computed_new_line = opts.new_line == nil or opts.new_line
   local computed_decorator
   if type(opts.decorator) == "string" then
-    computed_decorator = text_decorators[opts.decorator] or text_decorators.identity
+    local all_decorators = config.get_text_decorators()
+    computed_decorator = all_decorators[opts.decorator] or text_decorators.identity
   else
     computed_decorator = opts.decorator or text_decorators.identity
   end

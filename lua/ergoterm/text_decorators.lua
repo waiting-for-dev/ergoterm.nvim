@@ -2,12 +2,6 @@
 
 local M = {}
 
----Available decorator types
-M.DECORATORS = {
-  IDENTITY = "identity",
-  MARKDOWN_CODE = "markdown_code"
-}
-
 ---Identity decorator that returns text unchanged
 ---
 ---@param text string[]

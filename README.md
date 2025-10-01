@@ -128,6 +128,7 @@ Send text from your buffer to any terminal:
 - `decorator` - Text transformation (default: `identity`)
   - `identity` - Send text as-is
   - `markdown_code` - Wrap in markdown code block
+  - Custom decorators can be registered in configuration (see [Configuration](#️-configuration))
 - `trim` - Remove whitespace (default: `true`)
 - `new_line` - Add newline for execution (default: `true`)
 
@@ -187,8 +188,8 @@ map("n", "<leader>cx", ":TermSend! action=visible<CR>", opts)  -- Execute in ter
 map("x", "<leader>cx", ":TermSend! action=visible<CR>", opts)  -- Execute selection in terminal, keep focus
 
 -- Send as markdown code block
-map("n", "<leader>cS", ":TermSend! action=visible trim=false decorator=markdown_code<CR>", opts)
-map("x", "<leader>cS", ":TermSend! action=visible trim=false decorator=markdown_code<CR>", opts)
+map("n", "<leader>cS", ":TermSend! action=visible trim=false decorator=\"markdown_code\"<CR>", opts)
+map("x", "<leader>cS", ":TermSend! action=visible trim=false decorator=\"markdown_code\"<CR>", opts)
 ```
 
 ## 💾 Standalone Terminals
@@ -371,10 +372,10 @@ For complete API documentation and advanced usage patterns, see [`lua/ergoterm/t
 
 #### 🎨 Custom Text Decorators
 
-Create custom text transformations for sending code to terminals:
+Create custom text transformations for sending code to terminals. You can pass decorator functions directly or register them by name in the configuration:
 
 ```lua
--- Add timestamp to each line
+-- Option 1: Pass decorator function directly to send()
 local function timestamp_decorator(text)
   local timestamp = os.date("%H:%M:%S")
   local result = {}
@@ -384,8 +385,28 @@ local function timestamp_decorator(text)
   return result
 end
 
--- Use with Terminal:send()
 terminal:send({"echo hello"}, { decorator = timestamp_decorator })
+
+-- Option 2: Register named decorator in setup()
+require("ergoterm").setup({
+  text_decorators = {
+    extra = {
+      timestamp = function(text)
+        local timestamp = os.date("%H:%M:%S")
+        local result = {}
+        for _, line in ipairs(text) do
+          table.insert(result, string.format("[%s] %s", timestamp, line))
+        end
+        return result
+      end
+    }
+  }
+})
+
+-- Then use by name
+terminal:send({"echo hello"}, { decorator = "timestamp" })
+-- Or from command line
+:TermSend decorator=timestamp
 ```
 
 ### 🤖 Example: AI-Assisted Development with Claude Code
@@ -547,6 +568,23 @@ require("ergoterm").setup({
     -- These are merged with select_actions, allowing you to add custom actions
     -- without replacing the defaults
     extra_select_actions = {}
+  },
+
+  -- Text decorators configuration
+  text_decorators = {
+    -- Default text decorators available by name
+    -- These replace the built-in decorators entirely
+    default = {
+      identity = function(text) return text end,
+      markdown_code = function(text)
+        -- Implementation details...
+      end
+    },
+
+    -- Additional decorators to append to default
+    -- These are merged with default, allowing you to add custom decorators
+    -- without replacing the built-in ones
+    extra = {}
   }
 })
 ```
