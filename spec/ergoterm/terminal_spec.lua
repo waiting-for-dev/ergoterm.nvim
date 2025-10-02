@@ -367,7 +367,7 @@ describe(".select", function()
     end)
 
     ---@diagnostic disable: need-check-nil
-    assert.equal("No ergoterms have been started yet", result.msg)
+    assert.equal("No ergoterm terminals available", result.msg)
     assert.equal("info", result.level)
     ---@diagnostic enable: need-check-nil
   end)

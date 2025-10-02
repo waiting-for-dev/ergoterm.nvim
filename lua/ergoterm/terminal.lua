@@ -155,7 +155,7 @@ end
 function M.select(terminals, prompt, callbacks, picker)
   local computed_terminals = terminals or (M._state.universal_selection and M.get_all() or
     M._find_selectable_terminals_for_picker())
-  if #computed_terminals == 0 then return utils.notify("No ergoterms have been started yet", "info") end
+  if #computed_terminals == 0 then return utils.notify("No ergoterm terminals available", "info") end
   local computed_picker = picker or config.build_picker(config)
   local computed_callbacks = callbacks or M._get_default_picker_callbacks()
   return computed_picker.select(computed_terminals, prompt, computed_callbacks)
