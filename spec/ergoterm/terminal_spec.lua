@@ -371,6 +371,25 @@ describe(".select", function()
     assert.equal("info", result.level)
     ---@diagnostic enable: need-check-nil
   end)
+
+  it("wraps a single function callback into a default action table", function()
+    local picker = {
+      select = function(terminals, prompt, callbacks)
+        return { terminals, prompt, callbacks }
+      end
+    }
+    local term = terms.Terminal:new():start()
+    local callback_fn = function(t) return t end
+
+    local result = terms.select({ term }, "prompt", callback_fn, picker)
+
+    ---@diagnostic disable: need-check-nil
+    assert.is_table(result[3])
+    assert.is_table(result[3].default)
+    assert.equal(callback_fn, result[3].default.fn)
+    assert.equal("Default action", result[3].default.desc)
+    ---@diagnostic enable: need-check-nil
+  end)
 end)
 
 describe(".cleanup_all", function()

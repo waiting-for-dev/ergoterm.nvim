@@ -149,7 +149,7 @@ end
 ---@param terminals? Terminal[] array of terminals to choose from. Defaults to sticky + started terminals, or all
 --- if universal_selection is enabled.
 ---@param prompt string text to display in the picker
----@param callbacks? table<string, PickerCallbackDefinition> actions to execute on terminal selection
+---@param callbacks? table<string, PickerCallbackDefinition>|fun(term: Terminal) actions to execute on terminal selection, or a single function
 ---@param picker? Picker the picker implementation to use. Defaults to the configured picker.
 ---@return any result from the picker, or nil if no terminals available
 function M.select(terminals, prompt, callbacks, picker)
@@ -157,7 +157,12 @@ function M.select(terminals, prompt, callbacks, picker)
     M._find_selectable_terminals_for_picker())
   if #computed_terminals == 0 then return utils.notify("No ergoterm terminals available", "info") end
   local computed_picker = picker or config.build_picker(config)
-  local computed_callbacks = callbacks or M._get_default_picker_callbacks()
+  local computed_callbacks
+  if type(callbacks) == "function" then
+    computed_callbacks = { default = { fn = callbacks, desc = "Default action" } }
+  else
+    computed_callbacks = callbacks or M._get_default_picker_callbacks()
+  end
   return computed_picker.select(computed_terminals, prompt, computed_callbacks)
 end
 
