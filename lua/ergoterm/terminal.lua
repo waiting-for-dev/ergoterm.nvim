@@ -163,6 +163,9 @@ function M.select(terminals, prompt, callbacks, picker)
   else
     computed_callbacks = callbacks or M._get_default_picker_callbacks()
   end
+  if #computed_terminals == 1 and vim.tbl_count(computed_callbacks) == 1 and computed_callbacks.default then
+    return computed_callbacks.default.fn(computed_terminals[1])
+  end
   return computed_picker.select(computed_terminals, prompt, computed_callbacks)
 end
 

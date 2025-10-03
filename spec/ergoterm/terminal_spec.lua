@@ -381,7 +381,7 @@ describe(".select", function()
     local term = terms.Terminal:new():start()
     local callback_fn = function(t) return t end
 
-    local result = terms.select({ term }, "prompt", callback_fn, picker)
+    local result = terms.select({ term, term }, "prompt", callback_fn, picker)
 
     ---@diagnostic disable: need-check-nil
     assert.is_table(result[3])
@@ -389,6 +389,19 @@ describe(".select", function()
     assert.equal(callback_fn, result[3].default.fn)
     assert.equal("Default action", result[3].default.desc)
     ---@diagnostic enable: need-check-nil
+  end)
+
+  it("fast-forwards and executes callback when one terminal and only default callback", function()
+    local term = terms.Terminal:new():start()
+    local executed = false
+    local callback_fn = function(t)
+      executed = true
+      assert.equal(term, t)
+    end
+
+    terms.select({ term }, "prompt", callback_fn)
+
+    assert.is_true(executed)
   end)
 end)
 
