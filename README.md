@@ -290,6 +290,7 @@ All options default to values from your configuration:
   - Example: `{ below = 20, right = "40%" }` - 20 lines high for below splits, 40% width for right splits
 - `start_in_insert` - Start terminal in insert mode
 - `tags` - List of tags for categorizing and filtering terminals
+- `meta` - User-defined metadata table for custom purposes
 
 ## ⚡ API Overview
 
@@ -509,6 +510,9 @@ require("ergoterm").setup({
 
     -- Default tags for categorizing and filtering terminals
     tags = {},
+
+    -- User-defined metadata for custom purposes
+    meta = {},
 
     -- Floating window options
     float_opts = {

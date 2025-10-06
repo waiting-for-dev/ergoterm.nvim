@@ -74,6 +74,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
 ---@field tags string[]?
+---@field meta table?
 
 ---@class PickerConfig
 ---@field picker PickerOption?
@@ -130,6 +131,7 @@ local config = {
     shell = vim.o.shell,
     start_in_insert = true,
     tags = {},
+    meta = {},
   },
   picker = {
     picker = nil,

@@ -300,6 +300,7 @@ end
 ---@field start_in_insert boolean?
 ---@field sticky boolean? whether or not the terminal remains visible in picker even when stopped
 ---@field tags string[]? tags for categorizing and filtering terminals
+---@field meta table? user-defined metadata for custom purposes
 
 ---@class Terminal : TermCreateArgs
 ---@field id number
@@ -356,12 +357,12 @@ end
 ---Updates terminal configuration after creation
 ---
 ---Most options can be changed, but 'cmd' and 'dir' are immutable after creation.
----Float, size and tag options are merged with existing values rather than replaced entirely.
+---Float, size, meta, and tag options are merged with existing values rather than replaced entirely.
 ---
 ---@param opts TermCreateArgs configuration changes to apply
 ---@return Terminal? self for method chaining, or nil on error
 function Terminal:update(opts)
-  for _, key in ipairs({ "float_opts", "size" }) do
+  for _, key in ipairs({ "float_opts", "size", "meta" }) do
     if opts[key] then
       self[key] = vim.tbl_deep_extend("keep", opts[key], self[key])
       opts[key] = nil

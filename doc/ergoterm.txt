@@ -137,6 +137,7 @@ Options:
     cleanup_on_failure={boolean}   Cleanup terminal when process exits with failure (default: false)
     show_on_success={boolean}       Open terminal window when process exits successfully (default: false, requires `cleanup_on_success` to be false)
     show_on_failure={boolean}       Open terminal window when process exits with failure (default: false, requires `cleanup_on_failure` to be false)
+    meta={table}                    User-defined metadata for custom purposes (default: {})
 
 Available layouts:
     above      Horizontal split above current window
@@ -256,6 +257,7 @@ Updatable options:
     show_on_failure={boolean}       Open terminal window when process exits with failure. Requires `cleanup_on_failure` to be false.
     default_action={function}      Function to invoke when selecting terminal in picker with <Enter>
     tags={table}                 List of tags for categorizing and filtering terminals
+    meta={table}                 User-defined metadata for custom purposes
 
 Examples: >vim
     :TermUpdate layout=float
@@ -414,6 +416,15 @@ terminal_defaults.tags ~
 
     Default tags for categorizing and filtering terminals. Tags are strings
     that can be used to group terminals together for easier management.
+
+                                                               *ergoterm-meta*
+terminal_defaults.meta ~
+    Default: `{}`
+    Type: `table`
+
+    User-defined metadata for custom purposes. This is an empty table by
+    default that users can populate with any custom data they want to
+    associate with terminals.
 
                                                             *ergoterm-sticky*
 terminal_defaults.sticky ~
