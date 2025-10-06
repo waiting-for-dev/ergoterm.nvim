@@ -405,6 +405,27 @@ describe(".select", function()
   end)
 end)
 
+describe(".select_started", function()
+  it("filters terminals to only include started ones", function()
+    local picker = {
+      select = function(terminals, prompt, callbacks)
+        return { terminals, prompt, callbacks }
+      end
+    }
+    local started_term = terms.Terminal:new():start()
+    local stopped_term = terms.Terminal:new()
+    local all_terminals = { started_term, stopped_term }
+
+    local result = terms.select_started(all_terminals, "prompt", {}, picker)
+
+    ---@diagnostic disable: need-check-nil
+    assert.equal(1, #result[1])
+    assert.is_true(vim.tbl_contains(result[1], started_term))
+    assert.is_false(vim.tbl_contains(result[1], stopped_term))
+    ---@diagnostic enable: need-check-nil
+  end)
+end)
+
 describe(".cleanup_all", function()
   it("cleans up all terminals", function()
     local term = terms.Terminal:new()

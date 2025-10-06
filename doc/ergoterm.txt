@@ -862,6 +862,11 @@ require("ergoterm.terminal").with_tag({tag})                     *ergoterm.with_
 require("ergoterm.terminal").select({terminals}, {prompt}, {callbacks}, {picker}) *ergoterm.select()*
     Present picker interface for terminal selection.
 
+require("ergoterm.terminal").select_started({terminals}, {prompt}, {callbacks}, {picker}) *ergoterm.select_started()*
+    Present picker interface for started terminals only. Filters the provided
+    terminals to only include those that have been started, then presents
+    them in a picker interface. All other behavior matches select().
+
 require("ergoterm.terminal").cleanup_all()                       *ergoterm.cleanup_all()*
     Clean up all terminals. Non-sticky terminals are removed from the session,
     while sticky terminals are only removed if force option is true.

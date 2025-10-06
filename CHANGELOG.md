@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Available text decorators by name can be configured in `config.text_decorators`.
 - `.select()` can take a single function instead of a table of callbacks.
 - `.select()` to fast-forward if single terminal and single default callback
+- Add `.select_started()` function to select only among started terminals.
 
 ## 0.5.0 - 2025-09-27
 

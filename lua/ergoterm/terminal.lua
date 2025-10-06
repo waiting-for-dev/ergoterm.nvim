@@ -169,6 +169,22 @@ function M.select(terminals, prompt, callbacks, picker)
   return computed_picker.select(computed_terminals, prompt, computed_callbacks)
 end
 
+---Presents a picker interface for started terminals only
+---
+---Filters the provided terminals to only include those that have been started,
+---then presents them in a picker interface. All other behavior matches `select()`.
+---
+---@param terminals Terminal[] array of terminals to filter and choose from
+---@param prompt string text to display in the picker
+---@param callbacks? table<string, PickerCallbackDefinition>|fun(term: Terminal) actions to execute on terminal selection, or a single function
+---@param picker? Picker the picker implementation to use. Defaults to the configured picker.
+---@return any result from the picker, or nil if no started terminals available
+function M.select_started(terminals, prompt, callbacks, picker)
+  return M.select(vim.tbl_filter(function(term)
+    return term:is_started()
+  end, terminals), prompt, callbacks, picker)
+end
+
 ---@class CleanupOptions
 ---@field force? boolean whether to force removal of sticky terminals from the session (default: false)
 
