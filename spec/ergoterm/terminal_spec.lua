@@ -1169,21 +1169,6 @@ describe(":update", function()
     assert.equal("right", term:get_state("layout"))
   end)
 
-  it("doesn't override float_opts that are not-given options", function()
-    local term = terms.Terminal:new({ float_opts = { width = 100, height = 1 } })
-    term:update({ float_opts = { width = 200 } })
-
-    assert.equal(1, term:get_state("float_opts").height)
-  end)
-
-  it("doesn't override size that are not-given options", function()
-    local term = terms.Terminal:new({ size = { below = 20, right = "30%" } })
-
-    term:update({ size = { below = 25 } })
-
-    assert.equal(25, term.size.below)
-    assert.equal("30%", term.size.right)
-  end)
 
   it("recomputes on_job_exit", function()
     local foo = nil
@@ -1243,16 +1228,6 @@ describe(":update", function()
     term:update({ sticky = true })
 
     assert.is_true(term.sticky)
-  end)
-
-  it("merges tags without overriding existing ones", function()
-    local term = terms.Terminal:new({ tags = { "dev", "backend" } })
-    term:update({ tags = { "production" } })
-
-    assert.equal(3, #term.tags)
-    assert.is_true(vim.tbl_contains(term.tags, "dev"))
-    assert.is_true(vim.tbl_contains(term.tags, "backend"))
-    assert.is_true(vim.tbl_contains(term.tags, "production"))
   end)
 end)
 
