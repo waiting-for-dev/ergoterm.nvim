@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Breaking: Rename `with_tag()` to `filter_by_tag()`.
+
 ## 0.6.0 - 2025-10-06
 
 - Add `:prompt()` text decorator.

@@ -867,7 +867,7 @@ require("ergoterm.terminal").find({predicate})                   *ergoterm.find(
 require("ergoterm.terminal").filter({predicate})                 *ergoterm.filter()*
     Return all terminals matching condition function.
 
-require("ergoterm.terminal").with_tag({tag})                     *ergoterm.with_tag()*
+require("ergoterm.terminal").filter_by_tag({tag})                     *ergoterm.with_tag()*
     Return all terminals that have the specified tag.
 
 require("ergoterm.terminal").select({terminals}, {prompt}, {callbacks}, {picker}) *ergoterm.select()*

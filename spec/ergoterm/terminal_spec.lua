@@ -192,13 +192,13 @@ describe(".filter", function()
   end)
 end)
 
-describe(".with_tag", function()
+describe(".filter_by_tag", function()
   it("returns all terminals with the specified tag", function()
     local term1 = terms.Terminal:new({ name = "test1", tags = { "dev", "backend" } })
     local term2 = terms.Terminal:new({ name = "test2", tags = { "dev", "frontend" } })
     terms.Terminal:new({ name = "test3", tags = { "production", "backend" } })
 
-    local result = terms.with_tag("dev")
+    local result = terms.filter_by_tag("dev")
 
     assert.equal(2, #result)
     assert.is_true(vim.tbl_contains(result, term1))
@@ -209,7 +209,7 @@ describe(".with_tag", function()
     terms.Terminal:new({ name = "test1", tags = { "dev" } })
     terms.Terminal:new({ name = "test2", tags = { "frontend" } })
 
-    local result = terms.with_tag("production")
+    local result = terms.filter_by_tag("production")
 
     assert.equal(0, #result)
   end)
@@ -218,7 +218,7 @@ describe(".with_tag", function()
     terms.Terminal:new({ name = "test1" })
     terms.Terminal:new({ name = "test2" })
 
-    local result = terms.with_tag("dev")
+    local result = terms.filter_by_tag("dev")
 
     assert.equal(0, #result)
   end)

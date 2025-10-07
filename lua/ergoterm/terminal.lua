@@ -133,7 +133,7 @@ end
 ---
 ---@param tag string the tag to search for
 ---@return Terminal[] array of terminals that have the specified tag
-function M.with_tag(tag)
+function M.filter_by_tag(tag)
   return M.filter(function(term)
     return vim.tbl_contains(term.tags, tag)
   end)
