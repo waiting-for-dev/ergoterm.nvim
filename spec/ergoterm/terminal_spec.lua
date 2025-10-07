@@ -2284,7 +2284,7 @@ describe(":on_vim_resized", function()
   it("updates state with new computed float options", function()
     local original_lines = vim.o.lines
     vim.o.lines = 40
-    local term = terms.Terminal:new({ layout = "float" }):open()
+    local term = terms.Terminal:new({ layout = "float" })
     local float_opts_height = term:get_state("float_opts").height
 
     vim.o.lines = 150
@@ -2297,9 +2297,35 @@ describe(":on_vim_resized", function()
     vim.o.lines = original_lines
   end)
 
-  it("applies new computed float options to the window", function()
+  it("applies new win config to float terminal", function()
     local term = terms.Terminal:new({ layout = "float", float_opts = { width = 60, height = 30 } })
-    term:open("float")
+    term:open()
+    local spy_win_set_config = spy.on(vim.api, "nvim_win_set_config")
+
+    term:on_vim_resized()
+
+    assert.spy(spy_win_set_config).was_called_with(term:get_state("window"), match.is_table())
+  end)
+
+  it("updates state with new computed size", function()
+    local original_columns = vim.o.columns
+    vim.o.columns = 80
+    local term = terms.Terminal:new({ layout = "right" })
+    local initial_size = term:get_state("size")
+
+    vim.o.columns = 200
+
+    term:on_vim_resized()
+
+    local new_size = term:get_state("size")
+    assert.not_equal(initial_size, new_size)
+
+    vim.o.columns = original_columns
+  end)
+
+  it("applies new win config to a split terminal", function()
+    local term = terms.Terminal:new({ layout = "right" })
+    term:open()
     local spy_win_set_config = spy.on(vim.api, "nvim_win_set_config")
 
     term:on_vim_resized()
@@ -2308,8 +2334,8 @@ describe(":on_vim_resized", function()
   end)
 
   it("does nothing if layout is not float", function()
-    local term = terms.Terminal:new({ layout = "below" })
-    term:open("below")
+    local term = terms.Terminal:new({ layout = "tab" })
+    term:open()
     local spy_win_set_config = spy.on(vim.api, "nvim_win_set_config")
 
     term:on_vim_resized()

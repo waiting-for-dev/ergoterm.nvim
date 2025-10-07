@@ -686,10 +686,10 @@ end
 ---
 ---Updates the floating window configuration if the terminal is in float layout.
 function Terminal:on_vim_resized()
-  if self._state.layout == "float" then
-    local float_opts = self:_compute_float_opts()
-    self._state.float_opts = float_opts
-    vim.api.nvim_win_set_config(self._state.window, float_opts)
+  self._state.float_opts = self:_compute_float_win_config()
+  self._state.size = self:_compute_size()
+  if vim.tbl_contains({ "float", "above", "below", "left", "right" }, self._state.layout) and self:is_open() then
+    vim.api.nvim_win_set_config(self._state.window, self:_get_win_config(self._state.layout))
   end
 end
 
@@ -731,12 +731,10 @@ function Terminal:_show(layout)
   if not self:is_open() then
     local window = nil
     local computed_layout = layout or self._state.layout
-    if vim.tbl_contains({ "above", "below", "left", "right" }, computed_layout) then
-      window = self:_open_in_split(computed_layout)
+    if vim.tbl_contains({ "above", "below", "left", "right", "float" }, computed_layout) then
+      window = self:_open_in_new_window(computed_layout)
     elseif computed_layout == "tab" then
       window = self:_open_in_tab()
-    elseif computed_layout == "float" then
-      window = self:_open_in_float()
     else
       window = self:_open_in_window()
     end
@@ -749,18 +747,22 @@ function Terminal:_show(layout)
 end
 
 ---@private
-function Terminal:_open_in_split(layout)
-  local win_config
-  if layout == "above" then
-    win_config = { height = self._state.size.above, vertical = false, split = "above", win = -1 }
-  elseif layout == "below" then
-    win_config = { height = self._state.size.below, vertical = false, split = "below", win = -1 }
-  elseif layout == "left" then
-    win_config = { width = self._state.size.left, vertical = true, split = "left", win = -1 }
-  elseif layout == "right" then
-    win_config = { width = self._state.size.right, vertical = false, split = "right", win = -1 }
-  end
+function Terminal:_open_in_new_window(layout)
+  local win_config = self:_get_win_config(layout)
   return vim.api.nvim_open_win(self._state.bufnr, false, win_config)
+end
+
+---@private
+function Terminal:_get_win_config(layout)
+  local win_config
+  if layout == "float" then
+    win_config = self:_compute_float_win_config()
+  elseif vim.tbl_contains({ "above", "below", "left", "right" }, layout) then
+    win_config = self:_compute_split_win_config(layout)
+  else
+    win_config = {}
+  end
+  return win_config
 end
 
 ---@private
@@ -773,14 +775,6 @@ function Terminal:_open_in_tab()
   vim.api.nvim_set_current_win(current_window)
   vim.defer_fn(function() vim.cmd("stopinsert") end, 100)
   return window
-end
-
----@private
-function Terminal:_open_in_float()
-  local current_window_zindex = vim.api.nvim_win_get_config(0).zindex or 0
-  return vim.api.nvim_open_win(self._state.bufnr, false, vim.tbl_extend("force", self._state.float_opts, {
-    zindex = current_window_zindex + 1
-  }))
 end
 
 ---@private
@@ -875,7 +869,7 @@ function Terminal:_initialize_state()
     bufnr = nil,
     dir = self:_compute_dir(),
     layout = self.layout,
-    float_opts = self:_compute_float_opts(),
+    float_opts = self:_compute_float_win_config(),
     job_id = nil,
     last_exit_code = nil,
     mode = mode.get_initial(self.start_in_insert),
@@ -917,13 +911,29 @@ function Terminal:_compute_dir()
 end
 
 ---@private
-function Terminal:_compute_float_opts()
+function Terminal:_compute_split_win_config(layout)
+  local win_config
+  if layout == "above" then
+    win_config = { height = self._state.size.above, vertical = false, split = "above", win = -1 }
+  elseif layout == "below" then
+    win_config = { height = self._state.size.below, vertical = false, split = "below", win = -1 }
+  elseif layout == "left" then
+    win_config = { width = self._state.size.left, vertical = true, split = "left", win = -1 }
+  elseif layout == "right" then
+    win_config = { width = self._state.size.right, vertical = false, split = "right", win = -1 }
+  end
+  return win_config
+end
+
+---@private
+function Terminal:_compute_float_win_config()
   local float_opts = vim.tbl_deep_extend("keep", {}, self.float_opts or {})
   float_opts.title = float_opts.title or self.name
   float_opts.height = float_opts.height or math.ceil(math.min(vim.o.lines, math.max(20, vim.o.lines - 5)))
   float_opts.width = float_opts.width or math.ceil(math.min(vim.o.columns, math.max(80, vim.o.columns - 10)))
   float_opts.row = float_opts.row or math.ceil(vim.o.lines - float_opts.height) * 0.5 - 1
   float_opts.col = float_opts.col or math.ceil(vim.o.columns - float_opts.width) * 0.5 - 1
+  float_opts.zindex = (vim.api.nvim_win_get_config(0).zindex or 0) + 1
   return float_opts
 end
 
