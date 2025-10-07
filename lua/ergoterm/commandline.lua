@@ -317,6 +317,13 @@ function M._complete(options)
       vim.tbl_keys(options)
     )
 
+    if not utils.str_is_empty(lead) then
+      available_options = vim.tbl_filter(
+        function(option) return option:match("^" .. lead) ~= nil end,
+        available_options
+      )
+    end
+
     table.sort(available_options)
 
     return vim.tbl_map(function(option) return option .. "=" end, available_options)

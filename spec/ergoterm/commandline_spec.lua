@@ -82,6 +82,14 @@ describe("commandline.term_send_complete", function()
     assert.is_true(vim.tbl_contains(result, "decorator=identity"))
     assert.is_true(vim.tbl_contains(result, "decorator=markdown_code"))
   end)
+
+  it("completes partial option names", function()
+    local result = commandline.term_send_complete("act", "act", 3)
+
+    assert.is_true(vim.tbl_contains(result, "action="))
+    assert.is_false(vim.tbl_contains(result, "text="))
+    assert.is_false(vim.tbl_contains(result, "trim="))
+  end)
 end)
 
 describe("commandline.term_new_complete", function()
