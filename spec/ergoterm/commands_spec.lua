@@ -124,6 +124,20 @@ describe("M.new", function()
     assert.is_true(term.persist_mode)
   end)
 
+  it("creates a new terminal with persist_size=true by default", function()
+    local term = commands.new("")
+
+    assert.is_not_nil(term)
+    assert.is_true(term.persist_size)
+  end)
+
+  it("creates a new terminal with the given persist_size option", function()
+    local term = commands.new("persist_size=false")
+
+    assert.is_not_nil(term)
+    assert.is_false(term.persist_size)
+  end)
+
   it("creates a new terminal with selectable=true by default", function()
     local term = commands.new("")
 

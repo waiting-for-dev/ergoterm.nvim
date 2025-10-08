@@ -78,6 +78,7 @@ Create new terminals with `:TermNew` and customize them with options:
 - `bang_target` - Allow terminal to be targeted by bang commands (default: `true`)
 - `watch_files` - Watch for file changes when terminal produces output (requires vim's `autoread` option) (default: `false`)
 - `persist_mode` - Remember terminal mode between visits (default: `false`)
+- `persist_size` - Remember terminal size between visits (default: `true`)
 - `selectable` - Show in selection picker (default: `true`)
 - `start_in_insert` - Start terminal in insert mode (default: `true`)
 - `sticky` - Keep terminals visible in picker even when stopped (requires `selectable` to also be `true`) (default: `false`)
@@ -148,6 +149,7 @@ Modify existing terminal configuration:
 - `bang_target` - Allow terminal to be targeted by bang commands (can be overridden by universal selection mode)
 - `watch_files` - Watch for file changes when terminal produces output (requires vim's `autoread` option)
 - `persist_mode` - Remember terminal mode when revisiting
+- `persist_size` - Remember terminal size when revisiting
 - `selectable` - Show in selection picker (can be overridden by universal selection mode)
 - `start_in_insert` - Start in insert mode
 - `tags` - List of tags for categorizing and filtering terminals
@@ -283,6 +285,7 @@ All options default to values from your configuration:
 - `on_start` - Called when the terminal job process starts. Receives the terminal instance as its only argument
 - `on_stop` - Called when the terminal job process stops. Receives the terminal instance as its only argument
 - `persist_mode` - Remember terminal mode between visits
+- `persist_size` - Remember terminal size between visits
 - `selectable` - Include terminal in selection picker (can be overridden by universal selection mode)
 - `sticky` - Keep terminal visible in picker even when stopped (requires `selectable` to also be `true`)
 - `size` - Size configuration for different window layouts (table with `above`, `below`, `left`, `right` keys)
@@ -498,6 +501,9 @@ require("ergoterm").setup({
 
     -- Remember terminal mode between visits
     persist_mode = false,
+
+    -- Remember terminal size between visits
+    persist_size = true,
 
     -- Start terminals in insert mode
     start_in_insert = true,

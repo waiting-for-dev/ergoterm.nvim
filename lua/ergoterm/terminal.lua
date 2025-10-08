@@ -11,6 +11,8 @@ local lazy = require("ergoterm.lazy")
 local config = lazy.require("ergoterm.config")
 ---@module "ergoterm.mode"
 local mode = lazy.require("ergoterm.mode")
+---@module "ergoterm.size"
+local size_utils = lazy.require("ergoterm.size")
 ---@module "ergoterm.text_decorators"
 local text_decorators = lazy.require("ergoterm.text_decorators")
 ---@module "ergoterm.text_selector"
@@ -247,11 +249,11 @@ function M._get_default_picker_callbacks()
   return vim.tbl_extend("force", select_actions, extra_select_actions)
 end
 
----@class ComputedSizeOpts
----@field below number
----@field above number
----@field left number
----@field right number
+---@class SizeUnits
+---@field below "percentage"|"absolute"
+---@field above "percentage"|"absolute"
+---@field left "percentage"|"absolute"
+---@field right "percentage"|"absolute"
 
 ---@class TerminalState
 ---@field bufnr number?
@@ -264,7 +266,7 @@ end
 ---@field on_job_exit on_job_exit
 ---@field on_job_stdout on_job_stdout
 ---@field on_job_stderr on_job_stderr
----@field size ComputedSizeOpts
+---@field size Size
 ---@field tabpage number?
 ---@field window number?
 
@@ -295,8 +297,9 @@ end
 ---@field show_on_success boolean? whether to show terminal when process exits successfully
 ---@field show_on_failure boolean? whether to show terminal when process exits with failure
 ---@field persist_mode boolean? whether or not to persist the mode of the terminal on return
+---@field persist_size boolean? whether or not to persist the size of the terminal when window is closed
 ---@field selectable boolean? whether or not the terminal is visible in picker selections and can be last focused
----@field size SizeOpts? size configuration for different layouts
+---@field size Size? size configuration for different layouts
 ---@field start_in_insert boolean?
 ---@field sticky boolean? whether or not the terminal remains visible in picker even when stopped
 ---@field tags string[]? tags for categorizing and filtering terminals
@@ -332,6 +335,7 @@ function Terminal:new(args)
   term.float_opts = vim.tbl_deep_extend("keep", term.float_opts or {}, config.get("terminal_defaults.float_opts")) --@type FloatOpts
   term.float_winblend = term.float_winblend or config.get("terminal_defaults.float_winblend")
   term.persist_mode = vim.F.if_nil(term.persist_mode, config.get("terminal_defaults.persist_mode"))
+  term.persist_size = vim.F.if_nil(term.persist_size, config.get("terminal_defaults.persist_size"))
   term.selectable = vim.F.if_nil(term.selectable, config.get("terminal_defaults.selectable"))
   term.size = vim.tbl_deep_extend("keep", term.size or {}, config.get("terminal_defaults.size")) --@type SizeOpts
   term.start_in_insert = vim.F.if_nil(term.start_in_insert, config.get("terminal_defaults.start_in_insert"))
@@ -459,6 +463,9 @@ end
 function Terminal:close()
   if self:is_open() then
     self:on_close()
+    if self.persist_size then
+      self:_persist_size()
+    end
     if #vim.api.nvim_list_wins() == 1 then
       local empty_buf = vim.api.nvim_create_buf(false, true)
       vim.api.nvim_win_set_buf(self._state.window, empty_buf)
@@ -675,8 +682,6 @@ end
 ---
 ---Updates the floating window configuration if the terminal is in float layout.
 function Terminal:on_vim_resized()
-  self._state.float_opts = self:_compute_float_win_config()
-  self._state.size = self:_compute_size()
   if vim.tbl_contains({ "float", "above", "below", "left", "right" }, self._state.layout) and self:is_open() then
     vim.api.nvim_win_set_config(self._state.window, self:_get_win_config(self._state.layout))
   end
@@ -865,12 +870,13 @@ function Terminal:_initialize_state()
     on_job_exit = self:_compute_exit_handler(self.on_job_exit),
     on_job_stdout = self:_compute_output_handler(self.on_job_stdout),
     on_job_stderr = self:_compute_output_handler(self.on_job_stderr),
-    size = self:_compute_size(),
+    size = self.size,
     tabpage = nil,
     window = nil
   }
 end
 
+---@private
 function Terminal:_recompute_state()
   self._state.mode = mode.get_initial(self.start_in_insert)
   self._state.layout = self.layout
@@ -902,14 +908,15 @@ end
 ---@private
 function Terminal:_compute_split_win_config(layout)
   local win_config
+  local size = self:_compute_size()
   if layout == "above" then
-    win_config = { height = self._state.size.above, vertical = false, split = "above", win = -1 }
+    win_config = { height = size.above, vertical = false, split = "above", win = -1 }
   elseif layout == "below" then
-    win_config = { height = self._state.size.below, vertical = false, split = "below", win = -1 }
+    win_config = { height = size.below, vertical = false, split = "below", win = -1 }
   elseif layout == "left" then
-    win_config = { width = self._state.size.left, vertical = true, split = "left", win = -1 }
+    win_config = { width = size.left, vertical = true, split = "left", win = -1 }
   elseif layout == "right" then
-    win_config = { width = self._state.size.right, vertical = false, split = "right", win = -1 }
+    win_config = { width = size.right, vertical = false, split = "right", win = -1 }
   end
   return win_config
 end
@@ -929,19 +936,35 @@ end
 ---@private
 function Terminal:_compute_size()
   local size = {}
-  for direction, value in pairs(self.size) do
-    if type(value) == "string" and value:match("%%$") then
-      local percentage = tonumber(value:match("(%d+)%%"))
-      if direction == "below" or direction == "above" then
-        size[direction] = math.ceil(vim.o.lines * percentage / 100)
-      else
-        size[direction] = math.ceil(vim.o.columns * percentage / 100)
-      end
+  for layout, value in pairs(self._state.size) do
+    if size_utils.is_percentage(value) then
+      size[layout] = size_utils.percentage_to_absolute(value, layout)
     else
-      size[direction] = value
+      size[layout] = value
     end
   end
   return size
+end
+
+---@private
+function Terminal:_persist_size()
+  local layout = self._state.layout
+  if not self:is_open() then return end
+  if not vim.tbl_contains({ "above", "below", "left", "right" }, layout) then return end
+
+  local current_axis_absolute_size
+  local current_axis_size
+  if size_utils.is_vertical(layout) then
+    current_axis_absolute_size = vim.api.nvim_win_get_width(self._state.window)
+  else
+    current_axis_absolute_size = vim.api.nvim_win_get_height(self._state.window)
+  end
+  if size_utils.is_percentage(self.size[layout]) then
+    current_axis_size = size_utils.absolute_to_percentage(current_axis_absolute_size, layout)
+  else
+    current_axis_size = current_axis_absolute_size
+  end
+  self._state.size[layout] = current_axis_size
 end
 
 ---@private
@@ -1012,6 +1035,11 @@ function Terminal:_setup_buffer_autocommands()
     buffer = self._state.bufnr,
     group = group,
     callback = function() self:cleanup() end
+  })
+  vim.api.nvim_create_autocmd("WinClosed", {
+    buffer = self._state.bufnr,
+    group = group,
+    callback = function() self:close() end
   })
 end
 

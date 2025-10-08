@@ -26,6 +26,7 @@ local p = {
 ---@field bang_target boolean?
 ---@field watch_files boolean?
 ---@field persist_mode boolean?
+---@field persist_size boolean?
 ---@field selectable boolean?
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
@@ -69,6 +70,7 @@ function M.parse(args)
       bang_target = true,
       watch_files = true,
       persist_mode = true,
+      persist_size = true,
       selectable = true,
       start_in_insert = true,
       sticky = true,
@@ -229,6 +231,8 @@ M._all_options = {
 
   persist_mode = M._boolean_options,
 
+  persist_size = M._boolean_options,
+
   selectable = M._boolean_options,
 
   start_in_insert = M._boolean_options,
@@ -253,6 +257,7 @@ M._term_new_options = {
   bang_target = M._all_options.bang_target,
   watch_files = M._all_options.watch_files,
   persist_mode = M._all_options.persist_mode,
+  persist_size = M._all_options.persist_size,
   selectable = M._all_options.selectable,
   start_in_insert = M._all_options.start_in_insert,
   sticky = M._all_options.sticky,
@@ -269,6 +274,7 @@ M._term_update_options = {
   bang_target = M._all_options.bang_target,
   watch_files = M._all_options.watch_files,
   persist_mode = M._all_options.persist_mode,
+  persist_size = M._all_options.persist_size,
   selectable = M._all_options.selectable,
   start_in_insert = M._all_options.start_in_insert,
   sticky = M._all_options.sticky,

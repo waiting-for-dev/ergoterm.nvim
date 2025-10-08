@@ -39,7 +39,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field row? number
 ---@field col? number
 
----@class SizeOpts
+---@class Size
 ---@field below? string|number
 ---@field above? string|number
 ---@field left? string|number
@@ -68,9 +68,10 @@ M.NULL_CALLBACK = function(...) end
 ---@field show_on_success boolean?
 ---@field show_on_failure boolean?
 ---@field persist_mode boolean?
+---@field persist_size boolean?
 ---@field shell string|fun():string?
 ---@field selectable boolean?
----@field size SizeOpts?
+---@field size Size?
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
 ---@field tags string[]?
@@ -109,6 +110,7 @@ local config = {
     },
     float_winblend = 10,
     persist_mode = false,
+    persist_size = true,
     selectable = true,
     sticky = false,
     size = {

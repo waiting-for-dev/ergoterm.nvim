@@ -33,6 +33,7 @@ function M.new(args)
     bang_target = { parsed.bang_target, "boolean", true },
     watch_files = { parsed.watch_files, "boolean", true },
     persist_mode = { parsed.persist_mode, "boolean", true },
+    persist_size = { parsed.persist_size, "boolean", true },
     selectable = { parsed.selectable, "boolean", true },
     start_in_insert = { parsed.start_in_insert, "boolean", true },
     sticky = { parsed.sticky, "boolean", true },
@@ -50,6 +51,7 @@ function M.new(args)
     bang_target = parsed.bang_target,
     watch_files = parsed.watch_files,
     persist_mode = parsed.persist_mode,
+    persist_size = parsed.persist_size,
     selectable = parsed.selectable,
     start_in_insert = parsed.start_in_insert,
     sticky = parsed.sticky,
@@ -135,7 +137,7 @@ end
 ---Updates terminal configuration after creation
 ---
 ---Allows modification of terminal settings without recreating the terminal.
----Updatable fields include layout, name, auto_scroll, persist_mode,
+---Updatable fields include layout, name, auto_scroll, persist_mode, persist_size,
 ---selectable, and start_in_insert. Changes take effect immediately.
 ---
 ---Bang mode (!) targets the last focused terminal directly, otherwise
@@ -154,6 +156,7 @@ function M.update(args, bang, picker)
     bang_target = { parsed.bang_target, "boolean", true },
     watch_files = { parsed.watch_files, "boolean", true },
     persist_mode = { parsed.persist_mode, "boolean", true },
+    persist_size = { parsed.persist_size, "boolean", true },
     selectable = { parsed.selectable, "boolean", true },
     start_in_insert = { parsed.start_in_insert, "boolean", true },
     sticky = { parsed.sticky, "boolean", true },

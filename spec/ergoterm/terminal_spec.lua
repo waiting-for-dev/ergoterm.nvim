@@ -753,6 +753,18 @@ describe(":new", function()
     assert.is_false(term.persist_mode)
   end)
 
+  it("takes persist_size option", function()
+    local term = terms.Terminal:new({ persist_size = true })
+
+    assert.is_true(term.persist_size)
+  end)
+
+  it("defaults to config's persist_mode", function()
+    local term = terms.Terminal:new()
+
+    assert.is_true(term.persist_size)
+  end)
+
   it("takes start_in_insert option", function()
     local term = terms.Terminal:new({ start_in_insert = false })
 
@@ -1084,35 +1096,11 @@ describe(":new", function()
     assert.equal(10, term:get_state("float_opts").col)
   end)
 
-  it("initializes size with numeric values", function()
-    local term = terms.Terminal:new({ size = { below = 20, right = 30 } })
+  it("initializes size values", function()
+    local term = terms.Terminal:new({ size = { below = 20, right = "30%" } })
 
     assert.equal(20, term:get_state("size").below)
-    assert.equal(30, term:get_state("size").right)
-  end)
-
-  it("initializes size with percentage values for vertical layouts", function()
-    local original_lines = vim.o.lines
-    vim.o.lines = 40
-
-    local term = terms.Terminal:new({ size = { below = "25%", above = "75%" } })
-
-    assert.equal(10, term:get_state("size").below)
-    assert.equal(30, term:get_state("size").above)
-
-    vim.o.lines = original_lines
-  end)
-
-  it("initializes size with percentage values for horizontal layouts", function()
-    local original_columns = vim.o.columns
-    vim.o.columns = 80
-
-    local term = terms.Terminal:new({ size = { left = "25%", right = "75%" } })
-
-    assert.equal(20, term:get_state("size").left)
-    assert.equal(60, term:get_state("size").right)
-
-    vim.o.columns = original_columns
+    assert.equal("30%", term:get_state("size").right)
   end)
 
   it("initializes on_job_exit so it calls provided on_job_exit", function()
@@ -1623,6 +1611,46 @@ describe(":close", function()
     local bufnr = vim.api.nvim_win_get_buf(win_id)
     assert.is_true(vim.api.nvim_buf_is_valid(bufnr))
     assert.not_equal(initial_bufnr, bufnr)
+  end)
+
+  it("persists absolute size when persist_size is true", function()
+    local term = terms.Terminal:new({ persist_size = true, layout = "below", size = { below = 10 } })
+    term:open()
+    local win_id = term:get_state("window")
+    vim.api.nvim_win_set_config(win_id, { height = 20 })
+
+    term:close()
+
+    assert.equal(20, term:get_state("size").below)
+  end)
+
+  it("persists percentage size when persist_size is true", function()
+    local original_lines = vim.o.lines
+    vim.o.lines = 40
+
+    local term = terms.Terminal:new({ persist_size = true, layout = "below", size = { below = "50%" } })
+    assert.equal("50%", term:get_state("size").below)
+    term:open()
+    local win_id = term:get_state("window")
+    vim.api.nvim_win_set_config(win_id, { height = 20 })
+    vim.o.lines = 80
+
+    term:close()
+
+    assert.equal("25%", term:get_state("size").below)
+
+    vim.o.lines = original_lines
+  end)
+
+  it("doesn't persist size when persist_size is false", function()
+    local term = terms.Terminal:new({ persist_size = false, layout = "below", size = { below = 10 } })
+    term:open()
+    local win_id = term:get_state("window")
+    vim.api.nvim_win_set_config(win_id, { height = 20 })
+
+    term:close()
+
+    assert.equal(10, term:get_state("size").below)
   end)
 end)
 
@@ -2256,22 +2284,6 @@ end)
 
 
 describe(":on_vim_resized", function()
-  it("updates state with new computed float options", function()
-    local original_lines = vim.o.lines
-    vim.o.lines = 40
-    local term = terms.Terminal:new({ layout = "float" })
-    local float_opts_height = term:get_state("float_opts").height
-
-    vim.o.lines = 150
-
-    term:on_vim_resized()
-
-    local new_float_opts_height = term:get_state("float_opts").height
-    assert.not_equal(float_opts_height, new_float_opts_height)
-
-    vim.o.lines = original_lines
-  end)
-
   it("applies new win config to float terminal", function()
     local term = terms.Terminal:new({ layout = "float", float_opts = { width = 60, height = 30 } })
     term:open()
@@ -2280,22 +2292,6 @@ describe(":on_vim_resized", function()
     term:on_vim_resized()
 
     assert.spy(spy_win_set_config).was_called_with(term:get_state("window"), match.is_table())
-  end)
-
-  it("updates state with new computed size", function()
-    local original_columns = vim.o.columns
-    vim.o.columns = 80
-    local term = terms.Terminal:new({ layout = "right" })
-    local initial_size = term:get_state("size")
-
-    vim.o.columns = 200
-
-    term:on_vim_resized()
-
-    local new_size = term:get_state("size")
-    assert.not_equal(initial_size, new_size)
-
-    vim.o.columns = original_columns
   end)
 
   it("applies new win config to a split terminal", function()
@@ -2352,6 +2348,34 @@ describe(":_setup_buffer_autocommands", function()
     assert.is_true(#aucmds > 0)
     assert.is_true(aucmds[1].buffer == bufnr)
     assert.is_true(aucmds[1].group_name == "ErgoTermBuffer")
+  end)
+
+  it("adds a WinClosed autocommand", function()
+    local term = terms.Terminal:new()
+
+    term:start()
+
+    local bufnr = term:get_state("bufnr")
+    local aucmds = vim.api.nvim_get_autocmds({
+      event = "WinClosed",
+      buffer = bufnr,
+      group = "ErgoTermBuffer",
+    })
+
+    assert.is_true(#aucmds > 0)
+    assert.is_true(aucmds[1].buffer == bufnr)
+    assert.is_true(aucmds[1].group_name == "ErgoTermBuffer")
+  end)
+
+  it("closes terminal when WinClosed event is triggered", function()
+    local term = terms.Terminal:new()
+    term:open()
+    local win_id = term:get_state("window")
+
+    vim.api.nvim_win_close(win_id, true)
+    vim.wait(100)
+
+    assert.is_false(term:is_open())
   end)
 end)
 

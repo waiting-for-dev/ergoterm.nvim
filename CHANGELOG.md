@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - BREAKING: `term:update()` completely replaces table settings instead of merging them.
 - Resize splits on `VimResized` event.
 - Fix option names auto-completion in commands.
+- `persist_size` option to remember the size of split terminals
 
 ## 0.6.0 - 2025-10-06
 

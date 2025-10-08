@@ -130,6 +130,7 @@ Options:
     bang_target={boolean}       Allow terminal to be targeted by bang commands (default: true)
     watch_files={boolean}       Watch for file changes when terminal produces output (default: false)
     persist_mode={boolean}      Remember terminal mode between visits (default: false)
+    persist_size={boolean}      Remember terminal size between visits (default: true)
     selectable={boolean}        Show in selection picker (default: true)
     start_in_insert={boolean}   Start terminal in insert mode (default: true)
     sticky={boolean}            Keep terminal visible in picker even when stopped (default: false)
@@ -247,6 +248,7 @@ Updatable options:
                                  (can be overridden by universal selection mode)
     watch_files={boolean}        Watch for file changes when terminal produces output
     persist_mode={boolean}       Remember terminal mode
+    persist_size={boolean}       Remember terminal size
     selectable={boolean}         Show in selection picker
                                  (can be overridden by universal selection mode)
     start_in_insert={boolean}    Start in insert mode
@@ -390,6 +392,14 @@ terminal_defaults.persist_mode ~
     Type: `boolean`
     
     Remember terminal mode (normal/insert) between visits.
+
+                                                       *ergoterm-persist_size*
+terminal_defaults.persist_size ~
+    Default: `true`
+    Type: `boolean`
+    
+    Remember terminal size between visits.
+
 
                                                     *ergoterm-start_in_insert*
 terminal_defaults.start_in_insert ~
