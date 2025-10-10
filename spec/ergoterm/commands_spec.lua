@@ -307,10 +307,10 @@ describe("M.send", function()
     local term = terms.Terminal:new():start()
     local spy_send = spy.on(term, "send")
 
-    commands.send("action=silent", 0, false, select_only_picker)
+    commands.send("action=start", 0, false, select_only_picker)
 
     assert.spy(spy_send).was_called_with(term, "single_line", {
-      action = "silent",
+      action = "start",
       trim = nil,
       new_line = nil,
       decorator = nil

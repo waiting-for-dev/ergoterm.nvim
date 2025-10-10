@@ -199,9 +199,9 @@ M._all_options = {
 
   action = function(typed_action)
     local actions = {
-      "interactive",
-      "silent",
-      "visible"
+      "focus",
+      "open",
+      "start"
     }
     if utils.str_is_empty(typed_action) then return actions end
     return vim.tbl_filter(

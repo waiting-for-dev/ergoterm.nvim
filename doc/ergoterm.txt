@@ -204,15 +204,15 @@ last focused terminal without opening a picker.
 
 Options:
     text={text}           Custom text to send
-    action={action}       Terminal behavior (default: "interactive")
+    action={action}       Terminal behavior (default: "focus")
     decorator={decorator} Text transformation (default: "identity")
     trim={boolean}        Remove whitespace (default: true)
     new_line={boolean}    Add newline for execution (default: true)
 
 Action modes:
-    interactive    Focus terminal after sending (default)
-    visible        Show terminal but keep current focus
-    silent         Send without opening terminal
+    focus         Focus terminal after sending (default)
+    open          Show terminal but keep current focus
+    start         Send without opening terminal
 
 Text decorators:
     identity         Send text as-is (default)
@@ -222,8 +222,8 @@ Text decorators:
 Examples: >vim
     :TermSend
     :TermSend!
-    :TermSend action=visible
-    :TermSend text="echo hello" action=silent
+    :TermSend action=open
+    :TermSend text="echo hello" action=start
     :'<,'>TermSend decorator=markdown_code
 <
 
@@ -821,7 +821,7 @@ Terminal:send({input}, {opts})                          *Terminal:send()*
     Parameters:
         {input}    - Array of text lines or selection type string
         {opts}     - Table with options:
-          action   - "interactive"|"visible"|"silent" (default: "interactive")
+          action   - "focus"|"open"|"start" (default: "focus")
           trim     - Remove whitespace (default: true)
           new_line - Add newline (default: true)
           decorator - Text transformation function or string name
@@ -1004,12 +1004,12 @@ Useful keymaps to get started: >lua
     map("x", "<leader>cs", ":TermSend! new_line=false<CR>", opts)
     
     -- Send and show output without focusing terminal
-    map("n", "<leader>cx", ":TermSend! action=visible<CR>", opts)
-    map("x", "<leader>cx", ":TermSend! action=visible<CR>", opts)
+    map("n", "<leader>cx", ":TermSend! action=open<CR>", opts)
+    map("x", "<leader>cx", ":TermSend! action=open<CR>", opts)
     
     -- Send as markdown code block
-    map("n", "<leader>cS", ":TermSend! action=visible trim=false decorator=markdown_code<CR>", opts)
-    map("x", "<leader>cS", ":TermSend! action=visible trim=false decorator=markdown_code<CR>", opts)
+    map("n", "<leader>cS", ":TermSend! action=open trim=false decorator=markdown_code<CR>", opts)
+    map("x", "<leader>cS", ":TermSend! action=open trim=false decorator=markdown_code<CR>", opts)
 <
 
 ------------------------------------------------------------------------------

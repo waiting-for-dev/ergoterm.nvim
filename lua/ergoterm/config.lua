@@ -69,7 +69,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field show_on_failure boolean?
 ---@field persist_mode boolean?
 ---@field persist_size boolean?
----@field shell string|fun():string?
+---@field shell (string|fun():string)?
 ---@field selectable boolean?
 ---@field size Size?
 ---@field start_in_insert boolean?

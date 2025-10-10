@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 - BREAKING: Rename `with_tag()` to `filter_by_tag()`.
 - BREAKING: `term:update()` completely replaces table settings instead of merging them.
+- DEPRECATED: Rename `:send()` allowed action names:
+  - `silent` -> `start`
+  - `visible` -> `open`
+  - `interactive` -> `focus`
+- `:send()` will ensure terminal is in the action state before sending input.
 - Resize splits on `VimResized` event.
 - Fix option names auto-completion in commands.
 - `persist_size` option to remember the size of split terminals

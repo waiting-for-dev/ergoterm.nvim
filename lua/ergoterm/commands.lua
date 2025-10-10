@@ -87,10 +87,10 @@ end
 ---• Normal mode: current line under cursor
 ---• Visual selection: selected text (character-wise or line-wise)
 ---
----Action modes control terminal behavior:
----• "interactive" - opens and focuses terminal (default)
----• "visible" - opens terminal but maintains current focus
----• "silent" - sends without changing terminal visibility
+---Action modes control the terminal state before sending:
+---• "focus" - opens and focuses terminal (default)
+---• "open" - opens terminal but maintains current focus
+---• "start" - sends without changing terminal visibility
 ---
 ---Text processing options:
 ---• trim: removes leading/trailing whitespace (default: true)

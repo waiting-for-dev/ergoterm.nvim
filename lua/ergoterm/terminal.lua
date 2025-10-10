@@ -573,16 +573,17 @@ function Terminal:toggle(layout)
 end
 
 ---@class SendOptions
----@field action? "interactive"|"visible"|"silent" terminal interaction mode (default: "interactive")
+---@field action? "focus"|"open"|"start" terminal interaction mode (default: "focus")
 ---@field trim? boolean remove leading/trailing whitespace (default: true)
 ---@field new_line? boolean append newline for command execution (default: true)
 ---@field decorator? string | fun(text: string[]): string[] transform text before sending
 
 ---Sends text input to the terminal job
 ---
----Automatically starts the terminal if not running. The opts.action parameter controls
----window behavior: "interactive" focuses the terminal for user interaction,
----"visible" shows output without stealing focus, "silent" sends without UI changes.
+---Before sending text, ensures the terminal is in the appropriate state based on opts.action:
+---"focus" focuses the terminal for user interaction (default),
+---"open" opens the terminal without stealing focus,
+---"start" only starts the terminal without opening any window.
 ---Text is trimmed by default and gets a trailing newline for command execution.
 ---
 ---Input can be provided as:
@@ -595,23 +596,32 @@ end
 ---@param opts? SendOptions options for sending text
 ---@return self for method chaining
 function Terminal:send(input, opts)
-  if not self:is_started() then
-    utils.notify(string.format("%s terminal has not been started yet", self.name), "error")
-    return self
+  opts = opts or {}
+  local action = opts.action or "focus"
+
+  local deprecated_actions = {
+    silent = "start",
+    visible = "open",
+    interactive = "focus"
+  }
+  if deprecated_actions[action] then
+    utils.notify(
+      string.format("Action '%s' is deprecated, use '%s' instead", action,
+        deprecated_actions[action]),
+      "warn"
+    )
+    action = deprecated_actions[action]
   end
 
-  opts = opts or {}
-  local computed_action = opts.action or "interactive"
-  local computed_trim = opts.trim == nil or opts.trim
-  local computed_new_line = opts.new_line == nil or opts.new_line
-  local computed_decorator
+  local trim = opts.trim == nil or opts.trim
+  local new_line = opts.new_line == nil or opts.new_line
+  local decorator
   if type(opts.decorator) == "string" then
     local all_decorators = config.get_text_decorators()
-    computed_decorator = all_decorators[opts.decorator] or text_decorators.identity
+    decorator = all_decorators[opts.decorator] or text_decorators.identity
   else
-    computed_decorator = opts.decorator or text_decorators.identity
+    decorator = opts.decorator or text_decorators.identity
   end
-  local caller_window = vim.api.nvim_get_current_win()
   local text_input
   if type(input) == "string" then
     local valid_selection_types = { "single_line", "visual_lines", "visual_selection" }
@@ -627,27 +637,24 @@ function Terminal:send(input, opts)
   else
     text_input = input
   end
-  if computed_new_line then
+  if new_line then
     table.insert(text_input, "")
   end
-  if computed_trim then
+  if trim then
     for i, line in ipairs(text_input) do
       text_input[i] = line:gsub("^%s+", ""):gsub("%s+$", "")
     end
   end
-  local decorated_input = computed_decorator(text_input)
+  local decorated_input = decorator(text_input)
+  if action == "start" then
+    self:start()
+  elseif action == "open" then
+    self:open()
+  elseif action == "focus" then
+    self:focus()
+  end
   vim.fn.chansend(self._state.job_id, decorated_input)
   self:_scroll_bottom()
-  if computed_action ~= "silent" and not self:is_open() then
-    self:open()
-  end
-  if computed_action == "interactive" then
-    self:focus()
-  else
-    vim.schedule(function()
-      vim.api.nvim_set_current_win(caller_window)
-    end)
-  end
   return self
 end
 

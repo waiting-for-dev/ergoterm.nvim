@@ -122,10 +122,10 @@ Send text from your buffer to any terminal:
 
 **Available options:**
 - `text` - Custom text to send (default: current line or selection)
-- `action` - Terminal behavior (default: `interactive`)
-  - `interactive` - Focus terminal after sending
-  - `visible` - Show terminal but keep current focus
-  - `silent` - Send without opening terminal
+- `action` - Terminal behavior (default: `focus`)
+  - `focus` - Focus terminal after sending
+  - `open` - Show terminal but keep current focus
+  - `start` - Send without opening terminal
 - `decorator` - Text transformation (default: `identity`)
   - `identity` - Send text as-is
   - `markdown_code` - Wrap in markdown code block
@@ -186,12 +186,12 @@ map("n", "<leader>cs", ":TermSend! new_line=false<CR>", opts)  -- Send line with
 map("x", "<leader>cs", ":TermSend! new_line=false<CR>", opts)  -- Send selection without newline
 
 -- Send and show output without focusing terminal
-map("n", "<leader>cx", ":TermSend! action=visible<CR>", opts)  -- Execute in terminal, keep focus
-map("x", "<leader>cx", ":TermSend! action=visible<CR>", opts)  -- Execute selection in terminal, keep focus
+map("n", "<leader>cx", ":TermSend! action=open<CR>", opts)  -- Execute in terminal, keep focus
+map("x", "<leader>cx", ":TermSend! action=open<CR>", opts)  -- Execute selection in terminal, keep focus
 
 -- Send as markdown code block
-map("n", "<leader>cS", ":TermSend! action=visible trim=false decorator=\"markdown_code\"<CR>", opts)
-map("x", "<leader>cS", ":TermSend! action=visible trim=false decorator=\"markdown_code\"<CR>", opts)
+map("n", "<leader>cS", ":TermSend! action=open trim=false decorator=\"markdown_code\"<CR>", opts)
+map("x", "<leader>cS", ":TermSend! action=open trim=false decorator=\"markdown_code\"<CR>", opts)
 ```
 
 ## 💾 Standalone Terminals
@@ -352,10 +352,10 @@ The `Terminal:send(input, opts)` method provides flexible text input to terminal
 term:send("single_line")
 
 -- Send custom text without focusing terminal
-term:send({"echo hello", "ls -la"}, { action = "visible" })
+term:send({"echo hello", "ls -la"}, { action = "open" })
 
 -- Send visual selection silently (no UI changes)
-term:send("visual_selection", { action = "silent" })
+term:send("visual_selection", { action = "start" })
 
 -- Send with custom formatting
 term:send({"print('hello')"}, { trim = false, decorator = "markdown_code" })
@@ -368,9 +368,9 @@ term:send({"print('hello')"}, { trim = false, decorator = "markdown_code" })
 - `"visual_selection"` - Current visual character selection
 
 **Action modes:**
-- `"interactive"` - Focus terminal after sending (default)
-- `"visible"` - Show terminal output without stealing focus
-- `"silent"` - Send text without any UI changes
+- `"focus"` - Focus terminal after sending (default)
+- `"open"` - Show terminal output without stealing focus
+- `"start"` - Send text without any UI changes
 
 For complete API documentation and advanced usage patterns, see [`lua/ergoterm/terminal.lua`](lua/ergoterm/terminal.lua).
 

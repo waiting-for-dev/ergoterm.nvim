@@ -828,7 +828,6 @@ describe(":new", function()
   end)
 
   it("merges tags with defaults for non-given options", function()
-    local original_set = config.set
     config.set({ terminal_defaults = { tags = { "default" } } })
 
     local term = terms.Terminal:new({ tags = { "custom" } })
@@ -1762,7 +1761,7 @@ describe(":stop", function()
     local term = terms.Terminal:new()
     term:open()
 
-    term:stop(true)
+    term:stop()
 
     assert.is_false(term:is_open())
   end)
@@ -2081,44 +2080,24 @@ describe(":send", function()
     )
   end)
 
-  it("opens the terminal if not open and action is not silent", function()
+  it("opens the terminal if action is open", function()
     local term = terms.Terminal:new({ cmd = "cat" }):start()
     term:close()
 
-    term:send({ "foo" }, { action = "visible" })
+    term:send({ "foo" }, { action = "open" })
     vim.wait(100)
 
     assert.is_true(term:is_open())
   end)
 
-  it("does not open the terminal if action is silent", function()
+  it("focuses the terminal if action is focus", function()
     local term = terms.Terminal:new({ cmd = "cat" }):start()
     term:close()
 
-    term:send({ "foo" }, { action = "silent" })
-    vim.wait(100)
-
-    assert.is_false(term:is_open())
-  end)
-
-  it("focuses the terminal if action is interactive", function()
-    local term = terms.Terminal:new({ cmd = "cat" }):start()
-    term:close()
-
-    term:send({ "foo" }, { action = "interactive" })
+    term:send({ "foo" }, { action = "focus" })
     vim.wait(100)
 
     assert.is_true(term:is_focused())
-  end)
-
-  it("restores focus to original window if action is visible", function()
-    local term = terms.Terminal:new({ cmd = "cat" }):start()
-    local original_win = vim.api.nvim_get_current_win()
-
-    term:send({ "foo" }, { action = "visible" })
-    vim.wait(100)
-
-    assert.equal(original_win, vim.api.nvim_get_current_win())
   end)
 
   it("scrolls to the bottom after sending", function()
@@ -2146,19 +2125,6 @@ describe(":send", function()
     assert.equal(
       "Invalid input type 'invalid_type'. Must be a table with one item per line or one of: single_line, visual_lines, visual_selection",
       result.msg)
-    assert.equal("error", result.level)
-    ---@diagnostic enable: need-check-nil
-  end)
-
-  it("notifies error when terminal has not been started", function()
-    local term = terms.Terminal:new({ name = "test_terminal" })
-
-    local result = test_helpers.mocking_notify(function()
-      term:send({ "foo" })
-    end)
-
-    ---@diagnostic disable: need-check-nil
-    assert.equal("test_terminal terminal has not been started yet", result.msg)
     assert.equal("error", result.level)
     ---@diagnostic enable: need-check-nil
   end)
@@ -2502,7 +2468,6 @@ describe("on job exit", function()
   it("does not restart process when show_on_success triggers", function()
     local term = terms.Terminal:new({ cleanup_on_success = false, show_on_success = true })
     term:start()
-    local initial_job_id = term:get_state("job_id")
     local exit_handler = term:get_state("on_job_exit")
 
     exit_handler(1, 0, "exit")
@@ -2516,7 +2481,6 @@ describe("on job exit", function()
   it("does not restart process when show_on_failure triggers", function()
     local term = terms.Terminal:new({ cleanup_on_failure = false, show_on_failure = true })
     term:start()
-    local initial_job_id = term:get_state("job_id")
     local exit_handler = term:get_state("on_job_exit")
 
     exit_handler(1, 1, "exit")

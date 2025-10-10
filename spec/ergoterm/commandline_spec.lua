@@ -71,9 +71,9 @@ describe("commandline.term_send_complete", function()
   it("completes action values", function()
     local result = commandline.term_send_complete("action=", "action=", 7)
 
-    assert.is_true(vim.tbl_contains(result, "action=interactive"))
-    assert.is_true(vim.tbl_contains(result, "action=silent"))
-    assert.is_true(vim.tbl_contains(result, "action=visible"))
+    assert.is_true(vim.tbl_contains(result, "action=focus"))
+    assert.is_true(vim.tbl_contains(result, "action=open"))
+    assert.is_true(vim.tbl_contains(result, "action=start"))
   end)
 
   it("completes decorator values", function()
