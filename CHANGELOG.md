@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## 0.7.0 - 2025-10-13
+
 - BREAKING: Rename `with_tag()` to `filter_by_tag()`.
 - BREAKING: `term:update()` completely replaces table settings instead of merging them.
 - DEPRECATED: Rename `:send()` allowed action names:
