@@ -76,7 +76,7 @@ function M.select(bang, picker)
   if bang then
     return M._execute_on_last_focused(function(t) t:focus() end)
   else
-    return terms.select(nil, "Please select a terminal to open (or focus): ", nil, picker)
+    return terms.select({ prompt = "Please select a terminal to open (or focus): ", picker = picker })
   end
 end
 
@@ -129,8 +129,11 @@ function M.send(args, range, bang, picker)
   if bang then
     return M._execute_on_last_focused(send_to_terminal)
   else
-    return terms.select(nil, "Please select a terminal to send text: ",
-      { default = { fn = send_to_terminal, desc = "send-text" } }, picker)
+    return terms.select({
+      prompt = "Please select a terminal to send text: ",
+      callbacks = { default = { fn = send_to_terminal, desc = "send-text" } },
+      picker = picker
+    })
   end
 end
 
@@ -171,8 +174,11 @@ function M.update(args, bang, picker)
   if bang then
     return M._execute_on_last_focused(update_terminal)
   else
-    return terms.select(nil, "Please select a terminal to update: ",
-      { default = { fn = update_terminal, desc = "update-terminal" } }, picker)
+    return terms.select({
+      prompt = "Please select a terminal to update: ",
+      callbacks = { default = { fn = update_terminal, desc = "update-terminal" } },
+      picker = picker
+    })
   end
 end
 

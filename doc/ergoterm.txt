@@ -880,13 +880,27 @@ require("ergoterm.terminal").filter({predicate})                 *ergoterm.filte
 require("ergoterm.terminal").filter_by_tag({tag})                     *ergoterm.with_tag()*
     Return all terminals that have the specified tag.
 
-require("ergoterm.terminal").select({terminals}, {prompt}, {callbacks}, {picker}) *ergoterm.select()*
+require("ergoterm.terminal").select({opts})                 *ergoterm.select()*
     Present picker interface for terminal selection.
 
-require("ergoterm.terminal").select_started({terminals}, {prompt}, {callbacks}, {picker}) *ergoterm.select_started()*
+    Parameters:
+        {opts} - Table with options:
+          terminals - Array of terminal instances to select from
+          prompt    - String to display in picker prompt (optional)
+          callbacks - Table of picker callback definitions (optional)
+          picker    - Custom picker implementation (optional)
+
+require("ergoterm.terminal").select_started({opts})         *ergoterm.select_started()*
     Present picker interface for started terminals only. Filters the provided
     terminals to only include those that have been started, then presents
     them in a picker interface. All other behavior matches select().
+
+    Parameters:
+        {opts} - Table with options:
+          terminals - Array of terminal instances to select from
+          prompt    - String to display in picker prompt (optional)
+          callbacks - Table of picker callback definitions (optional)
+          picker    - Custom picker implementation (optional)
 
 require("ergoterm.terminal").cleanup_all()                       *ergoterm.cleanup_all()*
     Clean up all terminals. Non-sticky terminals are removed from the session,

@@ -235,7 +235,7 @@ describe(".select", function()
     terms.Terminal:new()
     local callbacks = {}
 
-    local result = terms.select(nil, "prompt", callbacks, picker)
+    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -254,7 +254,7 @@ describe(".select", function()
     local term = terms.Terminal:new({ selectable = true }):start()
     local callbacks = {}
 
-    local result = terms.select(nil, "prompt", callbacks, picker)
+    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -272,7 +272,7 @@ describe(".select", function()
     local term2 = terms.Terminal:new({ selectable = true })
     local callbacks = {}
 
-    local result = terms.select(nil, "prompt", callbacks, picker)
+    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -290,7 +290,7 @@ describe(".select", function()
     local term = terms.Terminal:new({ selectable = true, sticky = true })
     local callbacks = {}
 
-    local result = terms.select(nil, "prompt", callbacks, picker)
+    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -308,7 +308,7 @@ describe(".select", function()
     local hidden_term = terms.Terminal:new({ selectable = false }):start()
     local callbacks = {}
 
-    local result = terms.select(nil, "prompt", callbacks, picker)
+    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -327,7 +327,7 @@ describe(".select", function()
     local sticky_term = terms.Terminal:new({ selectable = false, sticky = true })
     local callbacks = {}
 
-    local result = terms.select(nil, "prompt", callbacks, picker)
+    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
@@ -347,7 +347,7 @@ describe(".select", function()
     local callbacks = {}
     terms.toggle_universal_selection()
 
-    local result = terms.select(nil, "prompt", callbacks, picker)
+    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
 
     ---@diagnostic disable: need-check-nil
     assert.equal(2, #result[1])
@@ -363,7 +363,7 @@ describe(".select", function()
       end
     }
     local result = test_helpers.mocking_notify(function()
-      terms.select(nil, "prompt", {}, picker)
+      terms.select({ prompt = "prompt", picker = picker })
     end)
 
     ---@diagnostic disable: need-check-nil
@@ -381,7 +381,7 @@ describe(".select", function()
     local term = terms.Terminal:new():start()
     local callback_fn = function(t) return t end
 
-    local result = terms.select({ term, term }, "prompt", callback_fn, picker)
+    local result = terms.select({ terminals = { term, term }, prompt = "prompt", callbacks = callback_fn, picker = picker })
 
     ---@diagnostic disable: need-check-nil
     assert.is_table(result[3])
@@ -399,7 +399,7 @@ describe(".select", function()
       assert.equal(term, t)
     end
 
-    terms.select({ term }, "prompt", callback_fn)
+    terms.select({ terminals = { term }, prompt = "prompt", callbacks = callback_fn })
 
     assert.is_true(executed)
   end)
@@ -416,7 +416,7 @@ describe(".select_started", function()
     local stopped_term = terms.Terminal:new()
     local all_terminals = { started_term, stopped_term }
 
-    local result = terms.select_started(all_terminals, "prompt", {}, picker)
+    local result = terms.select_started({ terminals = all_terminals, prompt = "prompt", picker = picker })
 
     ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])

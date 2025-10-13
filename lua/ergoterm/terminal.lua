@@ -141,34 +141,37 @@ function M.filter_by_tag(tag)
   end)
 end
 
+---@class TerminalSelectDefaults
+---@field terminals? Terminal[] array of terminals to choose from.
+---@field prompt? string text to display in the picker
+---@field callbacks? table<string, PickerCallbackDefinition>|fun(term: Terminal)
+---@field picker? Picker
+
 ---Presents a picker interface for terminal selection
 ---
----Shows started terminals plus sticky terminals regardless of their state, as long as `selectable`
----is `true` for them.
----If universal_selection is enabled, shows all terminals regardless of selectable flag.
----If no terminals are available, displays an info notification instead of opening the picker.
+---Terminals default to those that are started or sticky (unless selectable is false),
+---unless universal_selection is enabled, in which case all terminals are shown.
 ---
----@param terminals? Terminal[] array of terminals to choose from. Defaults to sticky + started terminals, or all
---- if universal_selection is enabled.
----@param prompt string text to display in the picker
----@param callbacks? table<string, PickerCallbackDefinition>|fun(term: Terminal) actions to execute on terminal selection, or a single function
----@param picker? Picker the picker implementation to use. Defaults to the configured picker.
+---@param defaults? TerminalSelectDefaults table containing terminals, prompt, callbacks and picker
 ---@return any result from the picker, or nil if no terminals available
-function M.select(terminals, prompt, callbacks, picker)
-  local computed_terminals = terminals or (M._state.universal_selection and M.get_all() or
+function M.select(defaults)
+  defaults = defaults or {}
+  local terminals = defaults.terminals or (M._state.universal_selection and M.get_all() or
     M._find_selectable_terminals_for_picker())
-  if #computed_terminals == 0 then return utils.notify("No ergoterm terminals available", "info") end
-  local computed_picker = picker or config.build_picker(config)
-  local computed_callbacks
-  if type(callbacks) == "function" then
-    computed_callbacks = { default = { fn = callbacks, desc = "Default action" } }
+  if #terminals == 0 then return utils.notify("No ergoterm terminals available", "info") end
+  local prompt = defaults.prompt or "Please select a terminal"
+  local picker = defaults.picker or config.build_picker(config)
+  local callbacks
+  if type(defaults.callbacks) == "function" then
+    callbacks = { default = { fn = defaults.callbacks, desc = "Default action" } }
   else
-    computed_callbacks = callbacks or M._get_default_picker_callbacks()
+    callbacks = defaults.callbacks or M._get_default_picker_callbacks()
   end
-  if #computed_terminals == 1 and vim.tbl_count(computed_callbacks) == 1 and computed_callbacks.default then
-    return computed_callbacks.default.fn(computed_terminals[1])
+  if #terminals == 1 and vim.tbl_count(callbacks) == 1 and callbacks.default then
+    return callbacks.default.fn(terminals[1])
   end
-  return computed_picker.select(computed_terminals, prompt, computed_callbacks)
+  ---@cast callbacks table<string, PickerCallbackDefinition>
+  return picker.select(terminals, prompt, callbacks)
 end
 
 ---Presents a picker interface for started terminals only
@@ -176,15 +179,20 @@ end
 ---Filters the provided terminals to only include those that have been started,
 ---then presents them in a picker interface. All other behavior matches `select()`.
 ---
----@param terminals Terminal[] array of terminals to filter and choose from
----@param prompt string text to display in the picker
----@param callbacks? table<string, PickerCallbackDefinition>|fun(term: Terminal) actions to execute on terminal selection, or a single function
----@param picker? Picker the picker implementation to use. Defaults to the configured picker.
+---@param defaults? TerminalSelectDefaults table containing terminals, prompt, callbacks and picker
 ---@return any result from the picker, or nil if no started terminals available
-function M.select_started(terminals, prompt, callbacks, picker)
-  return M.select(vim.tbl_filter(function(term)
+function M.select_started(defaults)
+  defaults = defaults or {}
+  local terminals = defaults.terminals or M.get_all()
+  local filtered_terminals = vim.tbl_filter(function(term)
     return term:is_started()
-  end, terminals), prompt, callbacks, picker)
+  end, terminals)
+  return M.select({
+    terminals = filtered_terminals,
+    prompt = defaults.prompt,
+    callbacks = defaults.callbacks,
+    picker = defaults.picker
+  })
 end
 
 ---@class CleanupOptions

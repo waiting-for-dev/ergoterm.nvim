@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- BREAKING: `select()` & `select_started()` now take table of options instead of ordered parameters.
+
 ## 0.7.0 - 2025-10-13
 
 - BREAKING: Rename `with_tag()` to `filter_by_tag()`.
