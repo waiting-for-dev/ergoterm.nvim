@@ -174,12 +174,17 @@ function M.select(defaults)
   return picker.select(terminals, prompt, callbacks)
 end
 
+---@class TerminalSelectStartedDefaults : TerminalSelectDefaults
+---@field default? Terminal terminal to select when none of the provided terminals are started
+
 ---Presents a picker interface for started terminals only
 ---
 ---Filters the provided terminals to only include those that have been started,
 ---then presents them in a picker interface. All other behavior matches `select()`.
+---If none of the terminals are started and a default terminal is provided,
+---that terminal is selected instead.
 ---
----@param defaults? TerminalSelectDefaults table containing terminals, prompt, callbacks and picker
+---@param defaults? TerminalSelectStartedDefaults table containing terminals, prompt, callbacks, picker and default
 ---@return any result from the picker, or nil if no started terminals available
 function M.select_started(defaults)
   defaults = defaults or {}
@@ -187,6 +192,9 @@ function M.select_started(defaults)
   local filtered_terminals = vim.tbl_filter(function(term)
     return term:is_started()
   end, terminals)
+  if #filtered_terminals == 0 and defaults.default then
+    filtered_terminals = { defaults.default }
+  end
   return M.select({
     terminals = filtered_terminals,
     prompt = defaults.prompt,

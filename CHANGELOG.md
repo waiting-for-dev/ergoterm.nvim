@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 - BREAKING: `select()` & `select_started()` now take table of options instead of ordered parameters.
+- `select_started()` can take a `default` option to provide default terminal if none of the list is started.
 
 ## 0.7.0 - 2025-10-13
 

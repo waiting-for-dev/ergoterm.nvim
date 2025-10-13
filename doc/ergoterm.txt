@@ -894,6 +894,8 @@ require("ergoterm.terminal").select_started({opts})         *ergoterm.select_sta
     Present picker interface for started terminals only. Filters the provided
     terminals to only include those that have been started, then presents
     them in a picker interface. All other behavior matches select().
+    If none of the terminals are started and a default terminal is provided,
+    that terminal is selected instead.
 
     Parameters:
         {opts} - Table with options:
@@ -901,6 +903,7 @@ require("ergoterm.terminal").select_started({opts})         *ergoterm.select_sta
           prompt    - String to display in picker prompt (optional)
           callbacks - Table of picker callback definitions (optional)
           picker    - Custom picker implementation (optional)
+          default   - Terminal to select when none are started (optional)
 
 require("ergoterm.terminal").cleanup_all()                       *ergoterm.cleanup_all()*
     Clean up all terminals. Non-sticky terminals are removed from the session,
