@@ -2026,6 +2026,19 @@ describe(":send", function()
     text_selector.select = original_select
   end)
 
+  it("resends last text when input is `last`", function()
+    local term = terms.Terminal:new({ cmd = "cat" }):start()
+
+    term:send({ "first" })
+    vim.wait(100)
+    term:send("last")
+    vim.wait(100)
+
+    local lines = vim.api.nvim_buf_get_lines(term:get_state("bufnr"), 0, -1, false)
+    assert.is_true(vim.tbl_contains(lines, "first"))
+    assert.is_true(vim.tbl_contains(lines, "first"))
+  end)
+
   it("adds a newline by default", function()
     local term = terms.Terminal:new():start()
     local spy_chansend = spy.on(vim.fn, "chansend")
@@ -2175,7 +2188,7 @@ describe(":send", function()
 
     ---@diagnostic disable: need-check-nil
     assert.equal(
-      "Invalid input type 'invalid_type'. Must be a table with one item per line or one of: single_line, visual_lines, visual_selection",
+      "Invalid input type 'invalid_type'. Must be a table with one item per line or one of: single_line, visual_lines, visual_selection, last",
       result.msg)
     assert.equal("error", result.level)
     ---@diagnostic enable: need-check-nil

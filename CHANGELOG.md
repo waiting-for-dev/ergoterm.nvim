@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - `select_started()` can take a `default` option to provide default terminal if none of the list is started.
 - List and table options can be passed to `TermNew` & `TermUpdate` commands.
 - Add new `:TermInspect` command to inspect terminal settings.
+- Add `last` option to `.send()` to resend what was sent last time.
 
 ## 0.7.0 - 2025-10-13
 

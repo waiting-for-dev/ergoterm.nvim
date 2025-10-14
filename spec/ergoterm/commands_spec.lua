@@ -176,7 +176,7 @@ describe("M.send", function()
 
     commands.send("action=start", 0, false, select_only_picker)
 
-    assert.spy(spy_send).was_called_with(term, "single_line", {
+    assert.spy(spy_send).was_called_with(match._, "single_line", {
       action = "start",
       trim = nil,
       new_line = nil,

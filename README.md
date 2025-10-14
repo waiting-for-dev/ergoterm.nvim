@@ -369,6 +369,7 @@ term:send({"print('hello')"}, { trim = false, decorator = "markdown_code" })
 - `"single_line"` - Current line under cursor
 - `"visual_lines"` - Current visual line selection  
 - `"visual_selection"` - Current visual character selection
+- `"last"` - Last sent text (for resending)
 
 **Action modes:**
 - `"focus"` - Focus terminal after sending (default)

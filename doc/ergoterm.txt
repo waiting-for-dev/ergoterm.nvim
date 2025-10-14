@@ -825,6 +825,7 @@ Terminal:send({input}, {opts})                          *Terminal:send()*
     • "single_line" - sends the current line under cursor
     • "visual_lines" - sends the current visual line selection
     • "visual_selection" - sends the current visual character selection
+    - "last" - sends the last sent text again
 
     Parameters:
         {input}    - Array of text lines or selection type string

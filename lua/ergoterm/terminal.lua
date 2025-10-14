@@ -279,6 +279,7 @@ end
 ---@field mode Mode
 ---@field job_id? number
 ---@field last_exit_code? number
+---@field last_sent string[]
 ---@field on_job_exit on_job_exit
 ---@field on_job_stdout on_job_stdout
 ---@field on_job_stderr on_job_stderr
@@ -607,8 +608,9 @@ end
 ---• "single_line" - sends the current line under cursor
 ---• "visual_lines" - sends the current visual line selection
 ---• "visual_selection" - sends the current visual character selection
+---• "last" - resends the last sent text
 ---
----@param input string[]|"single_line"|"visual_lines"|"visual_selection" lines of text to send or selection type
+---@param input string[]|"single_line"|"visual_lines"|"visual_selection"|"last" lines of text to send or selection type
 ---@param opts? SendOptions options for sending text
 ---@return self for method chaining
 function Terminal:send(input, opts)
@@ -638,9 +640,8 @@ function Terminal:send(input, opts)
   else
     decorator = opts.decorator or text_decorators.identity
   end
-  local text_input
   if type(input) == "string" then
-    local valid_selection_types = { "single_line", "visual_lines", "visual_selection" }
+    local valid_selection_types = { "single_line", "visual_lines", "visual_selection", "last" }
     if not vim.tbl_contains(valid_selection_types, input) then
       utils.notify(
         string.format("Invalid input type '%s'. Must be a table with one item per line or one of: %s", input,
@@ -649,10 +650,16 @@ function Terminal:send(input, opts)
       )
       return self
     end
+  end
+  local text_input
+  if input == "last" then
+    text_input = vim.deepcopy(self._state.last_sent)
+  elseif type(input) == "string" then
     text_input = text_selector.select(input)
   else
     text_input = input
   end
+  self._state.last_sent = vim.deepcopy(text_input)
   if new_line then
     table.insert(text_input, "")
   end
@@ -889,6 +896,7 @@ function Terminal:_initialize_state()
     float_opts = self:_compute_float_win_config(),
     job_id = nil,
     last_exit_code = nil,
+    last_sent = {},
     mode = mode.get_initial(self.start_in_insert),
     on_job_exit = self:_compute_exit_handler(self.on_job_exit),
     on_job_stdout = self:_compute_output_handler(self.on_job_stdout),
