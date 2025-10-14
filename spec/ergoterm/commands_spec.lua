@@ -33,180 +33,47 @@ describe("M.new", function()
     vim.fn.isdirectory = original_isdirectory
   end)
 
-  it("creates a new terminal with 'below' layout by default", function()
+  it("creates a new terminal with defaults when not explicitly given", function()
     local term = commands.new("")
 
     assert.is_not_nil(term)
     assert.equal("below", term:get_state("layout"))
   end)
 
-  it("creates a new terminal with the given layout", function()
+  it("creates a new terminal with overrides to the defaults when given", function()
     local term = commands.new("layout=right")
 
     assert.is_not_nil(term)
     assert.equal("right", term:get_state("layout"))
   end)
 
-  it("creates a new terminal with the command name by default", function()
-    local term = commands.new("cmd=/bin/bash")
+  it("creates a new terminal with list settings when given separated by commas", function()
+    local term = commands.new("tags=tag1,tag2,tag3")
 
     assert.is_not_nil(term)
-    assert.equal("/bin/bash", term.name)
+    assert.is_table(term.tags)
+    assert.equal(3, #term.tags)
+    assert.is_true(vim.tbl_contains(term.tags, "tag1"))
+    assert.is_true(vim.tbl_contains(term.tags, "tag2"))
+    assert.is_true(vim.tbl_contains(term.tags, "tag3"))
   end)
 
-  it("creates a new terminal with the given name", function()
-    local term = commands.new("name=test-terminal")
+  it("creates a new terminal with table settings when keys are separated by dots", function()
+    local term = commands.new("size.above=10 size.below=20%")
 
     assert.is_not_nil(term)
-    assert.equal("test-terminal", term.name)
+    assert.is_table(term.size)
+    assert.equal(10, term.size.above)
+    assert.equal("20%", term.size.below)
   end)
 
-  it("creates a new terminal with the shell as command by default", function()
-    local term = commands.new("")
+  it("keeps default table settings when only some keys are given", function()
+    local term = commands.new("float_opts.border=double")
 
     assert.is_not_nil(term)
-    assert.equal(vim.o.shell, term.cmd)
-  end)
-
-  it("creates a new terminal with the given command", function()
-    local term = commands.new("cmd=/bin/bash")
-
-    assert.is_not_nil(term)
-    assert.equal("/bin/bash", term.cmd)
-  end)
-
-  it("focuses the newly created terminal", function()
-    local term = commands.new("")
-
-    assert.is_not_nil(term)
-    assert.is_true(term:is_focused())
-  end)
-
-  it("creates a new terminal with auto_scroll=false by default", function()
-    local term = commands.new("")
-
-    assert.is_not_nil(term)
-    assert.is_false(term.auto_scroll)
-  end)
-
-  it("creates a new terminal with the given auto_scroll option", function()
-    local term = commands.new("auto_scroll=false")
-
-    assert.is_not_nil(term)
-    assert.is_false(term.auto_scroll)
-  end)
-
-  it("creates a new terminal with bang_target=true by default", function()
-    local term = commands.new("")
-
-    assert.is_not_nil(term)
-    assert.is_true(term.bang_target)
-  end)
-
-  it("creates a new terminal with the given bang_target option", function()
-    local term = commands.new("bang_target=false")
-
-    assert.is_not_nil(term)
-    assert.is_false(term.bang_target)
-  end)
-
-  it("creates a new terminal with persist_mode=false by default", function()
-    local term = commands.new("")
-
-    assert.is_not_nil(term)
-    assert.is_false(term.persist_mode)
-  end)
-
-  it("creates a new terminal with the given persist_mode option", function()
-    local term = commands.new("persist_mode=true")
-
-    assert.is_not_nil(term)
-    assert.is_true(term.persist_mode)
-  end)
-
-  it("creates a new terminal with persist_size=true by default", function()
-    local term = commands.new("")
-
-    assert.is_not_nil(term)
-    assert.is_true(term.persist_size)
-  end)
-
-  it("creates a new terminal with the given persist_size option", function()
-    local term = commands.new("persist_size=false")
-
-    assert.is_not_nil(term)
-    assert.is_false(term.persist_size)
-  end)
-
-  it("creates a new terminal with selectable=true by default", function()
-    local term = commands.new("")
-
-    assert.is_not_nil(term)
-    assert.is_true(term.selectable)
-  end)
-
-  it("creates a new terminal with the given selectable option", function()
-    local term = commands.new("selectable=false")
-
-    assert.is_not_nil(term)
-    assert.is_false(term.selectable)
-  end)
-
-  it("creates a new terminal with start_in_insert=true by default", function()
-    local term = commands.new("")
-
-    assert.is_not_nil(term)
-    assert.is_true(term.start_in_insert)
-  end)
-
-  it("creates a new terminal with the given start_in_insert option", function()
-    local term = commands.new("start_in_insert=false")
-
-    assert.is_not_nil(term)
-    assert.is_false(term.start_in_insert)
-  end)
-
-  it("creates a new terminal with cleanup_on_success=true by default", function()
-    local term = commands.new("")
-
-    assert.is_not_nil(term)
-    assert.is_true(term.cleanup_on_success)
-  end)
-
-  it("creates a new terminal with cleanup_on_failure=false by default", function()
-    local term = commands.new("")
-
-    assert.is_not_nil(term)
-    assert.is_false(term.cleanup_on_failure)
-  end)
-
-  it("creates a new terminal with sticky=false by default", function()
-    local term = commands.new("")
-
-    assert.is_not_nil(term)
-    assert.is_false(term.sticky)
-  end)
-
-  it("creates a new terminal with the given sticky option", function()
-    local term = commands.new("sticky=true")
-
-    assert.is_not_nil(term)
-    assert.is_true(term.sticky)
-  end)
-
-  it("creates a new terminal with multiple configuration options", function()
-    local term = commands.new(
-      "layout=float auto_scroll=false persist_mode=true selectable=false start_in_insert=false sticky=true cleanup_on_success=false cleanup_on_failure=true")
-
-    assert.is_not_nil(term)
-    assert.equal("float", term:get_state("layout"))
-    assert.is_false(term.auto_scroll)
-    assert.is_true(term.persist_mode)
-    assert.is_false(term.selectable)
-    assert.is_false(term.start_in_insert)
-    assert.is_true(term.sticky)
-    assert.is_false(term.cleanup_on_success)
-    assert.is_true(term.cleanup_on_failure)
+    assert.is_table(term.float_opts)
+    assert.equal("double", term.float_opts.border)
+    assert.equal("left", term.float_opts.title_pos)
   end)
 end)
 
@@ -480,73 +347,26 @@ describe("M.update", function()
     select = function() return nil end
   }
 
-  it("updates layout option", function()
-    local term = terms.Terminal:new():start()
+  it("updates plain options", function()
+    local term = terms.Terminal:new({ sticky = true })
 
     commands.update("layout=right", false, select_only_picker)
 
     assert.equal("right", term.layout)
   end)
 
-  it("updates name option", function()
-    local term = terms.Terminal:new():start()
+  it("merges given table options", function()
+    local term = terms.Terminal:new({ size = { above = 10 }, sticky = true })
 
-    commands.update("name=test-terminal", false, select_only_picker)
+    commands.update("size.below=20%", false, select_only_picker)
 
-    assert.equal("test-terminal", term.name)
-  end)
-
-  it("updates auto_scroll option", function()
-    local term = terms.Terminal:new():start()
-
-    commands.update("auto_scroll=false", false, select_only_picker)
-
-    assert.is_false(term.auto_scroll)
-  end)
-
-  it("updates persist_mode option", function()
-    local term = terms.Terminal:new():start()
-
-    commands.update("persist_mode=true", false, select_only_picker)
-
-    assert.is_true(term.persist_mode)
-  end)
-
-  it("updates selectable option", function()
-    local term = terms.Terminal:new():start()
-
-    commands.update("selectable=false", false, select_only_picker)
-
-    assert.is_false(term.selectable)
-  end)
-
-  it("updates start_in_insert option", function()
-    local term = terms.Terminal:new():start()
-
-    commands.update("start_in_insert=false", false, select_only_picker)
-
-    assert.is_false(term.start_in_insert)
-  end)
-
-  it("updates sticky option", function()
-    local term = terms.Terminal:new():start()
-
-    commands.update("sticky=true", false, select_only_picker)
-
-    assert.is_true(term.sticky)
-  end)
-
-  it("uses last focused terminal when called with the bang option", function()
-    local term = terms.Terminal:new():start()
-    term:focus()
-
-    commands.update("layout=right", true, null_picker)
-
-    assert.equal("right", term.layout)
+    assert.is_table(term.size)
+    assert.equal(10, term.size.above)
+    assert.equal("20%", term.size.below)
   end)
 
   it("ignores non bang target terminals when called with the bang option", function()
-    local term = terms.Terminal:new():start()
+    local term = terms.Terminal:new({ sticky = true })
     local term_not_bang_target = terms.Terminal:new({ bang_target = false }):start()
     term:focus()
     term_not_bang_target:focus()

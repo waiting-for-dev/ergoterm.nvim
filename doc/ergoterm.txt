@@ -115,34 +115,21 @@ Syntax: >vim
     :TermNew [options]
 <
 
-Options:
-    layout={layout}     Window layout (default: "below")
-    name={name}         Terminal name for identification (default: the
-        terminal's cmd)
-    dir={directory}     Working directory (default: current)
-                        Can be:
-                        • Absolute path: "/home/user/project"
-                        • Relative path: "~/my-project" or "./subdir"
-                        • "git_dir" - Auto-detect git repository root
-                        • nil - Use current working directory
-    cmd={command}       Shell command to run (default: system shell)
-    auto_scroll={boolean}       Auto-scroll terminal output (default: true)
-    bang_target={boolean}       Allow terminal to be targeted by bang commands (default: true)
-    watch_files={boolean}       Watch for file changes when terminal produces output (default: false)
-    persist_mode={boolean}      Remember terminal mode between visits (default: false)
-    persist_size={boolean}      Remember terminal size between visits (default: true)
-    selectable={boolean}        Show in selection picker (default: true)
-    start_in_insert={boolean}   Start terminal in insert mode (default: true)
-    sticky={boolean}            Keep terminal visible in picker even when stopped (default: false)
-    cleanup_on_success={boolean}   Cleanup terminal when process exits successfully (default: true)
-    cleanup_on_failure={boolean}   Cleanup terminal when process exits with failure (default: false)
-    show_on_success={boolean}       Open terminal window when process exits successfully (default: false, requires `cleanup_on_success` to be false)
-    show_on_failure={boolean}       Open terminal window when process exits with failure (default: false, requires `cleanup_on_failure` to be false)
-    meta={table}                    User-defined metadata for custom purposes (default: {})
+All terminal configuration options are available (see |ergoterm-options| for
+the complete list), except callback functions (on_create, on_open, on_close,
+on_focus, on_start, on_stop, on_job_exit, on_job_stdout, on_job_stderr).
+
+Special syntax for nested and list settings:
+    • Dot notation for table settings: Use table.key=value to set individual
+      table keys. For example, size.below=20 sets only the "below" key in the
+      size table without affecting other size values.
+
+    • Comma-separated for lists: Use setting=value1,value2,value3 for list
+      values. For example, tags=dev,test,prod creates a list with three tags.
 
 Available layouts:
     above      Horizontal split above current window
-    below      Horizontal split below current window  
+    below      Horizontal split below current window
     left       Vertical split to the left
     right      Vertical split to the right
     tab        New tab page
@@ -154,6 +141,8 @@ Examples: >vim
     :TermNew layout=float
     :TermNew layout=right name=server dir=~/project cmd=npm start
     :TermNew layout=float auto_scroll=false persist_mode=true
+    :TermNew size.below=20 size.right=30% float_opts.border=rounded
+    :TermNew tags=dev,backend meta.project=myapp
 <
 
 ------------------------------------------------------------------------------
@@ -240,31 +229,27 @@ Syntax: >vim
 The bang (!) version updates the last focused terminal without opening
 a picker.
 
-Updatable options:
-    layout={layout}              Change window layout
-    name={name}                  Rename terminal
-    auto_scroll={boolean}        Auto-scroll behavior
-    bang_target={boolean}        Allow terminal to be targeted by bang commands
-                                 (can be overridden by universal selection mode)
-    watch_files={boolean}        Watch for file changes when terminal produces output
-    persist_mode={boolean}       Remember terminal mode
-    persist_size={boolean}       Remember terminal size
-    selectable={boolean}         Show in selection picker
-                                 (can be overridden by universal selection mode)
-    start_in_insert={boolean}    Start in insert mode
-    sticky={boolean}             Keep terminal visible in picker even when stopped
-    cleanup_on_success={boolean}   Cleanup terminal when process exits successfully
-    cleanup_on_failure={boolean}   Cleanup terminal when process exits with failure
-    show_on_success={boolean}       Open terminal window when process exits successfully. Requires `cleanup_on_success` to be false.
-    show_on_failure={boolean}       Open terminal window when process exits with failure. Requires `cleanup_on_failure` to be false.
-    default_action={function}      Function to invoke when selecting terminal in picker with <Enter>
-    tags={table}                 List of tags for categorizing and filtering terminals
-    meta={table}                 User-defined metadata for custom purposes
+All options from TermNew are available (see |ergoterm-options| for the
+complete list), except `cmd` and `dir` which are immutable after terminal
+creation.
+
+Special update behavior:
+    • Table settings (using dot notation): Only the specified nested keys are
+      updated while other keys remain unchanged. For example, :TermUpdate!
+      size.below=20 updates only "below", preserves "above", "left", "right".
+
+    • List settings (comma-separated): The entire list is replaced. For
+      example, :TermUpdate! tags=prod,critical replaces all tags with the
+      new list.
 
 Examples: >vim
     :TermUpdate layout=float
     :TermUpdate! name=server
-    :TermUpdate auto_scroll=false
+    :TermUpdate! size.below=25
+    :TermUpdate! float_opts.border=double float_opts.width=120
+    :TermUpdate! size.below=15 size.right=40%
+    :TermUpdate! tags=prod,critical
+    :TermUpdate! meta.env=production
 <
 
 ------------------------------------------------------------------------------

@@ -65,27 +65,19 @@ Create new terminals with `:TermNew` and customize them with options:
 :TermNew
 :TermNew layout=float name=server dir=~/my-project cmd=iex
 :TermNew layout=right auto_scroll=false persist_mode=true
+:TermNew size.below=20 size.right=30% float_opts.border=rounded
+:TermNew tags=dev,backend meta.project=myapp
 ```
 
-**Available options:**
-- `layout` - Window layout (default: `below`)
-  - `above`, `below`, `left`, `right`, `tab`, `float`, `window`
-- `name` - Terminal name for identification (defaults to the terminal command)
-- `dir` - Working directory (default: current directory)
-  - Accepts absolute paths (`/home/user/project`), relative paths (`~/my-project`, `./subdir`), `"git_dir"` for auto-detected git repository root, or `nil` for current directory
-- `cmd` - Shell command to run (default: system shell)
-- `auto_scroll` - Automatically scroll terminal output to bottom (default: `false`)
-- `bang_target` - Allow terminal to be targeted by bang commands (default: `true`)
-- `watch_files` - Watch for file changes when terminal produces output (requires vim's `autoread` option) (default: `false`)
-- `persist_mode` - Remember terminal mode between visits (default: `false`)
-- `persist_size` - Remember terminal size between visits (default: `true`)
-- `selectable` - Show in selection picker (default: `true`)
-- `start_in_insert` - Start terminal in insert mode (default: `true`)
-- `sticky` - Keep terminals visible in picker even when stopped (requires `selectable` to also be `true`) (default: `false`)
-- `cleanup_on_success` - Cleanup terminal when process exits successfully (exit code 0) (default: `true`)
-- `cleanup_on_failure` - Cleanup terminal when process exits with failure (exit code non-zero) (default: `false`)
-- `show_on_success` - Open terminal window when process exits successfully (exit code 0) (default: `false`, requires `cleanup_on_success` to be `false`)
-- `show_on_failure` - Open terminal window when process exits with failure (exit code non-zero) (default: `false`, requires `cleanup_on_failure` to be `false`)
+All terminal configuration options are available (see [🔧 Available Options](#-available-options) section below), except callback functions (`on_create`, `on_open`, `on_close`, `on_focus`, `on_start`, `on_stop`, `on_job_exit`, `on_job_stdout`, `on_job_stderr`).
+
+**Special syntax for nested and list settings:**
+- **Dot notation** for table settings: Use `table.key=value` to set individual table keys
+  - Example: `size.below=20` sets only the `below` key in the `size` table
+  - Example: `float_opts.border=rounded` sets only the `border` key in `float_opts`
+  - Example: `meta.custom=value` sets arbitrary user-defined metadata
+- **Comma-separated** for lists: Use `setting=value1,value2,value3` for list values
+  - Example: `tags=dev,test,prod` creates a list with three tags
 
 ### 🎯 Selecting Terminals
 
@@ -138,21 +130,21 @@ Send text from your buffer to any terminal:
 Modify existing terminal configuration:
 
 ```vim
-:TermUpdate layout=float     " Update via picker
-:TermUpdate! name=server     " Update last focused terminal
+:TermUpdate layout=float              " Update via picker
+:TermUpdate! name=server              " Update last focused terminal
+:TermUpdate! size.below=25            " Update only bottom split height
+:TermUpdate! float_opts.border=double " Update floating window border
+:TermUpdate! tags=prod,backend        " Replace all tags
 ```
 
-**Available options:**
-- `layout` - Change window layout
-- `name` - Rename terminal
-- `auto_scroll` - Auto-scroll behavior
-- `bang_target` - Allow terminal to be targeted by bang commands (can be overridden by universal selection mode)
-- `watch_files` - Watch for file changes when terminal produces output (requires vim's `autoread` option)
-- `persist_mode` - Remember terminal mode when revisiting
-- `persist_size` - Remember terminal size when revisiting
-- `selectable` - Show in selection picker (can be overridden by universal selection mode)
-- `start_in_insert` - Start in insert mode
-- `tags` - List of tags for categorizing and filtering terminals
+All options from `:TermNew` are available (see [🔧 Available Options](#-available-options) section below), except `cmd` and `dir` which are immutable after terminal creation.
+
+**Special update behavior:**
+- **Table settings** (using dot notation): Only the specified nested keys are updated while other keys remain unchanged
+  - Example: `:TermUpdate! size.below=20` updates only `below`, preserves `above`, `left`, `right`
+  - Example: `:TermUpdate! meta.env=production` updates only the `env` key, preserves other metadata
+- **List settings** (comma-separated): The entire list is replaced
+  - Example: `:TermUpdate! tags=prod,critical` replaces all tags with the new list
 
 ### 🌐 Universal Selection Mode
 

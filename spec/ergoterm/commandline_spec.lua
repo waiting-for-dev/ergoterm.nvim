@@ -39,6 +39,47 @@ describe("commandline.parse", function()
     assert.is_false(result.new_line)
   end)
 
+  it("parses list values", function()
+    local args = "tags=dev,prod,test"
+
+    local result = commandline.parse(args)
+
+    assert.is_table(result.tags)
+    assert.equal(3, #result.tags)
+    assert.equal("dev", result.tags[1])
+    assert.equal("prod", result.tags[2])
+    assert.equal("test", result.tags[3])
+  end)
+
+  it("parses list values with a single item", function()
+    local args = "tags=dev"
+
+    local result = commandline.parse(args)
+
+    assert.is_table(result.tags)
+    assert.equal(1, #result.tags)
+  end)
+
+  it("parses table values", function()
+    local args = "size.below=20% size.above=10%"
+
+    local result = commandline.parse(args)
+
+    assert.is_table(result.size)
+    assert.equal("20%", result.size.below)
+    assert.equal("10%", result.size.above)
+  end)
+
+  it("parses table values with numeric values", function()
+    local args = "size.below=20 size.above=10"
+
+    local result = commandline.parse(args)
+
+    assert.is_table(result.size)
+    assert.equal(20, result.size.below)
+    assert.equal(10, result.size.above)
+  end)
+
   it("parses trailing arguments", function()
     local args = "cmd=ls layout=below some trailing args"
 
@@ -109,6 +150,16 @@ describe("commandline.term_new_complete", function()
     assert.is_true(vim.tbl_contains(result, "sticky="))
     assert.is_true(vim.tbl_contains(result, "cleanup_on_success="))
     assert.is_true(vim.tbl_contains(result, "cleanup_on_failure="))
+    assert.is_true(vim.tbl_contains(result, "size.below="))
+    assert.is_true(vim.tbl_contains(result, "size.above="))
+    assert.is_true(vim.tbl_contains(result, "size.left="))
+    assert.is_true(vim.tbl_contains(result, "size.right="))
+    assert.is_true(vim.tbl_contains(result, "float_opts.border="))
+    assert.is_true(vim.tbl_contains(result, "float_opts.width="))
+    assert.is_true(vim.tbl_contains(result, "float_opts.height="))
+    assert.is_true(vim.tbl_contains(result, "float_opts.title="))
+    assert.is_true(vim.tbl_contains(result, "tags="))
+    assert.is_true(vim.tbl_contains(result, "meta.="))
   end)
 
   it("completes boolean values for auto_scroll", function()
@@ -173,6 +224,36 @@ describe("commandline.term_new_complete", function()
     assert.is_true(vim.tbl_contains(result, "cleanup_on_failure=true"))
     assert.is_true(vim.tbl_contains(result, "cleanup_on_failure=false"))
   end)
+
+  it("completes values for float_opts.title_pos", function()
+    local result = commandline.term_new_complete("float_opts.title_pos=", "float_opts.title_pos=", 20)
+
+    assert.is_true(vim.tbl_contains(result, "float_opts.title_pos=left"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.title_pos=center"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.title_pos=right"))
+  end)
+
+  it("completes values for float_opts.border", function()
+    local result = commandline.term_new_complete("float_opts.border=", "float_opts.border=", 18)
+
+    assert.is_true(vim.tbl_contains(result, "float_opts.border=none"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.border=single"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.border=double"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.border=rounded"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.border=solid"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.border=shadow"))
+  end)
+
+  it("completes values for float_opts.relative", function()
+    local result = commandline.term_new_complete("float_opts.relative=", "float_opts.relative=", 20)
+
+    assert.is_true(vim.tbl_contains(result, "float_opts.relative=editor"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.relative=win"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.relative=cursor"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.relative=mouse"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.relative=laststatus"))
+    assert.is_true(vim.tbl_contains(result, "float_opts.relative=tabline"))
+  end)
 end)
 
 describe("commandline.term_update_complete", function()
@@ -190,5 +271,17 @@ describe("commandline.term_update_complete", function()
     assert.is_true(vim.tbl_contains(result, "sticky="))
     assert.is_true(vim.tbl_contains(result, "cleanup_on_success="))
     assert.is_true(vim.tbl_contains(result, "cleanup_on_failure="))
+    assert.is_true(vim.tbl_contains(result, "show_on_success="))
+    assert.is_true(vim.tbl_contains(result, "show_on_failure="))
+    assert.is_true(vim.tbl_contains(result, "size.below="))
+    assert.is_true(vim.tbl_contains(result, "size.above="))
+    assert.is_true(vim.tbl_contains(result, "size.left="))
+    assert.is_true(vim.tbl_contains(result, "size.right="))
+    assert.is_true(vim.tbl_contains(result, "float_opts.border="))
+    assert.is_true(vim.tbl_contains(result, "float_opts.width="))
+    assert.is_true(vim.tbl_contains(result, "float_opts.height="))
+    assert.is_true(vim.tbl_contains(result, "float_opts.title="))
+    assert.is_true(vim.tbl_contains(result, "tags="))
+    assert.is_true(vim.tbl_contains(result, "meta.="))
   end)
 end)

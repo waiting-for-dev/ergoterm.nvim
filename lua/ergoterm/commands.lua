@@ -40,7 +40,11 @@ function M.new(args)
     cleanup_on_success = { parsed.cleanup_on_success, "boolean", true },
     cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true },
     show_on_success = { parsed.show_on_success, "boolean", true },
-    show_on_failure = { parsed.show_on_failure, "boolean", true }
+    show_on_failure = { parsed.show_on_failure, "boolean", true },
+    size = { parsed.size, "table", true },
+    float_opts = { parsed.float_opts, "table", true },
+    tags = { parsed.tags, "table", true },
+    meta = { parsed.meta, "table", true }
   })
   return terms.Terminal:new({
     cmd = parsed.cmd,
@@ -58,7 +62,11 @@ function M.new(args)
     cleanup_on_success = parsed.cleanup_on_success,
     cleanup_on_failure = parsed.cleanup_on_failure,
     show_on_success = parsed.show_on_success,
-    show_on_failure = parsed.show_on_failure
+    show_on_failure = parsed.show_on_failure,
+    size = parsed.size,
+    float_opts = parsed.float_opts,
+    tags = parsed.tags,
+    meta = parsed.meta
   }):focus()
 end
 
@@ -166,10 +174,20 @@ function M.update(args, bang, picker)
     cleanup_on_success = { parsed.cleanup_on_success, "boolean", true },
     cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true },
     show_on_success = { parsed.show_on_success, "boolean", true },
-    show_on_failure = { parsed.show_on_failure, "boolean", true }
+    show_on_failure = { parsed.show_on_failure, "boolean", true },
+    size = { parsed.size, "table", true },
+    float_opts = { parsed.float_opts, "table", true },
+    tags = { parsed.tags, "table", true },
+    meta = { parsed.meta, "table", true }
   })
   local update_terminal = function(t)
-    t:update(parsed)
+    local merged_opts = vim.tbl_deep_extend("force", {}, parsed)
+    for setting_name, _ in pairs(commandline.nested_table_settings) do
+      if parsed[setting_name] then
+        merged_opts[setting_name] = vim.tbl_deep_extend("force", t[setting_name] or {}, parsed[setting_name])
+      end
+    end
+    t:update(merged_opts)
   end
   if bang then
     return M._execute_on_last_focused(update_terminal)

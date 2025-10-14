@@ -13,6 +13,28 @@ local p = {
   double = '"(.-)"',
 }
 
+M.nested_table_settings = {
+  size = { "below", "above", "left", "right" },
+  float_opts = { "title_pos", "width", "height", "relative", "border", "zindex", "title", "row", "col" },
+  meta = {}
+}
+
+M.list_settings = {
+  tags = true
+}
+
+function M._is_nested_setting(key)
+  local parts = vim.split(key, ".", { plain = true })
+  if #parts == 2 then
+    return M.nested_table_settings[parts[1]] ~= nil
+  end
+  return false
+end
+
+function M.is_list_setting(key)
+  return M.list_settings[key] == true
+end
+
 ---@class ParsedArgs
 ---@field layout string?
 ---@field cmd string?
@@ -36,6 +58,10 @@ local p = {
 ---@field show_on_failure boolean?
 ---@field text string?
 ---@field trailing string?
+---@field size Size?
+---@field float_opts FloatOpts?
+---@field tags string[]?
+---@field meta table<string, string|number>?
 
 ---@see https://stackoverflow.com/a/27007701
 ---@param args string
@@ -80,21 +106,40 @@ function M.parse(args)
       show_on_failure = true
     }
 
-    for _, part in ipairs(vim.split(args, " ")) do
-      if #part > 1 then
+    local parts_list = vim.split(args, " ")
+    local last_key_value_index = 0
+
+    for i, part in ipairs(parts_list) do
+      if #part > 1 and part:match("=") then
+        last_key_value_index = i
         local arg = vim.split(part, "=")
         local key, value = arg[1], arg[2]
         if boolean_options[key] then
           value = M._toboolean(value)
         end
-        result[key] = value
+
+        if M.is_list_setting(key) then
+          result[key] = vim.split(value, ",")
+        elseif M._is_nested_setting(key) then
+          local parts = vim.split(key, ".", { plain = true })
+          local top_key = parts[1]
+          local nested_key = parts[2]
+          result[top_key] = result[top_key] or {}
+          result[top_key][nested_key] = tonumber(value) or value
+        else
+          result[key] = value
+        end
       end
     end
 
-    -- capture trailing arguments as anything after the last key=value pair
-    local trailing = args:match("%s+(.+)")
-    if trailing then
-      result.trailing = trailing
+    if last_key_value_index > 0 and last_key_value_index < #parts_list then
+      local trailing_parts = {}
+      for i = last_key_value_index + 1, #parts_list do
+        table.insert(trailing_parts, parts_list[i])
+      end
+      if #trailing_parts > 0 then
+        result.trailing = table.concat(trailing_parts, " ")
+      end
     end
   end
   return result
@@ -245,7 +290,58 @@ M._all_options = {
 
   show_on_success = M._boolean_options,
 
-  show_on_failure = M._boolean_options
+  show_on_failure = M._boolean_options,
+
+  ["size.below"] = function() return {} end,
+
+  ["size.above"] = function() return {} end,
+
+  ["size.left"] = function() return {} end,
+
+  ["size.right"] = function() return {} end,
+
+  ["float_opts.title_pos"] = function(typed_value)
+    local positions = { "left", "center", "right" }
+    if utils.str_is_empty(typed_value) then return positions end
+    return vim.tbl_filter(
+      function(pos) return pos:match("^" .. typed_value .. "*") ~= nil end,
+      positions
+    )
+  end,
+
+  ["float_opts.width"] = function() return {} end,
+
+  ["float_opts.height"] = function() return {} end,
+
+  ["float_opts.relative"] = function(typed_value)
+    local relatives = { "editor", "win", "cursor", "mouse", "laststatus", "tabline" }
+    if utils.str_is_empty(typed_value) then return relatives end
+    return vim.tbl_filter(
+      function(rel) return rel:match("^" .. typed_value .. "*") ~= nil end,
+      relatives
+    )
+  end,
+
+  ["float_opts.border"] = function(typed_value)
+    local borders = { "none", "single", "double", "rounded", "solid", "shadow", "bold" }
+    if utils.str_is_empty(typed_value) then return borders end
+    return vim.tbl_filter(
+      function(border) return border:match("^" .. typed_value .. "*") ~= nil end,
+      borders
+    )
+  end,
+
+  ["float_opts.zindex"] = function() return {} end,
+
+  ["float_opts.title"] = function() return {} end,
+
+  ["float_opts.row"] = function() return {} end,
+
+  ["float_opts.col"] = function() return {} end,
+
+  tags = function() return {} end,
+
+  ["meta."] = function() return {} end
 }
 
 M._term_new_options = {
@@ -264,7 +360,22 @@ M._term_new_options = {
   cleanup_on_success = M._all_options.cleanup_on_success,
   cleanup_on_failure = M._all_options.cleanup_on_failure,
   show_on_success = M._all_options.show_on_success,
-  show_on_failure = M._all_options.show_on_failure
+  show_on_failure = M._all_options.show_on_failure,
+  ["size.below"] = M._all_options["size.below"],
+  ["size.above"] = M._all_options["size.above"],
+  ["size.left"] = M._all_options["size.left"],
+  ["size.right"] = M._all_options["size.right"],
+  ["float_opts.title_pos"] = M._all_options["float_opts.title_pos"],
+  ["float_opts.width"] = M._all_options["float_opts.width"],
+  ["float_opts.height"] = M._all_options["float_opts.height"],
+  ["float_opts.relative"] = M._all_options["float_opts.relative"],
+  ["float_opts.border"] = M._all_options["float_opts.border"],
+  ["float_opts.zindex"] = M._all_options["float_opts.zindex"],
+  ["float_opts.title"] = M._all_options["float_opts.title"],
+  ["float_opts.row"] = M._all_options["float_opts.row"],
+  ["float_opts.col"] = M._all_options["float_opts.col"],
+  tags = M._all_options.tags,
+  ["meta."] = M._all_options["meta."]
 }
 
 M._term_update_options = {
@@ -282,6 +393,21 @@ M._term_update_options = {
   cleanup_on_failure = M._all_options.cleanup_on_failure,
   show_on_success = M._all_options.show_on_success,
   show_on_failure = M._all_options.show_on_failure,
+  ["size.below"] = M._all_options["size.below"],
+  ["size.above"] = M._all_options["size.above"],
+  ["size.left"] = M._all_options["size.left"],
+  ["size.right"] = M._all_options["size.right"],
+  ["float_opts.title_pos"] = M._all_options["float_opts.title_pos"],
+  ["float_opts.width"] = M._all_options["float_opts.width"],
+  ["float_opts.height"] = M._all_options["float_opts.height"],
+  ["float_opts.relative"] = M._all_options["float_opts.relative"],
+  ["float_opts.border"] = M._all_options["float_opts.border"],
+  ["float_opts.zindex"] = M._all_options["float_opts.zindex"],
+  ["float_opts.title"] = M._all_options["float_opts.title"],
+  ["float_opts.row"] = M._all_options["float_opts.row"],
+  ["float_opts.col"] = M._all_options["float_opts.col"],
+  tags = M._all_options.tags,
+  ["meta."] = M._all_options["meta."]
 }
 
 M._term_send_options = {
