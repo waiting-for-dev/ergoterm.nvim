@@ -397,6 +397,59 @@ describe("M.update", function()
   end)
 end)
 
+describe("M.inspect", function()
+  local select_only_picker = {
+    select = function(terminals, _, callbacks)
+      callbacks.default.fn(terminals[1])
+    end
+  }
+  local null_picker = {
+    select = function() return nil end
+  }
+
+  it("calls vim.print with vim.inspect on selected terminal", function()
+    terms.Terminal:new({ name = "foo", sticky = true })
+    local original_print = vim.print
+    local print_called = false
+    local print_arg = nil
+    --- @diagnostic disable-next-line: duplicate-set-field
+    vim.print = function(passed_arg)
+      print_called = true
+      print_arg = passed_arg
+    end
+
+    commands.inspect(false, select_only_picker)
+
+    assert.is_true(print_called)
+    assert.is_string(print_arg)
+    ---@cast print_arg string
+    assert.is_true(string.find(print_arg, 'name = "foo"', 1, true) ~= nil)
+
+    vim.print = original_print
+  end)
+
+  it("uses last focused terminal when called with bang", function()
+    terms.Terminal:new({ name = "foo", sticky = true }):focus()
+    local original_print = vim.print
+    local print_called = false
+    local print_arg = nil
+    --- @diagnostic disable-next-line: duplicate-set-field
+    vim.print = function(passed_arg)
+      print_called = true
+      print_arg = passed_arg
+    end
+
+    commands.inspect(true, null_picker)
+
+    assert.is_true(print_called)
+    assert.is_string(print_arg)
+    ---@cast print_arg string
+    assert.is_true(string.find(print_arg, 'name = "foo"', 1, true) ~= nil)
+
+    vim.print = original_print
+  end)
+end)
+
 describe("M.toggle_universal_selection", function()
   it("toggles universal selection and notifies when enabled", function()
     local notify_result = test_helpers.mocking_notify(function()

@@ -200,6 +200,32 @@ function M.update(args, bang, picker)
   end
 end
 
+---Inspects a terminal's internal state
+---
+---Displays the terminal object's internal structure using vim.inspect().
+---Useful for debugging and understanding terminal configuration.
+---
+---Bang mode (!) inspects the last focused terminal directly, otherwise
+---prompts for terminal selection.
+---
+---@param bang boolean true to use last focused terminal
+---@param picker Picker interface for terminal selection
+---@return boolean success status of the operation
+function M.inspect(bang, picker)
+  local inspect_terminal = function(t)
+    vim.print(vim.inspect(t))
+  end
+  if bang then
+    return M._execute_on_last_focused(inspect_terminal)
+  else
+    return terms.select({
+      prompt = "Please select a terminal to inspect: ",
+      callbacks = { default = { fn = inspect_terminal, desc = "inspect-terminal" } },
+      picker = picker
+    })
+  end
+end
+
 ---Toggles universal selection mode
 ---
 ---When enabled, all terminals become selectable and can be set as last focused,
@@ -229,9 +255,9 @@ end
 
 ---Registers ErgoTerm user commands with Neovim
 ---
----Creates the standard ErgoTerm commands (TermNew, TermSelect, TermSend, TermUpdate)
----with appropriate completion, range, and bang support. The picker is built from
----the provided configuration.
+---Creates the standard ErgoTerm commands (TermNew, TermSelect, TermSend, TermUpdate,
+---TermInspect, TermToggleUniversalSelection) with appropriate completion, range, and
+---bang support. The picker is built from the provided configuration.
 ---
 ---@param conf ErgoTermConfig plugin configuration
 function M.setup(conf)
@@ -253,6 +279,10 @@ function M.setup(conf)
   command("TermUpdate", function(opts)
     M.update(opts.args, opts.bang, picker)
   end, { nargs = 1, complete = commandline.term_update_complete, bang = true })
+
+  command("TermInspect", function(opts)
+    M.inspect(opts.bang, picker)
+  end, { nargs = 0, bang = true })
 
   command("TermToggleUniversalSelection", function()
     M.toggle_universal_selection()

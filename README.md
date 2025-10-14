@@ -146,6 +146,17 @@ All options from `:TermNew` are available (see [🔧 Available Options](#-availa
 - **List settings** (comma-separated): The entire list is replaced
   - Example: `:TermUpdate! tags=prod,critical` replaces all tags with the new list
 
+### 🔍 Inspecting Terminals
+
+Inspect a terminal's internal state for debugging purposes:
+
+```vim
+:TermInspect          " Select terminal to inspect
+:TermInspect!         " Inspect last focused terminal
+```
+
+Displays the terminal object's internal structure using `vim.inspect()`, useful for debugging and understanding terminal configuration.
+
 ### 🌐 Universal Selection Mode
 
 Toggle universal selection mode to temporarily override the `selectable` and `bang_target` settings for all terminals:

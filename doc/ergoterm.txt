@@ -14,7 +14,8 @@ CONTENTS                                                    *ergoterm-contents*
    4.2 TermSelect .......................... |ergoterm-termselect|
    4.3 TermSend ............................ |ergoterm-termsend|
    4.4 TermUpdate .......................... |ergoterm-termupdate|
-   4.5 TermToggleUniversalSelection ........ |ergoterm-termtoggleuniversalselection|
+   4.5 TermInspect ......................... |ergoterm-terminspect|
+   4.6 TermToggleUniversalSelection ........ |ergoterm-termtoggleuniversalselection|
 5. Configuration ........................... |ergoterm-configuration|
    5.1 Setup ............................... |ergoterm-setup|
    5.2 Options ............................. |ergoterm-options|
@@ -104,7 +105,7 @@ After installation, you can immediately start using ErgoTerm:
 ==============================================================================
 4. COMMANDS                                                 *ergoterm-commands*
 
-ErgoTerm provides four main commands for terminal management.
+ErgoTerm provides several commands for terminal management.
 
 ------------------------------------------------------------------------------
 4.1 TermNew                                                 *ergoterm-termnew*
@@ -253,7 +254,29 @@ Examples: >vim
 <
 
 ------------------------------------------------------------------------------
-4.5 TermToggleUniversalSelection        *ergoterm-termtoggleuniversalselection*
+4.5 TermInspect                                           *ergoterm-terminspect*
+
+Inspect a terminal's internal state for debugging purposes.
+
+Syntax: >vim
+    :TermInspect
+    :TermInspect!        " Inspect last focused terminal directly
+<
+
+Displays the terminal object's internal structure using vim.inspect(). This is
+useful for debugging and understanding terminal configuration, including all
+internal state and settings.
+
+The bang (!) version inspects the last focused terminal directly without
+opening a picker.
+
+Examples: >vim
+    :TermInspect         " Select terminal to inspect via picker
+    :TermInspect!        " Inspect last focused terminal
+<
+
+------------------------------------------------------------------------------
+4.6 TermToggleUniversalSelection        *ergoterm-termtoggleuniversalselection*
 
 Toggle universal selection mode for all terminals.
 
