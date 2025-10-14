@@ -11,142 +11,11 @@ after_each(function()
   terms.reset_ids()
 end)
 
-describe(".get_focused", function()
-  it("returns currently focused terminal", function()
-    local term = terms.Terminal:new()
-    term:focus()
-
-    local result = terms.get_focused()
-
-    assert.equal(result, term)
-  end)
-
-  it("returns nil when there are terminals but none are focused", function()
-    local term = terms.Terminal:new()
-    term:focus()
-    term:close()
-
-    assert.is_nil(
-      terms.get_focused()
-    )
-  end)
-
-  it("returns nil when no terminals exist", function()
-    assert.is_nil(
-      terms.get_focused()
-    )
-  end)
-end)
-
-describe(".identify", function()
-  it("returns terminal when current buffer matches terminal buffer", function()
-    local term = terms.Terminal:new()
-    term:focus()
-
-    local result = terms.identify()
-
-    assert.equal(result, term)
-  end)
-
-  it("returns nil when current buffer doesn't match any terminal buffer", function()
-    local term = terms.Terminal:new()
-    term:start()
-    local other_bufnr = vim.api.nvim_create_buf(false, false)
-    vim.api.nvim_set_current_buf(other_bufnr)
-
-    local result = terms.identify()
-
-    assert.is_nil(result)
-  end)
-end)
-
-describe(".get_last_focused", function()
-  it("returns last focused bang target terminal when universal selection is disabled", function()
-    local term1 = terms.Terminal:new({ bang_target = false })
-    local term2 = terms.Terminal:new()
-    term2:focus()
-    term1:focus()
-
-    local result = terms.get_last_focused()
-
-    assert.equal(result, term2)
-  end)
-
-  it("returns last focused terminal regardless of bang_target option when universal selection is enabled", function()
-    local term1 = terms.Terminal:new({ bang_target = false })
-    local term2 = terms.Terminal:new()
-    term2:focus()
-    term1:focus()
-    terms.toggle_universal_selection()
-
-    local result = terms.get_last_focused()
-
-    assert.equal(result, term1)
-
-    terms.toggle_universal_selection()
-  end)
-
-  it("returns nil when no terminal has been focused", function()
-    assert.is_nil(
-      terms.get_last_focused()
-    )
-  end)
-end)
-
-describe(".get_all", function()
-  it("returns all terminals", function()
-    local term1 = terms.Terminal:new()
-    local term2 = terms.Terminal:new()
-
-    local result = terms.get_all()
-
-    assert.equal(2, #result)
-    assert.is_true(vim.tbl_contains(result, term1))
-    assert.is_true(vim.tbl_contains(result, term2))
-  end)
-
-  it("returns empty table when no terminals exist", function()
-    local result = terms.get_all()
-
-    assert.equal(0, #result)
-  end)
-end)
-
-
-describe(".get", function()
-  it("returns terminal with given id", function()
-    local term = terms.Terminal:new()
-
-    assert.equal(
-      term,
-      terms.get(term.id)
-    )
-  end)
-
-  it("returns nil when terminal does not exist", function()
-    assert.is_nil(terms.get(1))
-  end)
-end)
-
-describe(".get_by_name", function()
-  it("returns terminal with given name", function()
-    local term = terms.Terminal:new({ name = "test" })
-
-    assert.equal(
-      term,
-      terms.get_by_name("test")
-    )
-  end)
-
-  it("returns nil when terminal does not exist", function()
-    assert.is_nil(terms.get_by_name("foo"))
-  end)
-end)
-
 describe(".find", function()
-  it("returns terminal matching given predicate", function()
+  it("returns the first terminal matching given predicate", function()
     local term = terms.Terminal:new({ name = "test" })
     terms.Terminal:new({ name = "foo" })
+    terms.Terminal:new({ name = "test" })
 
     local result = terms.find(function(t)
       return t.name == "test"
@@ -163,6 +32,109 @@ describe(".find", function()
     end)
 
     assert.is_nil(result)
+  end)
+
+  it("returns nil when there are no terminals", function()
+    local result = terms.find(function()
+      return true
+    end)
+
+    assert.is_nil(result)
+  end)
+end)
+
+describe(".get_focused", function()
+  it("returns currently focused terminal", function()
+    local term = terms.Terminal:new():focus()
+
+    local result = terms.get_focused()
+
+    assert.equal(result, term)
+  end)
+
+  it("returns nil when there are terminals but none are focused", function()
+    terms.Terminal:new()
+
+    assert.is_nil(terms.get_focused())
+  end)
+end)
+
+describe(".identify", function()
+  it("returns terminal when current buffer matches terminal buffer", function()
+    local term = terms.Terminal:new():focus()
+
+    local result = terms.identify()
+
+    assert.equal(result, term)
+  end)
+
+  it("returns nil when current buffer doesn't match any terminal buffer", function()
+    terms.Terminal:new():start()
+    local other_bufnr = vim.api.nvim_create_buf(false, false)
+    vim.api.nvim_set_current_buf(other_bufnr)
+
+    local result = terms.identify()
+
+    assert.is_nil(result)
+  end)
+end)
+
+describe(".get_last_focused", function()
+  it("returns last focused terminal with `bang_target` flag when universal selection is disabled", function()
+    local term1 = terms.Terminal:new({ bang_target = false })
+    local term2 = terms.Terminal:new()
+    term2:focus()
+    term1:focus()
+
+    local result = terms.get_last_focused()
+
+    assert.equal(result, term2)
+  end)
+
+  it("returns last focused terminal regardless of bang_target flag when universal selection is enabled", function()
+    local term1 = terms.Terminal:new({ bang_target = false })
+    local term2 = terms.Terminal:new()
+    term2:focus()
+    term1:focus()
+    terms.toggle_universal_selection()
+
+    local result = terms.get_last_focused()
+
+    assert.equal(result, term1)
+
+    terms.toggle_universal_selection()
+  end)
+
+  it("returns nil when no terminal has been focused", function()
+    assert.is_nil(terms.get_last_focused())
+  end)
+end)
+
+describe(".get", function()
+  it("returns terminal with given id", function()
+    local term = terms.Terminal:new()
+
+    local result = terms.get(term.id)
+
+    assert.equal(result, term)
+  end)
+
+  it("returns nil when terminal does not exist", function()
+    assert.is_nil(terms.get(1))
+  end)
+end)
+
+describe(".get_by_name", function()
+  it("returns terminal with given name", function()
+    local term = terms.Terminal:new({ name = "test" })
+
+    local result = terms.get_by_name("test")
+
+    assert.equal(result, term)
+  end)
+
+  it("returns nil when terminal does not exist", function()
+    assert.is_nil(terms.get_by_name("foo"))
   end)
 end)
 
@@ -192,6 +164,30 @@ describe(".filter", function()
   end)
 end)
 
+describe(".get_all", function()
+  it("returns all terminals", function()
+    local term1 = terms.Terminal:new()
+    local term2 = terms.Terminal:new()
+
+    local result = terms.get_all()
+
+    assert.equal(2, #result)
+    assert.is_true(vim.tbl_contains(result, term1))
+    assert.is_true(vim.tbl_contains(result, term2))
+  end)
+
+  it("doesn't include deleted terminals", function()
+    local term1 = terms.Terminal:new()
+    local term2 = terms.Terminal:new()
+    term1:cleanup()
+
+    local result = terms.get_all()
+
+    assert.equal(1, #result)
+    assert.is_true(vim.tbl_contains(result, term2))
+  end)
+end)
+
 describe(".filter_by_tag", function()
   it("returns all terminals with the specified tag", function()
     local term1 = terms.Terminal:new({ name = "test1", tags = { "dev", "backend" } })
@@ -210,15 +206,6 @@ describe(".filter_by_tag", function()
     terms.Terminal:new({ name = "test2", tags = { "frontend" } })
 
     local result = terms.filter_by_tag("production")
-
-    assert.equal(0, #result)
-  end)
-
-  it("returns empty table when terminals have no tags", function()
-    terms.Terminal:new({ name = "test1" })
-    terms.Terminal:new({ name = "test2" })
-
-    local result = terms.filter_by_tag("dev")
 
     assert.equal(0, #result)
   end)

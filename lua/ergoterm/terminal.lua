@@ -22,10 +22,10 @@ local utils = lazy.require("ergoterm.utils")
 
 ---@class State
 ---@field last_focused Terminal? Last focused terminal
----@field last_focused_bang_target Terminal? Last bang_target focused terminal
----@field ids number[] All used session terminal ids, even when deleted from session
----@field terminals Terminal[] All terminals
----@field universal_selection boolean Whether to ignore selectable flag in selection and last focused
+---@field last_focused_bang_target Terminal? Last focused terminal with `bang_target` setting
+---@field ids number[] All used terminal IDs in this session, even when terminals are deleted
+---@field terminals Terminal[] All terminals in this session, excluding those that have been deleted
+---@field universal_selection boolean Whether to ignore `selectable` setting in selection and command' bang behavior
 M._state = {
   last_focused = nil,
   last_focused_bang_target = nil,
@@ -34,23 +34,26 @@ M._state = {
   universal_selection = false
 }
 
----Returns the terminal that currently has window focus
+---Finds the first terminal matching the given condition
 ---
----Searches through all terminals to find one whose window matches the current window.
----
----@return Terminal? the focused terminal, or nil if no terminal is focused
-function M.get_focused()
-  for _, term in pairs(M._state.terminals) do
-    if term:is_focused() then return term end
-  end
-  return nil
+---@param predicate fun(term: Terminal): boolean function that returns true for matching terminals
+---@return Terminal?
+function M.find(predicate)
+  return M.filter(predicate)[1]
 end
 
----Identifies the terminal associated with the current buffer
+---Returns the terminal that currently has window focus
 ---
----Searches through all terminals to find one whose buffer matches the current buffer.
+---@return Terminal?
+function M.get_focused()
+  return M.find(function(term)
+    return term:is_focused()
+  end)
+end
+
+---Returns the terminal associated with the current buffer
 ---
----@return Terminal? the identified terminal, or nil if no terminal is identified
+---@return Terminal?
 function M.identify()
   return M.find(function(term)
     return term._state.bufnr == vim.api.nvim_get_current_buf()
@@ -62,7 +65,7 @@ end
 ---If `universal_selection` is enabled, returns the last focused terminal regardless
 ---of its `bang_target` flag. Otherwise, returns the last focused terminal that is a bang target.
 ---
----@return Terminal? the last focused terminal, or nil if none have been focused
+---@return Terminal?
 function M.get_last_focused()
   if M._state.universal_selection then
     return M._state.last_focused
@@ -71,26 +74,12 @@ function M.get_last_focused()
   end
 end
 
----Returns all terminals in the current session
----
----Includes both started and stopped terminals. Use `filter()` to narrow results.
----
----@return Terminal[] array of all terminal instances
-function M.get_all()
-  local result = {}
-  for _, v in pairs(M._state.terminals) do
-    table.insert(result, v)
-  end
-  return result
-end
-
----Retrieves a terminal by its unique identifier
+---Gets a terminal by its unique ID
 ---
 ---@param id number
----@return Terminal? the terminal with the given id, or nil if not found
+---@return Terminal?
 function M.get(id)
-  local term = M._state.terminals[id]
-  return term
+  return M._state.terminals[id]
 end
 
 ---Finds the first terminal with the specified name
@@ -98,23 +87,11 @@ end
 ---Names are not guaranteed to be unique, so this returns the first match found.
 ---
 ---@param name string
----@return Terminal? the first terminal with matching name, or nil if not found
+---@return Terminal?
 function M.get_by_name(name)
-  for _, term in pairs(M._state.terminals) do
-    if term.name == name then return term end
-  end
-  return nil
-end
-
----Finds the first terminal matching the given condition
----
----@param predicate fun(term: Terminal): boolean function that returns true for matching terminals
----@return Terminal? the first matching terminal, or nil if none match
-function M.find(predicate)
-  for _, term in pairs(M._state.terminals) do
-    if predicate(term) then return term end
-  end
-  return nil
+  return M.find(function(term)
+    return term.name == name
+  end)
 end
 
 ---Returns all terminals matching the given condition
@@ -122,19 +99,20 @@ end
 ---@param predicate fun(term: Terminal): boolean function that returns true for matching terminals
 ---@return Terminal[] array of all matching terminals
 function M.filter(predicate)
-  local result = {}
-  for _, term in pairs(M._state.terminals) do
-    if predicate(term) then
-      table.insert(result, term)
-    end
-  end
-  return result
+  return vim.tbl_filter(predicate, M._state.terminals)
+end
+
+---Returns all terminals in the current session
+---
+---@return Terminal[]
+function M.get_all()
+  return M.filter(function(_) return true end)
 end
 
 ---Returns all terminals that have the specified tag
 ---
 ---@param tag string the tag to search for
----@return Terminal[] array of terminals that have the specified tag
+---@return Terminal[]
 function M.filter_by_tag(tag)
   return M.filter(function(term)
     return vim.tbl_contains(term.tags, tag)
