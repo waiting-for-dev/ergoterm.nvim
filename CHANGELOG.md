@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## 0.8.0 - 2025-10-15
+
 - BREAKING: `select()` & `select_started()` now take table of options instead of ordered parameters.
 - `select_started()` can take a `default` option to provide default terminal if none of the list is started.
 - List and table options can be passed to `TermNew` & `TermUpdate` commands.
