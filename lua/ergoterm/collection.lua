@@ -2,9 +2,6 @@
 
 local M = {}
 
----@module "ergoterm.lazy"
-local lazy = require("ergoterm.lazy")
-
 local select = require("ergoterm.collection.select")
 
 ---@class State

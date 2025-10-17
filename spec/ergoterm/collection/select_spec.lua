@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-field
 
 local select = require("ergoterm.collection.select")
-local terms = require("ergoterm.terminal")
+local terms = require("ergoterm")
 local test_helpers = require("test_helpers")
 
 after_each(function()

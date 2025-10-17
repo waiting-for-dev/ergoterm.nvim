@@ -689,10 +689,10 @@ Create persistent terminal configurations that survive across Neovim sessions.
 These terminals are defined once and can be quickly accessed.
 
 Example: >lua
-    local terms = require("ergoterm.terminal")
-    
+    local ergoterm = require("ergoterm")
+
     -- Create standalone terminals
-    local lazygit = terms.Terminal:new({
+    local lazygit = ergoterm:new({
       name = "lazygit",
       cmd = "lazygit", 
       layout = "float",
@@ -701,7 +701,7 @@ Example: >lua
       bang_target = false
     })
   
-    local server = terms.Terminal:new({
+    local server = ergoterm:new({
       name = "server",
       cmd = "npm start",
       layout = "right",
@@ -720,17 +720,16 @@ For project-specific terminal configurations, create a `.nvim.lua` file in your
 project root. This is especially useful with the `sticky` option to keep
 project terminals available even when stopped: >lua
 
-    local terms = require("ergoterm.terminal")
-    local term = require("ergoterm.terminal").Terminal
+    local ergoterm = require("ergoterm")
 
-    term:new({
+    ergoterm:new({
       name = "Phoenix Server",
       cmd = "iex -S mix phx.server",
       layout = "right",
       sticky = true
     })
 
-    term:new({
+    ergoterm:new({
       name = "DB Console",
       cmd = "psql -U postgres my_database",
       layout = "below",
@@ -761,8 +760,8 @@ Every terminal follows this progression:
 4. **Focus** - `Terminal:focus()` - Brings into active focus
 
 Each method is idempotent and automatically calls prerequisite methods: >lua
-    local terms = require("ergoterm.terminal")
-    local term = terms.Terminal:new({ cmd = "htop" })
+    local ergoterm = require("ergoterm")
+    local term = ergoterm:new({ cmd = "htop" })
     
     -- These cascade - focus() calls start() and open() if needed
     term:focus()  -- Automatically starts and opens if needed
@@ -865,31 +864,35 @@ Terminal:get_state({key})                               *Terminal:get_state()*
 
 Module Functions:                                       *ergoterm-module*
 
-require("ergoterm.terminal").get_focused()                       *ergoterm.get_focused()*
+Note: All module functions are available through require("ergoterm").
+For backward compatibility, require("ergoterm.terminal") is still supported
+but deprecated.
+
+require("ergoterm").get_focused()                       *ergoterm.get_focused()*
     Returns terminal that currently has window focus.
 
-require("ergoterm.terminal").get_last_focused()                  *ergoterm.get_last_focused()*
+require("ergoterm").get_last_focused()                  *ergoterm.get_last_focused()*
     Returns most recently focused terminal.
 
-require("ergoterm.terminal").get_all()                           *ergoterm.get_all()*
+require("ergoterm").get_all()                           *ergoterm.get_all()*
     Returns array of all terminal instances.
 
-require("ergoterm.terminal").get({id})                           *ergoterm.get()*
+require("ergoterm").get({id})                           *ergoterm.get()*
     Retrieve terminal by unique identifier.
 
-require("ergoterm.terminal").get_by_name({name})                 *ergoterm.get_by_name()*
+require("ergoterm").get_by_name({name})                 *ergoterm.get_by_name()*
     Find first terminal with specified name.
 
-require("ergoterm.terminal").find({predicate})                   *ergoterm.find()*
+require("ergoterm").find({predicate})                   *ergoterm.find()*
     Find first terminal matching condition function.
 
-require("ergoterm.terminal").filter({predicate})                 *ergoterm.filter()*
+require("ergoterm").filter({predicate})                 *ergoterm.filter()*
     Return all terminals matching condition function.
 
-require("ergoterm.terminal").filter_by_tag({tag})                     *ergoterm.with_tag()*
+require("ergoterm").filter_by_tag({tag})                     *ergoterm.with_tag()*
     Return all terminals that have the specified tag.
 
-require("ergoterm.terminal").select({opts})                 *ergoterm.select()*
+require("ergoterm").select({opts})                 *ergoterm.select()*
     Present picker interface for terminal selection.
 
     Parameters:
@@ -899,7 +902,7 @@ require("ergoterm.terminal").select({opts})                 *ergoterm.select()*
           callbacks - Table of picker callback definitions (optional)
           picker    - Custom picker implementation (optional)
 
-require("ergoterm.terminal").select_started({opts})         *ergoterm.select_started()*
+require("ergoterm").select_started({opts})         *ergoterm.select_started()*
     Present picker interface for started terminals only. Filters the provided
     terminals to only include those that have been started, then presents
     them in a picker interface. All other behavior matches select().
@@ -914,16 +917,16 @@ require("ergoterm.terminal").select_started({opts})         *ergoterm.select_sta
           picker    - Custom picker implementation (optional)
           default   - Terminal to select when none are started (optional)
 
-require("ergoterm.terminal").cleanup_all()                       *ergoterm.cleanup_all()*
+require("ergoterm").cleanup_all()                       *ergoterm.cleanup_all()*
     Clean up all terminals. Non-sticky terminals are removed from the session,
     while sticky terminals are only removed if force option is true.
 
-require("ergoterm.terminal").toggle_universal_selection()         *ergoterm.toggle_universal_selection()*
+require("ergoterm").toggle_universal_selection()         *ergoterm.toggle_universal_selection()*
     Toggle universal selection mode. Returns the new state (boolean).
     When enabled, all terminals are selectable regardless of their
     individual selectable setting.
 
-require("ergoterm.terminal").with_defaults({custom_defaults})      *ergoterm.with_defaults()*
+require("ergoterm").with_defaults({custom_defaults})      *ergoterm.with_defaults()*
     Create a terminal factory with custom defaults.
     Returns a factory table with a new() method that creates terminals
     with the provided defaults merged with global configuration.
@@ -935,7 +938,7 @@ require("ergoterm.terminal").with_defaults({custom_defaults})      *ergoterm.wit
         Factory table with new() method
 
     Example: >lua
-        local task = require("ergoterm.terminal").with_defaults({
+        local task = require("ergoterm").with_defaults({
           tags = { "task" },
           selectable = false
         })
@@ -979,8 +982,8 @@ Option 1 - Pass decorator function directly: >lua
       return result
     end
 
-    local terms = require("ergoterm.terminal")
-    local term = terms.get_last_focused()
+    local ergoterm = require("ergoterm")
+    local term = ergoterm.get_last_focused()
     term:send("single_line", { decorator = timestamp_decorator })
 <
 
@@ -1001,6 +1004,8 @@ Option 2 - Register named decorator in configuration: >lua
     })
 
     -- Then use by name
+    local ergoterm = require("ergoterm")
+    local term = ergoterm.get_last_focused()
     term:send("single_line", { decorator = "timestamp" })
     -- Or from command line
     :TermSend decorator=timestamp
@@ -1042,10 +1047,10 @@ Useful keymaps to get started: >lua
 8.2 AI Integration                                             *ergoterm-ai*
 
 Example integration with Claude for AI-assisted development: >lua
-    local terms = require("ergoterm.terminal")
-    
+    local ergoterm = require("ergoterm")
+
     -- Create persistent Claude terminal
-    local claude = terms.Terminal:new({
+    local claude = ergoterm.Terminal:new({
       name = "claude",
       cmd = "claude",
       layout = "right", 

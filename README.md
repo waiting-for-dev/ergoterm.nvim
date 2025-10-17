@@ -206,10 +206,10 @@ Create persistent terminal configurations that survive across Neovim sessions. T
 Define terminals in your configuration:
 
 ```lua
-local terms = require("ergoterm.terminal")
+local ergoterm = require("ergoterm")
 
 -- Create standalone terminals
-local lazygit = terms.Terminal:new({
+local lazygit = ergoterm:new({
   name = "lazygit",
   cmd = "lazygit",
   layout = "float",
@@ -218,7 +218,7 @@ local lazygit = terms.Terminal:new({
   bang_target = false
 })
 
-local claude = terms.Terminal:new({
+local claude = ergoterm:new({
   name = "claude",
   cmd = "claude",
   layout = "right",
@@ -237,16 +237,16 @@ vim.keymap.set("n", "<leader>ci", function() claude:toggle() end, { desc = "Open
 For project-specific terminal configurations, you can leverage a `.nvim.lua` file in your project root. This is especially useful with the `sticky` option to keep project terminals available even when stopped:
 
 ```lua
-local term = require("ergoterm.terminal").Terminal
+local ergoterm = require("ergoterm")
 
-term:new({
+ergoterm:new({
   name = "Phoenix Server",
   cmd = "iex -S mix phx.server",
   layout = "right",
   sticky = true
 })
 
-term:new({
+ergoterm:new({
   name = "DB Console",
   cmd = "psql -U postgres my_database",
   layout = "below",
@@ -314,10 +314,10 @@ Every terminal follows this lifecycle progression:
 Each method is idempotent and will automatically call prerequisite methods:
 
 ```lua
-local terms = require("ergoterm.terminal")
+local ergoterm = require("ergoterm")
 
 -- Create a terminal instance
-local term = terms.Terminal:new({ cmd = "htop", layout = "float" })
+local term = ergoterm.Terminal:new({ cmd = "htop", layout = "float" })
 
 -- These methods cascade - focus() will start() and open() if needed
 term:focus()  -- Automatically calls start() and open() if not already done
@@ -376,7 +376,9 @@ term:send({"print('hello')"}, { trim = false, decorator = "markdown_code" })
 - `"open"` - Show terminal output without stealing focus
 - `"start"` - Send text without any UI changes
 
-For complete API documentation and advanced usage patterns, see [`lua/ergoterm/terminal.lua`](lua/ergoterm/terminal.lua).
+For complete API documentation and advanced usage patterns, see the source code in [`lua/ergoterm/`](lua/ergoterm/).
+
+**Note on Backward Compatibility:** The `require("ergoterm.terminal")` module is still supported for backward compatibility but is deprecated. All new code should use `require("ergoterm")` as the main entry point.
 
 #### 🎨 Custom Text Decorators
 
@@ -422,10 +424,10 @@ terminal:send({"echo hello"}, { decorator = "timestamp" })
 Here's an example showing how to integrate [Claude Code](https://claude.ai/) for AI-assisted coding:
 
 ```lua
-local terms = require("ergoterm.terminal")
+local ergoterm = require("ergoterm")
 
 -- Create persistent Claude terminal
-local claude = terms.Terminal:new({
+local claude = ergoterm.Terminal:new({
   name = "claude",
   cmd = "claude",
   layout = "right",

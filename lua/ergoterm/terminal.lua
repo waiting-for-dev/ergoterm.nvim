@@ -6,11 +6,13 @@
 --- - ergoterm.instance (internal) for Terminal class
 --- - ergoterm (public API) as the main entry point
 
+local utils = require("ergoterm.utils")
+
 local warned = false
 if not warned then
-  vim.notify(
+  utils.notify(
     "require('ergoterm.terminal') is deprecated. Use require('ergoterm') instead.",
-    vim.log.levels.WARN
+    "warn"
   )
   warned = true
 end

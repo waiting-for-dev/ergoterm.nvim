@@ -45,10 +45,18 @@ M.reset_ids = collection.reset_ids
 
 M.Terminal = instance.Terminal
 
+--- Create a new terminal instance.
+---
+--- @param args TermCreateArgs?
+--- @return Terminal
 function M:new(args)
   return instance.Terminal:new(args)
 end
 
+--- Create a factory for terminals with default settings.
+---
+--- @param custom_defaults TermCreateArgs Default settings for terminals created by the factory.
+--- @return table A factory with a `new` method to create terminals with the specified defaults
 function M.with_defaults(custom_defaults)
   return {
     new = function(_, args)
