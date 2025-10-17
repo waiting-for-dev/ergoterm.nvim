@@ -124,12 +124,6 @@ function M.select(defaults)
   return select(defaults)
 end
 
----Presents a picker interface for started terminals only
----
----Filters the provided terminals to only include those that have been started,
----then presents them in a picker interface. All other behavior matches `select()`.
----If none of the terminals are started and a default terminal is provided,
----that terminal is selected instead.
 M.select_started = select.select_started
 
 ---@class CleanupOptions

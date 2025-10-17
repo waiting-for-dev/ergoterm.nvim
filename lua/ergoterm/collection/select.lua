@@ -36,6 +36,13 @@ end
 ---@class TerminalSelectStartedDefaults : TerminalSelectDefaultsRequiredTerminals
 ---@field default? Terminal terminal to select when none of the provided terminals are started
 
+---Presents a picker interface for started terminals only
+---
+---Filters the provided terminals to only include those that have been started,
+---then presents them in a picker interface. All other behavior matches `select()`.
+---If none of the terminals are started and a default terminal is provided,
+---that terminal is selected instead.
+---
 ---@param defaults TerminalSelectStartedDefaults
 ---@return any result from the picker, or nil if no started terminals available
 ---@private
