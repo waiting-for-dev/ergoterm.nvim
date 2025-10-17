@@ -212,183 +212,88 @@ describe(".filter_by_tag", function()
 end)
 
 describe(".select", function()
-  it("returns result of calling given picker with started terminal and given prompt and callbacks", function()
+  it("calls select with provided defaults", function()
     local picker = {
       select = function(terminals, prompt, callbacks)
         return { terminals, prompt, callbacks }
       end
     }
-    local term = terms.Terminal:new():start()
-    terms.Terminal:new()
+    local term = terms.Terminal:new()
     local callbacks = {}
 
-    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
+    local result = terms.select({ terminals = { term }, prompt = "prompt", callbacks = callbacks, picker = picker })
 
-    ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
     assert.is_true(vim.tbl_contains(result[1], term))
     assert.equal("prompt", result[2])
     assert.equal(callbacks, result[3])
-    ---@diagnostic enable: need-check-nil
   end)
 
-  it("includes started terminals with selectable=true from picler", function()
+  it("includes selectable started terminals", function()
     local picker = {
       select = function(terminals, prompt, callbacks)
         return { terminals, prompt, callbacks }
       end
     }
     local term = terms.Terminal:new({ selectable = true }):start()
-    local callbacks = {}
+    terms.Terminal:new({ selectable = false }):start()
 
-    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
+    local result = terms.select({ prompt = "prompt", callbacks = {}, picker = picker })
 
-    ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
     assert.is_true(vim.tbl_contains(result[1], term))
-    ---@diagnostic enable: need-check-nil
   end)
 
-  it("excludes non-started terminals with selectable=true from picler", function()
+  it("includes selectable stopped but not cleaned up terminals", function()
     local picker = {
       select = function(terminals, prompt, callbacks)
         return { terminals, prompt, callbacks }
       end
     }
-    local term1 = terms.Terminal:new({ selectable = true }):start()
-    local term2 = terms.Terminal:new({ selectable = true })
-    local callbacks = {}
+    local term1 = terms.Terminal:new({ selectable = true }):start():stop()
+    local term2 = terms.Terminal:new({ selectable = false }):start():stop()
+    vim.api.nvim_buf_delete(term2:get_state("bufnr"), { force = true })
 
-    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
+    local result = terms.select({ prompt = "prompt", callbacks = {}, picker = picker })
 
-    ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
     assert.is_true(vim.tbl_contains(result[1], term1))
-    assert.is_false(vim.tbl_contains(result[1], term2))
-    ---@diagnostic enable: need-check-nil
   end)
 
-  it("includes sticky terminals with selectable=true even when not started", function()
+  it("includes selectable sticky terminals", function()
     local picker = {
       select = function(terminals, prompt, callbacks)
         return { terminals, prompt, callbacks }
       end
     }
     local term = terms.Terminal:new({ selectable = true, sticky = true })
-    local callbacks = {}
+    terms.Terminal:new({ selectable = false, sticky = true })
 
-    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
+    local result = terms.select({ prompt = "prompt", callbacks = {}, picker = picker })
 
-    ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
     assert.is_true(vim.tbl_contains(result[1], term))
-    ---@diagnostic enable: need-check-nil
   end)
 
-  it("excludes started terminals with selectable=false from picker", function()
+  it("includes all terminals when universal selection is enabled", function()
     local picker = {
       select = function(terminals, prompt, callbacks)
         return { terminals, prompt, callbacks }
       end
     }
-    local visible_term = terms.Terminal:new({ selectable = true }):start()
-    local hidden_term = terms.Terminal:new({ selectable = false }):start()
-    local callbacks = {}
-
-    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
-
-    ---@diagnostic disable: need-check-nil
-    assert.equal(1, #result[1])
-    assert.is_true(vim.tbl_contains(result[1], visible_term))
-    assert.is_false(vim.tbl_contains(result[1], hidden_term))
-    ---@diagnostic enable: need-check-nil
-  end)
-
-  it("excludes sticky terminals with selectable=false from picker", function()
-    local picker = {
-      select = function(terminals, prompt, callbacks)
-        return { terminals, prompt, callbacks }
-      end
-    }
-    local started_term = terms.Terminal:new({ selectable = true }):start()
-    local sticky_term = terms.Terminal:new({ selectable = false, sticky = true })
-    local callbacks = {}
-
-    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
-
-    ---@diagnostic disable: need-check-nil
-    assert.equal(1, #result[1])
-    assert.is_true(vim.tbl_contains(result[1], started_term))
-    assert.is_false(vim.tbl_contains(result[1], sticky_term))
-    ---@diagnostic enable: need-check-nil
-  end)
-
-  it("includes terminals with selectable=false when universal selection is enabled", function()
-    local picker = {
-      select = function(terminals, prompt, callbacks)
-        return { terminals, prompt, callbacks }
-      end
-    }
-    local visible_term = terms.Terminal:new({ selectable = true }):start()
-    local hidden_term = terms.Terminal:new({ selectable = false }):start()
-    local callbacks = {}
+    local term1 = terms.Terminal:new({ selectable = true }):start()
+    local term2 = terms.Terminal:new({ selectable = false }):start()
+    local term3 = terms.Terminal:new({ selectable = true, sticky = true })
+    local term4 = terms.Terminal:new({ selectable = false, sticky = true })
     terms.toggle_universal_selection()
 
-    local result = terms.select({ prompt = "prompt", callbacks = callbacks, picker = picker })
+    local result = terms.select({ prompt = "prompt", callbacks = {}, picker = picker })
 
-    ---@diagnostic disable: need-check-nil
-    assert.equal(2, #result[1])
-    assert.is_true(vim.tbl_contains(result[1], visible_term))
-    assert.is_true(vim.tbl_contains(result[1], hidden_term))
-    ---@diagnostic enable: need-check-nil
-  end)
-
-  it("notifies when no terminals are started", function()
-    local picker = {
-      select = function()
-        return nil
-      end
-    }
-    local result = test_helpers.mocking_notify(function()
-      terms.select({ prompt = "prompt", picker = picker })
-    end)
-
-    ---@diagnostic disable: need-check-nil
-    assert.equal("No ergoterm terminals available", result.msg)
-    assert.equal("info", result.level)
-    ---@diagnostic enable: need-check-nil
-  end)
-
-  it("wraps a single function callback into a default action table", function()
-    local picker = {
-      select = function(terminals, prompt, callbacks)
-        return { terminals, prompt, callbacks }
-      end
-    }
-    local term = terms.Terminal:new():start()
-    local callback_fn = function(t) return t end
-
-    local result = terms.select({ terminals = { term, term }, prompt = "prompt", callbacks = callback_fn, picker = picker })
-
-    ---@diagnostic disable: need-check-nil
-    assert.is_table(result[3])
-    assert.is_table(result[3].default)
-    assert.equal(callback_fn, result[3].default.fn)
-    assert.equal("Default action", result[3].default.desc)
-    ---@diagnostic enable: need-check-nil
-  end)
-
-  it("fast-forwards and executes callback when one terminal and only default callback", function()
-    local term = terms.Terminal:new():start()
-    local executed = false
-    local callback_fn = function(t)
-      executed = true
-      assert.equal(term, t)
-    end
-
-    terms.select({ terminals = { term }, prompt = "prompt", callbacks = callback_fn })
-
-    assert.is_true(executed)
+    assert.equal(4, #result[1])
+    assert.is_true(vim.tbl_contains(result[1], term1))
+    assert.is_true(vim.tbl_contains(result[1], term2))
+    assert.is_true(vim.tbl_contains(result[1], term3))
+    assert.is_true(vim.tbl_contains(result[1], term4))
   end)
 end)
 

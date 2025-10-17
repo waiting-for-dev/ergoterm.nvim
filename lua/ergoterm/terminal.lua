@@ -11,6 +11,7 @@ local lazy = require("ergoterm.lazy")
 local config = lazy.require("ergoterm.config")
 ---@module "ergoterm.mode"
 local mode = lazy.require("ergoterm.mode")
+local select = require("ergoterm.collection.select")
 ---@module "ergoterm.size"
 local size_utils = lazy.require("ergoterm.size")
 ---@module "ergoterm.text_decorators"
@@ -119,37 +120,37 @@ function M.filter_by_tag(tag)
   end)
 end
 
----@class TerminalSelectDefaults
+---@private
+function M._filter_defaults_for_picker()
+  if M._state.universal_selection then
+    return M.get_all()
+  else
+    return M.filter(function(term)
+      ---@diagnostic disable-next-line: return-type-mismatch
+      return term.selectable and (term:is_active() or term.sticky)
+    end)
+  end
+end
+
+---@class TerminalSelectDefaultsOptionalTerminals : Defaults
 ---@field terminals? Terminal[] array of terminals to choose from.
----@field prompt? string text to display in the picker
----@field callbacks? table<string, PickerCallbackDefinition>|fun(term: Terminal)
----@field picker? Picker
 
 ---Presents a picker interface for terminal selection
 ---
----Terminals default to those that are started or sticky (unless selectable is false),
----unless universal_selection is enabled, in which case all terminals are shown.
+---The available terminals default to:
 ---
----@param defaults? TerminalSelectDefaults table containing terminals, prompt, callbacks and picker
+---- If `universal_selection` is disabled (default): all terminals that are selectable and
+---  either active (started or stopped but still with active buffer) or sticky.
+---- If `universal_selection` is enabled: all terminals.
+---
+---@param defaults? TerminalSelectDefaultsOptionalTerminals table containing terminals, prompt, callbacks and picker
 ---@return any result from the picker, or nil if no terminals available
 function M.select(defaults)
   defaults = defaults or {}
-  local terminals = defaults.terminals or (M._state.universal_selection and M.get_all() or
+  defaults.terminals = defaults.terminals or (M._state.universal_selection and M.get_all() or
     M._find_selectable_terminals_for_picker())
-  if #terminals == 0 then return utils.notify("No ergoterm terminals available", "info") end
-  local prompt = defaults.prompt or "Please select a terminal"
-  local picker = defaults.picker or config.build_picker(config)
-  local callbacks
-  if type(defaults.callbacks) == "function" then
-    callbacks = { default = { fn = defaults.callbacks, desc = "Default action" } }
-  else
-    callbacks = defaults.callbacks or M._get_default_picker_callbacks()
-  end
-  if #terminals == 1 and vim.tbl_count(callbacks) == 1 and callbacks.default then
-    return callbacks.default.fn(terminals[1])
-  end
-  ---@cast callbacks table<string, PickerCallbackDefinition>
-  return picker.select(terminals, prompt, callbacks)
+
+  return select(defaults)
 end
 
 ---@class TerminalSelectStartedDefaults : TerminalSelectDefaults
@@ -228,21 +229,6 @@ function M.reset_ids()
   M._state.ids = {}
 end
 
----@private
-function M._find_selectable_terminals_for_picker()
-  return M.filter(function(term)
-    ---@diagnostic disable-next-line: return-type-mismatch
-    return term.selectable and (term:is_active() or term.sticky)
-  end)
-end
-
----@private
-function M._get_default_picker_callbacks()
-  local select_actions = config.get("picker.select_actions")
-  local extra_select_actions = config.get("picker.extra_select_actions")
-  return vim.tbl_extend("force", select_actions, extra_select_actions)
-end
-
 ---@class SizeUnits
 ---@field below "percentage"|"absolute"
 ---@field above "percentage"|"absolute"
@@ -314,7 +300,7 @@ Terminal.__index = Terminal
 ---@param args TermCreateArgs?
 ---@return Terminal the newly created terminal instance
 function Terminal:new(args)
-  local term = args or {} ---@cast term Terminal
+  local term = vim.deepcopy(args or {}) --@type TermResolvedArgs
   setmetatable(term, self)
   term.auto_scroll = vim.F.if_nil(term.auto_scroll, config.get("terminal_defaults.auto_scroll"))
   term.bang_target = vim.F.if_nil(term.bang_target, config.get("terminal_defaults.bang_target"))
@@ -726,6 +712,14 @@ function Terminal:get_status_icon()
   else
     return "○"
   end
+end
+
+---@private
+function M._find_selectable_terminals_for_picker()
+  return M.filter(function(term)
+    ---@diagnostic disable-next-line: return-type-mismatch
+    return term.selectable and (term:is_active() or term.sticky)
+  end)
 end
 
 ---@private
