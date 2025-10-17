@@ -120,19 +120,7 @@ function M.filter_by_tag(tag)
   end)
 end
 
----@private
-function M._filter_defaults_for_picker()
-  if M._state.universal_selection then
-    return M.get_all()
-  else
-    return M.filter(function(term)
-      ---@diagnostic disable-next-line: return-type-mismatch
-      return term.selectable and (term:is_active() or term.sticky)
-    end)
-  end
-end
-
----@class TerminalSelectDefaultsOptionalTerminals : Defaults
+---@class TerminalSelectDefaultsOptionalTerminals : TerminalSelectDefaults
 ---@field terminals? Terminal[] array of terminals to choose from.
 
 ---Presents a picker interface for terminal selection
@@ -153,34 +141,13 @@ function M.select(defaults)
   return select(defaults)
 end
 
----@class TerminalSelectStartedDefaults : TerminalSelectDefaults
----@field default? Terminal terminal to select when none of the provided terminals are started
-
 ---Presents a picker interface for started terminals only
 ---
 ---Filters the provided terminals to only include those that have been started,
 ---then presents them in a picker interface. All other behavior matches `select()`.
 ---If none of the terminals are started and a default terminal is provided,
 ---that terminal is selected instead.
----
----@param defaults? TerminalSelectStartedDefaults table containing terminals, prompt, callbacks, picker and default
----@return any result from the picker, or nil if no started terminals available
-function M.select_started(defaults)
-  defaults = defaults or {}
-  local terminals = defaults.terminals or M.get_all()
-  local filtered_terminals = vim.tbl_filter(function(term)
-    return term:is_started()
-  end, terminals)
-  if #filtered_terminals == 0 and defaults.default then
-    filtered_terminals = { defaults.default }
-  end
-  return M.select({
-    terminals = filtered_terminals,
-    prompt = defaults.prompt,
-    callbacks = defaults.callbacks,
-    picker = defaults.picker
-  })
-end
+M.select_started = select.select_started
 
 ---@class CleanupOptions
 ---@field force? boolean whether to force removal of sticky terminals from the session (default: false)
@@ -227,6 +194,18 @@ end
 ---testing.
 function M.reset_ids()
   M._state.ids = {}
+end
+
+---@private
+function M._filter_defaults_for_picker()
+  if M._state.universal_selection then
+    return M.get_all()
+  else
+    return M.filter(function(term)
+      ---@diagnostic disable-next-line: return-type-mismatch
+      return term.selectable and (term:is_active() or term.sticky)
+    end)
+  end
 end
 
 ---@class SizeUnits

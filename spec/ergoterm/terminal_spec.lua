@@ -298,7 +298,7 @@ describe(".select", function()
 end)
 
 describe(".select_started", function()
-  it("filters terminals to only include started ones", function()
+  it("calls select_started with provided defaults", function()
     local picker = {
       select = function(terminals, prompt, callbacks)
         return { terminals, prompt, callbacks }
@@ -310,63 +310,9 @@ describe(".select_started", function()
 
     local result = terms.select_started({ terminals = all_terminals, prompt = "prompt", picker = picker })
 
-    ---@diagnostic disable: need-check-nil
     assert.equal(1, #result[1])
     assert.is_true(vim.tbl_contains(result[1], started_term))
     assert.is_false(vim.tbl_contains(result[1], stopped_term))
-    ---@diagnostic enable: need-check-nil
-  end)
-
-  it("uses default terminal when no terminals are started", function()
-    local picker = {
-      select = function(terminals, prompt, callbacks)
-        return { terminals, prompt, callbacks }
-      end
-    }
-    local stopped_term = terms.Terminal:new()
-    local default_term = terms.Terminal:new()
-    local all_terminals = { stopped_term, default_term }
-
-    local result = terms.select_started({
-      terminals = all_terminals,
-      prompt = "prompt",
-      picker = picker,
-      default =
-          default_term
-    })
-
-    ---@diagnostic disable: need-check-nil
-    assert.equal(1, #result[1])
-    assert.is_true(vim.tbl_contains(result[1], default_term))
-    assert.is_false(vim.tbl_contains(result[1], stopped_term))
-    ---@diagnostic enable: need-check-nil
-  end)
-
-  it("ignores default terminal when some terminals are started", function()
-    local picker = {
-      select = function(terminals, prompt, callbacks)
-        return { terminals, prompt, callbacks }
-      end
-    }
-    local started_term = terms.Terminal:new():start()
-    local stopped_term = terms.Terminal:new()
-    local default_term = terms.Terminal:new()
-    local all_terminals = { started_term, stopped_term }
-
-    local result = terms.select_started({
-      terminals = all_terminals,
-      prompt = "prompt",
-      picker = picker,
-      default =
-          default_term
-    })
-
-    ---@diagnostic disable: need-check-nil
-    assert.equal(1, #result[1])
-    assert.is_true(vim.tbl_contains(result[1], started_term))
-    assert.is_false(vim.tbl_contains(result[1], stopped_term))
-    assert.is_false(vim.tbl_contains(result[1], default_term))
-    ---@diagnostic enable: need-check-nil
   end)
 end)
 

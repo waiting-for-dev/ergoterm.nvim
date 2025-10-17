@@ -16,13 +16,9 @@ local M = {}
 ---@class TerminalSelectDefaultsRequiredTerminals : TerminalSelectDefaults
 ---@field terminals Terminal[] array of terminals to choose from.
 
----Presents a picker interface for terminal selection
----
----Terminals default to those that are started or sticky (unless selectable is false),
----unless universal_selection is enabled, in which case all terminals are shown.
----
 ---@param defaults TerminalSelectDefaultsRequiredTerminals table containing terminals, prompt, callbacks and picker
 ---@return any result from the picker, or nil if no terminals available
+---@private
 function M.select(defaults)
   local terminals = defaults.terminals
   local prompt = defaults.prompt or "Please select a terminal"
@@ -34,6 +30,35 @@ function M.select(defaults)
     return callbacks.default.fn(terminals[1])
   else
     return picker.select(terminals, prompt, callbacks)
+  end
+end
+
+---@class TerminalSelectStartedDefaults : TerminalSelectDefaultsRequiredTerminals
+---@field default? Terminal terminal to select when none of the provided terminals are started
+
+---@param defaults TerminalSelectStartedDefaults
+---@return any result from the picker, or nil if no started terminals available
+---@private
+function M.select_started(defaults)
+  defaults = defaults or {}
+  local terminals = M._filter_started_terminals_or_default_if_none(defaults.terminals, defaults.default)
+  return M.select({
+    terminals = terminals,
+    prompt = defaults.prompt,
+    callbacks = defaults.callbacks,
+    picker = defaults.picker
+  })
+end
+
+---@private
+function M._filter_started_terminals_or_default_if_none(terminals, default)
+  local started_terminals = vim.tbl_filter(function(term)
+    return term:is_started()
+  end, terminals)
+  if #started_terminals == 0 and default then
+    return { default }
+  else
+    return started_terminals
   end
 end
 

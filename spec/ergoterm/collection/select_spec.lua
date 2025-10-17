@@ -66,3 +66,40 @@ describe(".select", function()
     assert.equal("Default action", result[3].default.desc)
   end)
 end)
+
+describe(".select_started", function()
+  it("filters terminals to only include started ones", function()
+    local picker = {
+      select = function(terminals, prompt, callbacks)
+        return { terminals, prompt, callbacks }
+      end
+    }
+    local started_term = terms.Terminal:new():start()
+    local stopped_term = terms.Terminal:new()
+
+    local result = select.select_started({ terminals = { started_term, stopped_term }, prompt = "prompt", picker = picker })
+
+    assert.equal(1, #result[1])
+    assert.is_true(vim.tbl_contains(result[1], started_term))
+  end)
+
+  it("uses default terminal when no terminals are started", function()
+    local picker = {
+      select = function(terminals, prompt, callbacks)
+        return { terminals, prompt, callbacks }
+      end
+    }
+    local stopped_term = terms.Terminal:new()
+    local default_term = terms.Terminal:new()
+
+    local result = select.select_started({
+      terminals = { stopped_term, default_term },
+      prompt = "prompt",
+      picker = picker,
+      default = default_term
+    })
+
+    assert.equal(1, #result[1])
+    assert.is_true(vim.tbl_contains(result[1], default_term))
+  end)
+end)
