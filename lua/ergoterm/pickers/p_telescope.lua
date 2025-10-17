@@ -1,5 +1,3 @@
-local terms = require("ergoterm.terminal")
-
 local M = {}
 
 
@@ -67,7 +65,7 @@ function M.select(terminals, prompt, definitions)
         -- Only clear if it's not a terminal buffer
         if self.state.bufnr and vim.api.nvim_buf_is_valid(self.state.bufnr) then
           local ok, filetype = pcall(vim.api.nvim_buf_get_option, self.state.bufnr, 'filetype')
-          if not ok or filetype ~= terms.FILETYPE then
+          if not ok or filetype ~= "ErgoTerm" then
             -- Only clear non-terminal buffers
             self.state.bufnr = nil
             self.state.bufname = nil

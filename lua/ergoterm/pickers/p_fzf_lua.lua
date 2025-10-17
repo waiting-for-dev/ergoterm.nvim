@@ -1,5 +1,3 @@
-local terms = require("ergoterm.terminal")
-
 local M = {}
 
 M._state = {
@@ -41,7 +39,7 @@ function M.previewer:safe_buf_delete()
   local bufnr = vim.api.nvim_get_current_buf()
   local filetype = vim.api.nvim_buf_get_option(bufnr, 'filetype')
 
-  if filetype ~= terms.FILETYPE then
+  if filetype ~= "ErgoTerm" then
     M.previewer.super.safe_buf_delete(self)
   end
 end

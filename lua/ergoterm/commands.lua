@@ -7,8 +7,8 @@ local lazy = require("ergoterm.lazy")
 local commandline = lazy.require("ergoterm.commandline")
 ---@module "ergoterm.config"
 local config = lazy.require("ergoterm.config")
----@module "ergoterm.terminal"
-local terms = lazy.require("ergoterm.terminal")
+---@module "ergoterm"
+local terms = lazy.require("ergoterm")
 ---@module "ergoterm.utils"
 local utils = lazy.require("ergoterm.utils")
 

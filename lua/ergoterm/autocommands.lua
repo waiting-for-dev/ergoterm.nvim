@@ -1,8 +1,8 @@
 ---@module "ergoterm.lazy"
 local lazy = require("ergoterm.lazy")
 
----@module "ergoterm.terminal"
-local terms = lazy.require("ergoterm.terminal")
+---@module "ergoterm"
+local terms = lazy.require("ergoterm")
 
 local AUGROUP = "ErgoTermAutoCommands"
 
