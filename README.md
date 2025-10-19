@@ -317,7 +317,7 @@ Each method is idempotent and will automatically call prerequisite methods:
 local ergoterm = require("ergoterm")
 
 -- Create a terminal instance
-local term = ergoterm.Terminal:new({ cmd = "htop", layout = "float" })
+local term = ergoterm:new({ cmd = "htop", layout = "float" })
 
 -- These methods cascade - focus() will start() and open() if needed
 term:focus()  -- Automatically calls start() and open() if not already done
@@ -427,7 +427,7 @@ Here's an example showing how to integrate [Claude Code](https://claude.ai/) for
 local ergoterm = require("ergoterm")
 
 -- Create persistent Claude terminal
-local claude = ergoterm.Terminal:new({
+local claude = ergoterm:new({
   name = "claude",
   cmd = "claude",
   layout = "right",

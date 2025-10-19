@@ -1050,7 +1050,7 @@ Example integration with Claude for AI-assisted development: >lua
     local ergoterm = require("ergoterm")
 
     -- Create persistent Claude terminal
-    local claude = ergoterm.Terminal:new({
+    local claude = ergoterm:new({
       name = "claude",
       cmd = "claude",
       layout = "right", 
