@@ -18,6 +18,7 @@ local text_decorators = require("ergoterm.text_decorators")
 M.NULL_CALLBACK = function(...) end
 
 ---@alias layout "window" | "below" | "left" | "right" | "tab" | "above" | "float"
+---@alias default_action fun(term: Terminal)
 ---@alias on_close fun(term: Terminal)
 ---@alias on_create fun(term: Terminal)
 ---@alias on_focus fun(term: Terminal)
@@ -45,7 +46,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field left? string|number
 ---@field right? string|number
 
----@class TerminalDefaults
+---@class TerminalDefaultsFromConfig
 ---@field auto_scroll boolean?
 ---@field bang_target boolean?
 ---@field watch_files boolean?
@@ -69,13 +70,15 @@ M.NULL_CALLBACK = function(...) end
 ---@field show_on_failure boolean?
 ---@field persist_mode boolean?
 ---@field persist_size boolean?
----@field shell (string|fun():string)?
 ---@field selectable boolean?
 ---@field size Size?
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
 ---@field tags string[]?
 ---@field meta table?
+
+---@class TerminalDefaults : TerminalDefaultsFromConfig
+---@field shell string
 
 ---@class PickerConfig
 ---@field picker PickerOption?
@@ -169,7 +172,6 @@ function M.build_picker(conf)
   elseif type(picker_option) == "string" then
     return M._get_picker_by_name(picker_option)
   else
-    ---@diagnostic disable-next-line: return-type-mismatch
     return picker_option
   end
 end

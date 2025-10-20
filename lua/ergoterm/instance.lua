@@ -1,5 +1,3 @@
----Terminal instance class and methods
-
 local FILETYPE = "ErgoTerm"
 
 local M = {}
@@ -22,12 +20,6 @@ local text_selector = lazy.require("ergoterm.text_selector")
 ---@module "ergoterm.utils"
 local utils = lazy.require("ergoterm.utils")
 
----@class SizeUnits
----@field below "percentage"|"absolute"
----@field above "percentage"|"absolute"
----@field left "percentage"|"absolute"
----@field right "percentage"|"absolute"
-
 ---@class TerminalState
 ---@field bufnr number?
 ---@field dir? string
@@ -44,43 +36,47 @@ local utils = lazy.require("ergoterm.utils")
 ---@field tabpage number?
 ---@field window number?
 
----@class TermCreateArgs
----@field auto_scroll boolean? whether or not to scroll down on terminal output
----@field bang_target boolean? whether or not the terminal can be targeted by bang commands
----@field watch_files boolean? whether or not run `checktime` on terminal output
+---@class TermCreateArgs : TerminalDefaultsFromConfig
 ---@field cmd? string command to run in the terminal
----@field clear_env? boolean use clean job environment, passed to jobstart()
----@field cleanup_on_success boolean? whether or not to cleanup the terminal when the process exits successfully
----@field cleanup_on_failure boolean? whether or not to cleanup the terminal when the process exits with failure
----@field default_action fun(term: Terminal)? the default action to invoke when selecting the terminal in picker
 ---@field dir string? the directory for the terminal
----@field layout layout? the layout to open the terminal in the first time
 ---@field env? table<string, string> environmental variables passed to jobstart()
 ---@field name string?
----@field float_opts FloatOpts? options for the floating window
----@field float_winblend? number
----@field on_close on_close? Callback to run when the terminal is closed. It takes the terminal as an argument.
----@field on_create on_create? Callback to run when the terminal is created. It takes the terminal as an argument.
----@field on_focus on_focus? Callback to run when the terminal is focused. It takes the terminal as an argument.
----@field on_job_exit on_job_exit? Callback to run when the
----@field on_job_stderr on_job_stderr?
----@field on_job_stdout on_job_stdout?
----@field on_open on_open?
----@field on_stop on_stop?
----@field on_start on_start?
----@field show_on_success boolean? whether to show terminal when process exits successfully
----@field show_on_failure boolean? whether to show terminal when process exits with failure
----@field persist_mode boolean? whether or not to persist the mode of the terminal on return
----@field persist_size boolean? whether or not to persist the size of the terminal when window is closed
----@field selectable boolean? whether or not the terminal is visible in picker selections and can be last focused
----@field size Size? size configuration for different layouts
----@field start_in_insert boolean?
----@field sticky boolean? whether or not the terminal remains visible in picker even when stopped
----@field tags string[]? tags for categorizing and filtering terminals
----@field meta table? user-defined metadata for custom purposes
 
----@class Terminal : TermCreateArgs
+---@class Terminal
 ---@field id number
+---@field cmd string
+---@field dir string|string?
+---@field env table<string, string>?
+---@field auto_scroll boolean
+---@field bang_target boolean
+---@field watch_files boolean
+---@field clear_env boolean
+---@field cleanup_on_success boolean
+---@field cleanup_on_failure boolean
+---@field default_action default_action
+---@field layout layout
+---@field float_opts FloatOpts
+---@field float_winblend number
+---@field persist_mode boolean
+---@field persist_size boolean
+---@field selectable boolean
+---@field size Size
+---@field start_in_insert boolean
+---@field sticky boolean
+---@field name string
+---@field on_close on_close
+---@field on_create on_create
+---@field on_focus on_focus
+---@field on_job_exit on_job_exit
+---@field on_job_stdout on_job_stdout
+---@field on_job_stderr on_job_stderr
+---@field on_open on_open
+---@field on_start on_start
+---@field on_stop on_stop
+---@field show_on_success boolean
+---@field show_on_failure boolean
+---@field tags string[]
+---@field meta table
 ---@field _state TerminalState
 local Terminal = {}
 Terminal.__index = Terminal
@@ -106,6 +102,7 @@ function Terminal:new(args)
   term.layout = term.layout or config.get("terminal_defaults.layout")
   term.env = term.env
   term.name = term.name or term.cmd
+  term.meta = term.meta or {}
   term.float_opts = vim.tbl_deep_extend("keep", term.float_opts or {}, config.get("terminal_defaults.float_opts"))
   term.float_winblend = term.float_winblend or config.get("terminal_defaults.float_winblend")
   term.persist_mode = vim.F.if_nil(term.persist_mode, config.get("terminal_defaults.persist_mode"))

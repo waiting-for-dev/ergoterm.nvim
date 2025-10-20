@@ -278,10 +278,8 @@ describe("M.send", function()
       assert.is_false(result)
     end)
 
-    --- @diagnostic disable: need-check-nil
     assert.equal("No terminals are open", notify_result.msg)
     assert.equal("error", notify_result.level)
-    --- @diagnostic enable: need-check-nil
   end)
 
   it("uses text selector for visual selection when range > 0", function()
@@ -382,10 +380,8 @@ describe("M.update", function()
       commands.update("layout=right", true, null_picker)
     end)
 
-    --- @diagnostic disable: need-check-nil
     assert.equal("No terminals are open", notify_result.msg)
     assert.equal("error", notify_result.level)
-    --- @diagnostic enable: need-check-nil
   end)
 
   it("calls picker to select a terminal when not in bang mode", function()
@@ -457,10 +453,8 @@ describe("M.toggle_universal_selection", function()
       assert.is_true(result)
     end)
 
-    --- @diagnostic disable: need-check-nil
     assert.equal("Universal selection enabled", notify_result.msg)
     assert.equal("info", notify_result.level)
-    --- @diagnostic enable: need-check-nil
 
     terms.toggle_universal_selection()
   end)
@@ -473,10 +467,8 @@ describe("M.toggle_universal_selection", function()
       assert.is_false(result)
     end)
 
-    --- @diagnostic disable: need-check-nil
     assert.equal("Universal selection disabled", notify_result.msg)
     assert.equal("info", notify_result.level)
-    --- @diagnostic enable: need-check-nil
 
     terms.toggle_universal_selection()
   end)

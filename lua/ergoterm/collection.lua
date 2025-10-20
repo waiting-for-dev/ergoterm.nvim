@@ -179,7 +179,6 @@ function M._filter_defaults_for_picker()
     return M.get_all()
   else
     return M.filter(function(term)
-      ---@diagnostic disable-next-line: return-type-mismatch
       return term.selectable and (term:is_active() or term.sticky)
     end)
   end
@@ -188,7 +187,6 @@ end
 ---@private
 function M._find_selectable_terminals_for_picker()
   return M.filter(function(term)
-    ---@diagnostic disable-next-line: return-type-mismatch
     return term.selectable and (term:is_active() or term.sticky)
   end)
 end
