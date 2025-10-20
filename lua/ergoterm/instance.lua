@@ -37,10 +37,12 @@ local utils = lazy.require("ergoterm.utils")
 ---@field window number?
 
 ---@class TermCreateArgs : TerminalDefaultsFromConfig
----@field cmd? string command to run in the terminal
+---@field cmd string? command to run in the terminal
 ---@field dir string? the directory for the terminal
----@field env? table<string, string> environmental variables passed to jobstart()
+---@field env table<string, string>? environmental variables passed to jobstart()
 ---@field name string?
+---@field meta table?
+---@field tags string[]?
 
 ---@class Terminal
 ---@field id number

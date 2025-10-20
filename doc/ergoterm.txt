@@ -427,23 +427,6 @@ terminal_defaults.selectable ~
     Note: This setting can be temporarily overridden by enabling universal
     selection mode with |ergoterm-termtoggleuniversalselection|.
 
-                                                               *ergoterm-tags*
-terminal_defaults.tags ~
-    Default: `{}`
-    Type: `table<string>`
-
-    Default tags for categorizing and filtering terminals. Tags are strings
-    that can be used to group terminals together for easier management.
-
-                                                               *ergoterm-meta*
-terminal_defaults.meta ~
-    Default: `{}`
-    Type: `table`
-
-    User-defined metadata for custom purposes. This is an empty table by
-    default that users can populate with any custom data they want to
-    associate with terminals.
-
                                                             *ergoterm-sticky*
 terminal_defaults.sticky ~
     Default: `false`

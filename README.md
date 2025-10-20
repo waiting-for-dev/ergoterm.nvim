@@ -520,12 +520,6 @@ require("ergoterm").setup({
     -- Keep terminals visible in picker even when stopped, provided `selectable` is also true
     sticky = false,
 
-    -- Default tags for categorizing and filtering terminals
-    tags = {},
-
-    -- User-defined metadata for custom purposes
-    meta = {},
-
     -- Floating window options
     float_opts = {
       title_pos = "left",

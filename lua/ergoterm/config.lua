@@ -75,7 +75,6 @@ M.NULL_CALLBACK = function(...) end
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
 ---@field tags string[]?
----@field meta table?
 
 ---@class TerminalDefaults : TerminalDefaultsFromConfig
 ---@field shell string?
@@ -135,8 +134,7 @@ local config = {
     show_on_failure = false,
     shell = vim.o.shell,
     start_in_insert = true,
-    tags = {},
-    meta = {},
+    tags = {}
   },
   picker = {
     picker = nil,
