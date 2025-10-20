@@ -78,7 +78,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field meta table?
 
 ---@class TerminalDefaults : TerminalDefaultsFromConfig
----@field shell string
+---@field shell string?
 
 ---@class PickerConfig
 ---@field picker PickerOption?

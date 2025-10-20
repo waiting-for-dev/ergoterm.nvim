@@ -196,4 +196,10 @@ function M._compute_id()
   return #M._state.ids + 1
 end
 
+---@private
+function M._add_terminal_to_state(term)
+  table.insert(M._state.ids, term.id)
+  M._state.terminals[term.id] = term
+end
+
 return M

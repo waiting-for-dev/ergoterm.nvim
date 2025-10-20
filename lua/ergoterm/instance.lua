@@ -83,11 +83,12 @@ Terminal.__index = Terminal
 
 ---Creates a new terminal instance with merged configuration
 ---
----Combines provided arguments with global configuration defaults. The terminal
----is registered in the module state but not started until `start()` is called.
+---Combines provided arguments with global configuration defaults.
+---
+---The terminal is registered in the module state but not started until `start()` is called.
 ---
 ---@param args TermCreateArgs?
----@return Terminal the newly created terminal instance
+---@return Terminal
 function Terminal:new(args)
   local term = vim.deepcopy(args or {})
   setmetatable(term, self)
@@ -125,7 +126,7 @@ function Terminal:new(args)
   term.tags = term.tags or vim.tbl_deep_extend("keep", {}, config.get("terminal_defaults.tags") or {})
   term.id = collection._compute_id()
   term:_initialize_state()
-  term:_add_to_state()
+  collection._add_terminal_to_state(term)
   return term
 end
 
@@ -584,12 +585,6 @@ end
 function Terminal:_set_options()
   self:_set_ft_options()
   self:_set_win_options()
-end
-
----@private
-function Terminal:_add_to_state()
-  table.insert(collection._state.ids, self.id)
-  collection._state.terminals[self.id] = self
 end
 
 ---@private

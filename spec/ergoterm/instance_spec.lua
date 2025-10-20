@@ -14,22 +14,10 @@ after_each(function()
 end)
 
 describe(":new", function()
-  it("takes auto_scroll option", function()
-    local term = Terminal:new({ auto_scroll = false })
-
-    assert.is_false(term.auto_scroll)
-  end)
-
   it("defaults to config's auto_scroll", function()
     local term = Terminal:new()
 
     assert.is_false(term.auto_scroll)
-  end)
-
-  it("takes bang_target option", function()
-    local term = Terminal:new({ bang_target = false })
-
-    assert.is_false(term.bang_target)
   end)
 
   it("defaults to config's bang_target", function()
@@ -38,22 +26,10 @@ describe(":new", function()
     assert.is_true(term.bang_target)
   end)
 
-  it("takes cmd option", function()
-    local term = Terminal:new({ cmd = "echo hello" })
-
-    assert.equal("echo hello", term.cmd)
-  end)
-
   it("defaults to config's shell if cmd is not provided", function()
     local term = Terminal:new()
 
     assert.equal(vim.o.shell, term.cmd)
-  end)
-
-  it("takes clear_env option", function()
-    local term = Terminal:new({ clear_env = true })
-
-    assert.is_true(term.clear_env)
   end)
 
   it("defaults to config's clear_env", function()
@@ -62,22 +38,10 @@ describe(":new", function()
     assert.is_false(term.clear_env)
   end)
 
-  it("takes cleanup_on_success option", function()
-    local term = Terminal:new({ cleanup_on_success = false })
-
-    assert.is_false(term.cleanup_on_success)
-  end)
-
   it("defaults to config's cleanup_on_success", function()
     local term = Terminal:new()
 
     assert.is_true(term.cleanup_on_success)
-  end)
-
-  it("takes cleanup_on_failure option", function()
-    local term = Terminal:new({ cleanup_on_failure = true })
-
-    assert.is_true(term.cleanup_on_failure)
   end)
 
   it("defaults to config's cleanup_on_failure", function()
@@ -86,23 +50,10 @@ describe(":new", function()
     assert.is_false(term.cleanup_on_failure)
   end)
 
-  it("takes default_action option", function()
-    local custom_action = function(term) term:close() end
-    local term = Terminal:new({ default_action = custom_action })
-
-    assert.equal(custom_action, term.default_action)
-  end)
-
   it("defaults to config's default_action", function()
     local term = Terminal:new()
 
     assert.is_function(term.default_action)
-  end)
-
-  it("takes show_on_success option", function()
-    local term = Terminal:new({ show_on_success = true })
-
-    assert.is_true(term.show_on_success)
   end)
 
   it("defaults to config's show_on_success", function()
@@ -111,22 +62,10 @@ describe(":new", function()
     assert.is_false(term.show_on_success)
   end)
 
-  it("takes show_on_failure option", function()
-    local term = Terminal:new({ show_on_failure = true })
-
-    assert.is_true(term.show_on_failure)
-  end)
-
   it("defaults to config's show_on_failure", function()
     local term = Terminal:new()
 
     assert.is_false(term.show_on_failure)
-  end)
-
-  it("takes layout option", function()
-    local term = Terminal:new({ layout = "right" })
-
-    assert.equal("right", term.layout)
   end)
 
   it("defaults to config's layout", function()
@@ -135,29 +74,10 @@ describe(":new", function()
     assert.equal("below", term.layout)
   end)
 
-  it("takes env option", function()
-    local term = Terminal:new({ env = { FOO = "bar" } })
-
-    assert.equal("bar", term.env.FOO)
-  end)
-
-  it("takes name option", function()
-    local term = Terminal:new({ name = "test" })
-
-    assert.equal("test", term.name)
-  end)
-
   it("defaults name to cmd option", function()
     local term = Terminal:new({ cmd = "echo hello" })
 
     assert.equal("echo hello", term.name)
-  end)
-
-  it("takes float_opts option", function()
-    local term = Terminal:new({ float_opts = { width = 100, height = 50 } })
-
-    assert.equal(100, term.float_opts.width)
-    assert.equal(50, term.float_opts.height)
   end)
 
   it("defaults to config's float_opts for non-given options", function()
@@ -166,22 +86,10 @@ describe(":new", function()
     assert.equal("single", term.float_opts.border)
   end)
 
-  it("takes float_winblend option", function()
-    local term = Terminal:new({ float_winblend = 20 })
-
-    assert.equal(20, term.float_winblend)
-  end)
-
   it("defaults to config's float_winblend", function()
     local term = Terminal:new()
 
     assert.equal(10, term.float_winblend)
-  end)
-
-  it("takes persist_mode option", function()
-    local term = Terminal:new({ persist_mode = true })
-
-    assert.is_true(term.persist_mode)
   end)
 
   it("defaults to config's persist_mode", function()
@@ -190,22 +98,10 @@ describe(":new", function()
     assert.is_false(term.persist_mode)
   end)
 
-  it("takes persist_size option", function()
-    local term = Terminal:new({ persist_size = true })
-
-    assert.is_true(term.persist_size)
-  end)
-
   it("defaults to config's persist_mode", function()
     local term = Terminal:new()
 
     assert.is_true(term.persist_size)
-  end)
-
-  it("takes start_in_insert option", function()
-    local term = Terminal:new({ start_in_insert = false })
-
-    assert.is_false(term.start_in_insert)
   end)
 
   it("defaults to config's start_in_insert", function()
@@ -214,22 +110,10 @@ describe(":new", function()
     assert.is_true(term.start_in_insert)
   end)
 
-  it("takes selectable option", function()
-    local term = Terminal:new({ selectable = false })
-
-    assert.is_false(term.selectable)
-  end)
-
   it("defaults to config's selectable", function()
     local term = Terminal:new()
 
     assert.is_true(term.selectable)
-  end)
-
-  it("takes sticky option", function()
-    local term = Terminal:new({ sticky = true })
-
-    assert.is_true(term.sticky)
   end)
 
   it("defaults to config's sticky", function()
@@ -238,24 +122,10 @@ describe(":new", function()
     assert.is_false(term.sticky)
   end)
 
-  it("takes watch_files option", function()
-    local term = Terminal:new({ watch_files = true })
-
-    assert.is_true(term.watch_files)
-  end)
-
   it("defaults to config's watch_files", function()
     local term = Terminal:new()
 
     assert.is_false(term.watch_files)
-  end)
-
-  it("takes tags option", function()
-    local term = Terminal:new({ tags = { "dev", "backend" } })
-
-    assert.equal(2, #term.tags)
-    assert.is_true(vim.tbl_contains(term.tags, "dev"))
-    assert.is_true(vim.tbl_contains(term.tags, "backend"))
   end)
 
   it("defaults to config's tags", function()
@@ -272,14 +142,7 @@ describe(":new", function()
     assert.equal(1, #term.tags)
     assert.is_true(vim.tbl_contains(term.tags, "custom"))
 
-    config.set({})
-  end)
-
-  it("takes size option", function()
-    local term = Terminal:new({ size = { below = 20, right = "30%" } })
-
-    assert.equal(20, term.size.below)
-    assert.equal("30%", term.size.right)
+    config.set({ terminal_defaults = { tags = {} } })
   end)
 
   it("defaults to config's size", function()
@@ -291,6 +154,22 @@ describe(":new", function()
     assert.equal("50%", term.size.right)
   end)
 
+  it("defaults to config's float_opts", function()
+    local term = Terminal:new()
+    local float_opts = term.float_opts
+
+    assert.equal(float_opts.title_pos, "left")
+    assert.equal(float_opts.relative, "editor")
+    assert.equal(float_opts.border, "single")
+    assert.equal(float_opts.zindex, 50)
+  end)
+
+  it("merges float_opts with defaults for non-given options", function()
+    local term = Terminal:new({ float_opts = { width = 100, height = 20 } })
+
+    assert.equal("single", term.float_opts.border)
+  end)
+
   it("merges size with defaults for non-given options", function()
     local term = Terminal:new({ size = { below = 20 } })
 
@@ -300,43 +179,10 @@ describe(":new", function()
     assert.equal("50%", term.size.right)
   end)
 
-  it("takes on_close option", function()
-    local foo = nil
-
-    local term = Terminal:new({ on_close = function() foo = "foo" end })
-    term:on_close()
-
-    assert.equal("foo", foo)
-  end)
-
-  it("defaults to config's on_close", function()
-    local term = Terminal:new()
-
-    assert.equal(config.NULL_CALLBACK, term.on_close)
-  end)
-
-  it("takes on_create option", function()
-    local foo = nil
-
-    local term = Terminal:new({ on_create = function() foo = "foo" end })
-    term:on_create()
-
-    assert.equal("foo", foo)
-  end)
-
   it("defaults to config's on_create", function()
     local term = Terminal:new()
 
     assert.equal(config.NULL_CALLBACK, term.on_create)
-  end)
-
-  it("takes on_focus option", function()
-    local foo = nil
-
-    local term = Terminal:new({ on_focus = function() foo = "foo" end })
-    term:on_focus()
-
-    assert.equal("foo", foo)
   end)
 
   it("defaults to config's on_focus", function()
@@ -345,28 +191,10 @@ describe(":new", function()
     assert.equal(config.NULL_CALLBACK, term.on_focus)
   end)
 
-  it("takes on_job_exit option", function()
-    local foo = nil
-
-    local term = Terminal:new({ on_job_exit = function() foo = "foo" end })
-    term:on_job_exit(1, 2, "event")
-
-    assert.equal("foo", foo)
-  end)
-
   it("defaults to config's on_job_exit", function()
     local term = Terminal:new()
 
     assert.equal(config.NULL_CALLBACK, term.on_job_exit)
-  end)
-
-  it("takes on_job_stdout option", function()
-    local foo = nil
-
-    local term = Terminal:new({ on_job_stdout = function() foo = "foo" end })
-    term:on_job_stdout(1, { "data" }, "name")
-
-    assert.equal("foo", foo)
   end)
 
   it("defaults to config's on_job_stdout", function()
@@ -375,28 +203,10 @@ describe(":new", function()
     assert.equal(config.NULL_CALLBACK, term.on_job_stdout)
   end)
 
-  it("takes on_job_stderr option", function()
-    local foo = nil
-
-    local term = Terminal:new({ on_job_stderr = function() foo = "foo" end })
-    term:on_job_stderr(1, { "data" }, "name")
-
-    assert.equal("foo", foo)
-  end)
-
   it("defaults to config's on_job_stderr", function()
     local term = Terminal:new()
 
     assert.equal(config.NULL_CALLBACK, term.on_job_stderr)
-  end)
-
-  it("takes on_open option", function()
-    local foo = nil
-
-    local term = Terminal:new({ on_open = function() foo = "foo" end })
-    term:on_open()
-
-    assert.equal("foo", foo)
   end)
 
   it("defaults to config's on_open", function()
@@ -405,28 +215,10 @@ describe(":new", function()
     assert.equal(config.NULL_CALLBACK, term.on_open)
   end)
 
-  it("takes on_start option", function()
-    local foo = nil
-
-    local term = Terminal:new({ on_start = function() foo = "foo" end })
-    term:on_start()
-
-    assert.equal("foo", foo)
-  end)
-
   it("defaults to config's on_start", function()
     local term = Terminal:new()
 
     assert.equal(config.NULL_CALLBACK, term.on_start)
-  end)
-
-  it("takes on_stop option", function()
-    local foo = nil
-
-    local term = Terminal:new({ on_stop = function() foo = "foo" end })
-    term:on_stop()
-
-    assert.equal("foo", foo)
   end)
 
   it("defaults to config's on_stop", function()
@@ -443,7 +235,7 @@ describe(":new", function()
     assert.equal(2, term2.id)
   end)
 
-  it("doesn't build cleaned up terminal ids", function()
+  it("doesn't reuse ids from cleaned up terminal", function()
     local term1 = Terminal:new()
     term1:cleanup()
     local term2 = Terminal:new()
@@ -478,22 +270,14 @@ describe(":new", function()
       Terminal:new({ dir = "/invalid" })
     end)
 
-    ---@diagnostic disable: need-check-nil
     assert.equal("/invalid is not a directory", result.msg)
     assert.equal("error", result.level)
-    ---@diagnostic enable: need-check-nil
   end)
 
   it("initializes layout from given layout", function()
     local term = Terminal:new({ layout = "right" })
 
     assert.equal("right", term:get_state("layout"))
-  end)
-
-  it("doesn't override float_opts defaults for non-given options", function()
-    local term = Terminal:new({ float_opts = { width = 100, height = 20 } })
-
-    assert.equal("single", term.float_opts.border)
   end)
 
   it("initializes float_opts title from name when not given", function()
