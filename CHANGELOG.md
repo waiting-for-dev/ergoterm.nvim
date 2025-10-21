@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 - DEPRECATED API `require("ergoterm.terminal")` use `require("ergoterm")` instead.
+- `term:update()` accepts a `deep_merge` option to merge table settings instead of replacing them.
 
 ## 0.8.0 - 2025-10-15
 

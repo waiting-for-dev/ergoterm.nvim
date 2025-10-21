@@ -17,6 +17,8 @@ local size_utils = lazy.require("ergoterm.size")
 local text_decorators = lazy.require("ergoterm.text_decorators")
 ---@module "ergoterm.text_selector"
 local text_selector = lazy.require("ergoterm.text_selector")
+---@module "ergoterm.instance.update"
+local update = require("ergoterm.instance.update")
 ---@module "ergoterm.utils"
 local utils = lazy.require("ergoterm.utils")
 
@@ -36,7 +38,7 @@ local utils = lazy.require("ergoterm.utils")
 ---@field tabpage number?
 ---@field window number?
 
----@class TermCreateArgs : TerminalDefaultsFromConfig
+---@class TerminalCreateSettings : TerminalDefaultsFromConfig
 ---@field cmd string? command to run in the terminal
 ---@field dir string? the directory for the terminal
 ---@field env table<string, string>? environmental variables passed to jobstart()
@@ -89,7 +91,7 @@ Terminal.__index = Terminal
 ---
 ---The terminal is registered in the module state but not started until `start()` is called.
 ---
----@param args TermCreateArgs?
+---@param args TerminalCreateSettings?
 ---@return Terminal
 function Terminal:new(args)
   local term = vim.deepcopy(args or {})
@@ -132,25 +134,19 @@ function Terminal:new(args)
   return term
 end
 
----Updates terminal configuration after creation
+---Updates terminal settings
 ---
----Most options can be changed, but 'cmd' and 'dir' are immutable after creation.
+---It'll override table settings instead of deep merging them, unless
+---`opts.deep_merge` is true.
 ---
----@param opts TermCreateArgs configuration changes to apply
----@return Terminal? self for method chaining, or nil on error
-function Terminal:update(opts)
-  for k, v in pairs(opts) do
-    if k == "cmd" or k == "dir" then
-      utils.notify(
-        string.format("Cannot change %s after terminal creation", k),
-        "error"
-      )
-    else
-      self[k] = v
-    end
-  end
-  self:_recompute_state()
-  return self
+---It'll error if trying to update immutable properties like `cmd` or `dir`.
+---
+---@param settings TerminalCreateSettings properties to update
+---@param opts? UpdateOptions options for updating
+---
+---@return Terminal?
+function Terminal:update(settings, opts)
+  return update(self, settings, opts)
 end
 
 ---Initializes the terminal job and buffer
@@ -651,16 +647,6 @@ function Terminal:_initialize_state()
     tabpage = nil,
     window = nil
   }
-end
-
----@private
-function Terminal:_recompute_state()
-  self._state.mode = mode.get_initial(self.start_in_insert)
-  self._state.layout = self.layout
-  self._state.on_job_exit = self:_compute_exit_handler(self.on_job_exit)
-  self._state.on_job_stdout = self:_compute_output_handler(self.on_job_stdout)
-  self._state.on_job_stderr = self:_compute_output_handler(self.on_job_stderr)
-  self._state.size = self:_compute_size()
 end
 
 ---@private

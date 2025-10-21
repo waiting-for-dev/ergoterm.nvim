@@ -49,7 +49,7 @@ M.text_decorators = require("ergoterm.text_decorators")
 
 --- Create a new terminal instance.
 ---
---- @param args TermCreateArgs?
+--- @param args TerminalCreateSettings?
 --- @return Terminal
 function M:new(args)
   return instance.Terminal:new(args)
@@ -57,7 +57,7 @@ end
 
 --- Create a factory for terminals with default settings.
 ---
---- @param custom_defaults TermCreateArgs Default settings for terminals created by the factory.
+--- @param custom_defaults TerminalCreateSettings Default settings for terminals created by the factory.
 --- @return table A factory with a `new` method to create terminals with the specified defaults
 function M.with_defaults(custom_defaults)
   return {

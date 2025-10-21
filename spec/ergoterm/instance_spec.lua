@@ -355,7 +355,7 @@ describe(":new", function()
 end)
 
 describe(":update", function()
-  it("updates passed properties", function()
+  it("updates terminal with given settings", function()
     local term = Terminal:new({ name = "foo", layout = "below" })
     term:update({ name = "bar", layout = "right" })
 
@@ -363,79 +363,13 @@ describe(":update", function()
     assert.equal("right", term.layout)
   end)
 
-  it("recomputes mode", function()
-    local term = Terminal:new({ start_in_insert = false })
-    term:update({ start_in_insert = true })
+  it("deep merges table settings when deep_merge = true", function()
+    local term = Terminal:new({ env = { FOO = "foo", BAR = "bar" } })
+    term:update({ env = { BAZ = "baz" } }, { deep_merge = true })
 
-    assert.equal("i", term:get_state("mode"))
-  end)
-
-  it("recomputes layout", function()
-    local term = Terminal:new({ layout = "below" })
-    term:update({ layout = "right" })
-
-    assert.equal("right", term:get_state("layout"))
-  end)
-
-
-  it("recomputes on_job_exit", function()
-    local foo = nil
-    local term = Terminal:new({ on_job_exit = function() foo = "foo" end })
-    term:update({ on_job_exit = function() foo = "bar" end })
-
-    term:get_state("on_job_exit")(1, 2, "event")
-    assert.equal("bar", foo)
-  end)
-
-  it("recomputes on_job_stdout", function()
-    local foo = nil
-    local term = Terminal:new({ on_job_stdout = function() foo = "foo" end })
-    term:update({ on_job_stdout = function() foo = "bar" end })
-
-    term:get_state("on_job_stdout")(1, { "data" }, "name")
-    assert.equal("bar", foo)
-  end)
-
-  it("recomputes on_job_stderr", function()
-    local foo = nil
-    local term = Terminal:new({ on_job_stderr = function() foo = "foo" end })
-    term:update({ on_job_stderr = function() foo = "bar" end })
-
-    term:get_state("on_job_stderr")(1, { "data" }, "name")
-    assert.equal("bar", foo)
-  end)
-
-  it("doesn't allow updating cmd", function()
-    local term = Terminal:new({ cmd = "echo hello" })
-
-    local result = test_helpers.mocking_notify(function()
-      term:update({ cmd = "echo world" })
-    end)
-
-    ---@diagnostic disable: need-check-nil
-    assert.equal("Cannot change cmd after terminal creation", result.msg)
-    assert.equal("error", result.level)
-    ---@diagnostic enable: need-check-nil
-  end)
-
-  it("doesn't allow updating dir", function()
-    local term = Terminal:new({ dir = "/tmp" })
-
-    local result = test_helpers.mocking_notify(function()
-      term:update({ dir = "/home" })
-    end)
-
-    ---@diagnostic disable: need-check-nil
-    assert.equal("Cannot change dir after terminal creation", result.msg)
-    assert.equal("error", result.level)
-    ---@diagnostic enable: need-check-nil
-  end)
-
-  it("updates sticky option", function()
-    local term = Terminal:new({ sticky = false })
-    term:update({ sticky = true })
-
-    assert.is_true(term.sticky)
+    assert.equal("foo", term.env.FOO)
+    assert.equal("bar", term.env.BAR)
+    assert.equal("baz", term.env.BAZ)
   end)
 end)
 

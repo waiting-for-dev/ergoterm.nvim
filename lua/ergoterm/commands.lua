@@ -181,13 +181,7 @@ function M.update(args, bang, picker)
     meta = { parsed.meta, "table", true }
   })
   local update_terminal = function(t)
-    local merged_opts = vim.tbl_deep_extend("force", {}, parsed)
-    for setting_name, _ in pairs(commandline.nested_table_settings) do
-      if parsed[setting_name] then
-        merged_opts[setting_name] = vim.tbl_deep_extend("force", t[setting_name] or {}, parsed[setting_name])
-      end
-    end
-    t:update(merged_opts)
+    t:update(parsed, { deep_merge = true })
   end
   if bang then
     return M._execute_on_last_focused(update_terminal)

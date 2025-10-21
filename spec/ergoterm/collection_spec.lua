@@ -5,7 +5,7 @@ local instance = require("ergoterm.instance")
 local Terminal = instance.Terminal
 
 after_each(function()
-  collection.cleanup_all({ close = true, force = true })
+  collection.cleanup_all({ force = true })
   collection.reset_ids()
 end)
 
