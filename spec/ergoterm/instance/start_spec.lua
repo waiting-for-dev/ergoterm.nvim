@@ -43,6 +43,14 @@ describe(".start", function()
     assert.is_true(vim.api.nvim_buf_is_valid(bufnr))
   end)
 
+  it("sets has_been_started to true", function()
+    local term = Terminal:new()
+
+    start(term)
+
+    assert.is_true(term:get_state("has_been_started"))
+  end)
+
   it("starts job with the given command", function()
     local term = Terminal:new({ cmd = "echo hello" })
     local spy_termopen = spy.on(vim.fn, "termopen")

@@ -341,6 +341,12 @@ describe(":new", function()
     assert.equal("foo", foo)
   end)
 
+  it("initializes has_been_started to false", function()
+    local term = Terminal:new()
+
+    assert.is_false(term:get_state("has_been_started"))
+  end)
+
   it("adds terminal to the list of terminals in the state", function()
     local term = Terminal:new()
 
@@ -388,19 +394,19 @@ describe(":is_started", function()
 end)
 
 describe(":is_active", function()
-  it("returns true if terminal has active buffer", function()
+  it("returns true if terminal is started", function()
     local term = Terminal:new():start()
 
     assert.is_true(term:is_active())
   end)
 
-  it("returns false if terminal has no buffer", function()
+  it("returns false if terminal is not started yet", function()
     local term = Terminal:new()
 
     assert.is_false(term:is_active())
   end)
 
-  it("returns false if terminal has been cleaned up", function()
+  it("returns false if terminal started but has now been cleaned up", function()
     local term = Terminal:new({ cleanup_on_failure = true }):start()
     term:stop()
     vim.wait(100)
@@ -408,14 +414,25 @@ describe(":is_active", function()
     assert.is_false(term:is_active())
   end)
 
-  it("returns false if terminal buffer is deleted", function()
-    local term = Terminal:new():start()
-    local bufnr = term:get_state("bufnr")
+  it("returns true if terminal started but has now stopped but not been cleaned up", function()
+    local term = Terminal:new({ cleanup_on_failure = false }):start()
+    term:stop()
+    vim.wait(100)
 
-    vim.api.nvim_buf_delete(bufnr, { force = true })
-
-    assert.is_false(term:is_active())
+    assert.is_true(term:is_active())
   end)
+
+  it(
+    "returns true if terminal started but has now stopped and although should not be cleaned up the buffer has been deleted",
+    function()
+      local term = Terminal:new({ cleanup_on_failure = false }):start()
+      term:stop()
+      vim.wait(100)
+      local bufnr = term:get_state("bufnr")
+      vim.api.nvim_buf_delete(bufnr, { force = true })
+
+      assert.is_false(term:is_active())
+    end)
 end)
 
 describe(":open", function()
@@ -973,6 +990,30 @@ describe(":cleanup", function()
     term:cleanup()
 
     assert.is_nil(term:get_state("bufnr"))
+  end)
+end)
+
+describe(":is_cleaned_up", function()
+  it("returns true if the terminal has been started and manually cleaned up", function()
+    local term = Terminal:new()
+    term:start()
+
+    term:cleanup()
+
+    assert.is_true(term:is_cleaned_up())
+  end)
+
+  it("returns false if the terminal has been started but not cleaned up", function()
+    local term = Terminal:new()
+    term:start()
+
+    assert.is_false(term:is_cleaned_up())
+  end)
+
+  it("returns false if the terminal has not been started yet", function()
+    local term = Terminal:new()
+
+    assert.is_false(term:is_cleaned_up())
   end)
 end)
 

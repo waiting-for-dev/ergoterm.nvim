@@ -31,6 +31,7 @@ local utils = lazy.require("ergoterm.utils")
 ---@field float_opts FloatOpts
 ---@field mode Mode
 ---@field job_id? number
+---@field has_been_started boolean
 ---@field last_exit_code? number
 ---@field last_sent string[]
 ---@field on_job_exit on_job_exit
@@ -172,11 +173,12 @@ end
 
 ---Checks if the terminal has an active buffer
 ---
----An active terminal has a valid buffer, but the job may not be running.
+---A terminal will have an active buffer when started or if already stopped but not
+--- yet cleaned up.
 ---
----@return boolean true if the terminal has a valid buffer
+---@return boolean
 function Terminal:is_active()
-  return self._state.bufnr ~= nil and vim.api.nvim_buf_is_valid(self._state.bufnr)
+  return self._state.has_been_started and not self:is_cleaned_up()
 end
 
 ---Creates a window for the terminal without focusing it
@@ -318,6 +320,11 @@ function Terminal:cleanup(opts)
   if not self.sticky or force then
     collection._state.terminals[self.id] = nil
   end
+end
+
+---@return boolean
+function Terminal:is_cleaned_up()
+  return self._state.has_been_started and self._state.bufnr == nil
 end
 
 ---Toggles terminal window visibility
@@ -631,6 +638,7 @@ function Terminal:_initialize_state()
     layout = self.layout,
     float_opts = self:_compute_float_win_config(),
     job_id = nil,
+    has_been_started = false,
     last_exit_code = nil,
     last_sent = {},
     mode = mode.get_initial(self.start_in_insert),

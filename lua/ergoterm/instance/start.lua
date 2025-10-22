@@ -9,6 +9,7 @@ function M.start(term)
   if not M.is_started(term) then
     term._state.dir = term:_compute_dir()
     term._state.bufnr = vim.api.nvim_create_buf(false, false)
+    term._state.has_been_started = true
     vim.api.nvim_buf_call(term._state.bufnr, function()
       term._state.job_id = M._start_job(term)
     end)
@@ -18,6 +19,7 @@ function M.start(term)
   return term
 end
 
+---@param term Terminal
 function M.is_started(term)
   return term._state.job_id ~= nil
 end
