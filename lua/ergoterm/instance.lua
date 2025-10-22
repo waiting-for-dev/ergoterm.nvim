@@ -11,6 +11,8 @@ local collection = require("ergoterm.collection")
 local config = lazy.require("ergoterm.config")
 ---@module "ergoterm.mode"
 local mode = lazy.require("ergoterm.mode")
+---@module "ergoterm.instance.start"
+local start = require("ergoterm.instance.start")
 ---@module "ergoterm.size"
 local size_utils = lazy.require("ergoterm.size")
 ---@module "ergoterm.text_decorators"
@@ -69,7 +71,6 @@ local utils = lazy.require("ergoterm.utils")
 ---@field sticky boolean
 ---@field name string
 ---@field on_close on_close
----@field on_create on_create
 ---@field on_focus on_focus
 ---@field on_job_exit on_job_exit
 ---@field on_job_stdout on_job_stdout
@@ -117,7 +118,6 @@ function Terminal:new(args)
   term.start_in_insert = vim.F.if_nil(term.start_in_insert, config.get("terminal_defaults.start_in_insert"))
   term.sticky = vim.F.if_nil(term.sticky, config.get("terminal_defaults.sticky"))
   term.on_close = vim.F.if_nil(term.on_close, config.get("terminal_defaults.on_close"))
-  term.on_create = vim.F.if_nil(term.on_create, config.get("terminal_defaults.on_create"))
   term.on_focus = vim.F.if_nil(term.on_focus, config.get("terminal_defaults.on_focus"))
   term.on_job_stderr = vim.F.if_nil(term.on_job_stderr, config.get("terminal_defaults.on_job_stderr"))
   term.on_job_stdout = vim.F.if_nil(term.on_job_stdout, config.get("terminal_defaults.on_job_stdout"))
@@ -151,29 +151,23 @@ end
 
 ---Initializes the terminal job and buffer
 ---
----Creates the terminal buffer and starts the underlying job process. Does not
----open a window - use `open()` or `focus()` for that. Idempotent - safe to call
----multiple times. Triggers the `on_create` callback.
+---It recomputes the directory before starting the job
 ---
----@return self for method chaining
+---The job is called with the environment and exit and output handlers configured
+---in the terminal instance.
+---
+---It also sets up buffer autocommands and triggers the `on_start` callback.
+---
+---@return Terminal
 function Terminal:start()
-  if not self:is_started() then
-    self._state.dir = self:_compute_dir()
-    self._state.bufnr = vim.api.nvim_create_buf(false, false)
-    vim.api.nvim_buf_call(self._state.bufnr, function()
-      self._state.job_id = self:_start_job()
-    end)
-    self:_setup_buffer_autocommands()
-    self:on_create()
-  end
-  return self
+  return start(self)
 end
 
 ---Checks if the terminal job is running
 ---
----@return boolean true if the terminal job is active
+---@return boolean
 function Terminal:is_started()
-  return self._state.job_id ~= nil
+  return start.is_started(self)
 end
 
 ---Checks if the terminal has an active buffer
@@ -731,19 +725,6 @@ function Terminal:_persist_size()
 end
 
 ---@private
-function Terminal:_start_job()
-  return vim.fn.termopen(self.cmd, {
-    detach = 1,
-    cwd = self._state.dir,
-    on_exit = self._state.on_job_exit,
-    on_stdout = self._state.on_job_stdout,
-    on_stderr = self._state.on_job_stderr,
-    env = self.env,
-    clear_env = self.clear_env,
-  })
-end
-
----@private
 function Terminal:_restore_mode()
   mode.set(self._state.mode)
   return self
@@ -785,25 +766,6 @@ function Terminal:_set_float_options()
   local window = self._state.window
   vim.api.nvim_set_option_value("sidescrolloff", 0, { scope = "local", win = window })
   vim.api.nvim_set_option_value("winblend", self.float_winblend, { scope = "local", win = window })
-end
-
-function Terminal:_setup_buffer_autocommands()
-  local group = vim.api.nvim_create_augroup("ErgoTermBuffer", { clear = true })
-  vim.api.nvim_create_autocmd("VimResized", {
-    buffer = self._state.bufnr,
-    group = group,
-    callback = function() self:on_vim_resized() end
-  })
-  vim.api.nvim_create_autocmd("BufWipeout", {
-    buffer = self._state.bufnr,
-    group = group,
-    callback = function() self:cleanup() end
-  })
-  vim.api.nvim_create_autocmd("WinClosed", {
-    buffer = self._state.bufnr,
-    group = group,
-    callback = function() self:close() end
-  })
 end
 
 ---@private

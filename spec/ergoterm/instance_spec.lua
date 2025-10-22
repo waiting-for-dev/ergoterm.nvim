@@ -179,12 +179,6 @@ describe(":new", function()
     assert.equal("50%", term.size.right)
   end)
 
-  it("defaults to config's on_create", function()
-    local term = Terminal:new()
-
-    assert.equal(config.NULL_CALLBACK, term.on_create)
-  end)
-
   it("defaults to config's on_focus", function()
     local term = Terminal:new()
 
@@ -374,7 +368,7 @@ describe(":update", function()
 end)
 
 describe(":start", function()
-  it("creates a new buffer", function()
+  it("starts the terminal", function()
     local term = Terminal:new()
 
     term:start()
@@ -383,88 +377,13 @@ describe(":start", function()
     assert.is_not_nil(bufnr)
     assert.is_true(vim.api.nvim_buf_is_valid(bufnr))
   end)
-
-  it("opens term with the given command", function()
-    local term = Terminal:new({ cmd = "echo hello" })
-    local spy_termopen = spy.on(vim.fn, "termopen")
-
-    term:start()
-
-    assert.spy(spy_termopen).was_called_with("echo hello", match.is_table())
-  end)
-
-  it("updates the state with the new job_id", function()
-    local term = Terminal:new()
-
-    term:start()
-
-    local job_id = term:get_state("job_id")
-    assert.is_number(job_id)
-  end)
-
-  it("runs the on_create callback", function()
-    local called = false
-    local term = Terminal:new({
-      on_create = function() called = true end,
-    })
-
-    term:start()
-
-    assert.is_true(called)
-  end)
-
-  it("does nothing if already started", function()
-    local term = Terminal:new()
-    term:start()
-    local initial_bufnr = term:get_state("bufnr")
-    local initial_job_id = term:get_state("job_id")
-
-    term:start()
-
-    assert.equal(initial_bufnr, term:get_state("bufnr"))
-    assert.equal(initial_job_id, term:get_state("job_id"))
-  end)
-
-  it("recomputes dir on start", function()
-    local original_termopen = vim.fn.termopen
-    local original_cwd = vim.loop.cwd
-    vim.fn.termopen = function(_, _) return 1 end
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.loop.cwd = function() return "/initial/dir" end
-
-    local term = Terminal:new({})
-
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.loop.cwd = function() return "/changed/dir" end
-
-    term:start()
-
-    assert.equal("/changed/dir", term:get_state("dir"))
-
-    vim.fn.termopen = original_termopen
-    vim.loop.cwd = original_cwd
-  end)
 end)
 
 describe(":is_started", function()
-  it("returns true if terminal is started", function()
+  it("returns whether terminal is started", function()
     local term = Terminal:new():start()
 
     assert.is_true(term:is_started())
-  end)
-
-  it("returns false if terminal is not started", function()
-    local term = Terminal:new()
-
-    assert.is_false(term:is_started())
-  end)
-
-  it("returns false if terminal job is stopped", function()
-    local term = Terminal:new():start()
-    term:stop()
-    vim.wait(100)
-
-    assert.is_false(term:is_started())
   end)
 end)
 

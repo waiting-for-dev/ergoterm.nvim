@@ -20,7 +20,6 @@ M.NULL_CALLBACK = function(...) end
 ---@alias layout "window" | "below" | "left" | "right" | "tab" | "above" | "float"
 ---@alias default_action fun(term: Terminal)
 ---@alias on_close fun(term: Terminal)
----@alias on_create fun(term: Terminal)
 ---@alias on_focus fun(term: Terminal)
 ---@alias on_job_exit fun(t: Terminal, job: number, exit_code: number, event: string)
 ---@alias on_job_stdout fun(t: Terminal, channel_id: number, data: string[], name: string)
@@ -58,7 +57,6 @@ M.NULL_CALLBACK = function(...) end
 ---@field float_opts FloatOpts?
 ---@field float_winblend number?
 ---@field on_close on_close?
----@field on_create on_create?
 ---@field on_focus on_focus?
 ---@field on_job_exit on_job_exit?
 ---@field on_job_stdout on_job_stdout?
@@ -122,7 +120,6 @@ local config = {
       right = "50%"
     },
     on_close = M.NULL_CALLBACK,
-    on_create = M.NULL_CALLBACK,
     on_focus = M.NULL_CALLBACK,
     on_job_exit = M.NULL_CALLBACK,
     on_open = M.NULL_CALLBACK,

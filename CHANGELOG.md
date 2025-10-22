@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- BREAKING: Fix `term:start()` calling `on_create` callback instead of `on_start`. `on_create` has been removed.
 - DEPRECATED API `require("ergoterm.terminal")` use `require("ergoterm")` instead.
 - `term:update()` accepts a `deep_merge` option to merge table settings instead of replacing them.
 
