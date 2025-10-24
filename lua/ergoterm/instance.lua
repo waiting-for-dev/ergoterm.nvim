@@ -1,5 +1,3 @@
-local FILETYPE = "ErgoTerm"
-
 local M = {}
 
 ---@module "ergoterm.lazy"
@@ -11,6 +9,8 @@ local collection = require("ergoterm.collection")
 local config = lazy.require("ergoterm.config")
 ---@module "ergoterm.mode"
 local mode = lazy.require("ergoterm.mode")
+---@module "ergoterm.instance.open"
+local open = require("ergoterm.instance.open")
 ---@module "ergoterm.instance.start"
 local start = require("ergoterm.instance.start")
 ---@module "ergoterm.size"
@@ -184,8 +184,8 @@ end
 ---Creates a window for the terminal without focusing it
 ---
 ---Automatically starts the terminal if not already started. Uses the provided
----layout or falls back to the terminal's current layout setting. The layout
----determines window positioning:
+---layout or falls back to the terminal's initial layout or last used layout if
+---changed. Supported layouts:
 ---
 ---• "above" - horizontal split above current window
 ---• "below" - horizontal split below current window
@@ -195,29 +195,19 @@ end
 ---• "float" - floating window with configured dimensions
 ---• "window" - replace current window content
 ---
----Idempotent - safe to call on already open terminals.
+---It'll call the `on_open` callback after opening the window.
 ---
----@param layout string? window layout override
----@return self for method chaining
+---@param layout layout? window layout override
+---@return self
 function Terminal:open(layout)
-  if not self:is_started() then self:start() end
-  self:_show(layout)
-  return self
+  return open(self, layout)
 end
 
----Checks if the terminal has a visible window
+---Returns whether the terminal window is currently open
 ---
----Searches all tabpages to determine if the terminal's window still exists
----and is valid.
----
----@return boolean true if the terminal window is currently visible
+---@return boolean
 function Terminal:is_open()
-  if not self._state.window then return false end
-  local wins = {}
-  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
-    vim.list_extend(wins, vim.api.nvim_tabpage_list_wins(tab))
-  end
-  return vim.tbl_contains(wins, self._state.window)
+  return open.is_open(self)
 end
 
 ---Closes the terminal window while keeping the job running
@@ -467,7 +457,7 @@ end
 ---Updates the floating window configuration if the terminal is in float layout.
 function Terminal:on_vim_resized()
   if vim.tbl_contains({ "float", "above", "below", "left", "right" }, self._state.layout) and self:is_open() then
-    vim.api.nvim_win_set_config(self._state.window, self:_get_win_config(self._state.layout))
+    vim.api.nvim_win_set_config(self._state.window, self:_compute_win_config(self._state.layout))
   end
 end
 
@@ -506,32 +496,11 @@ end
 
 ---@private
 function Terminal:_show(layout)
-  if not self:is_open() then
-    local window = nil
-    local computed_layout = layout or self._state.layout
-    if vim.tbl_contains({ "above", "below", "left", "right", "float" }, computed_layout) then
-      window = self:_open_in_new_window(computed_layout)
-    elseif computed_layout == "tab" then
-      window = self:_open_in_tab()
-    else
-      window = self:_open_in_window()
-    end
-    self._state.layout = computed_layout
-    self._state.window = window
-    self._state.tabpage = vim.api.nvim_win_get_tabpage(window)
-    self:_set_options()
-    self:on_open()
-  end
+  open.show(self, layout)
 end
 
 ---@private
-function Terminal:_open_in_new_window(layout)
-  local win_config = self:_get_win_config(layout)
-  return vim.api.nvim_open_win(self._state.bufnr, false, win_config)
-end
-
----@private
-function Terminal:_get_win_config(layout)
+function Terminal:_compute_win_config(layout)
   local win_config
   if layout == "float" then
     win_config = self:_compute_float_win_config()
@@ -541,49 +510,6 @@ function Terminal:_get_win_config(layout)
     win_config = {}
   end
   return win_config
-end
-
----@private
-function Terminal:_open_in_tab()
-  local current_window = vim.api.nvim_get_current_win()
-  vim.cmd("tabnew")
-  vim.bo.bufhidden = "wipe"
-  vim.api.nvim_set_current_buf(self._state.bufnr)
-  local window = vim.api.nvim_get_current_win()
-  vim.api.nvim_set_current_win(current_window)
-  vim.defer_fn(function() vim.cmd("stopinsert") end, 100)
-  return window
-end
-
----@private
-function Terminal:_open_in_window()
-  vim.api.nvim_set_current_buf(self._state.bufnr)
-  return vim.api.nvim_get_current_win()
-end
-
----@private
-function Terminal:_set_ft_options()
-  local buf = vim.bo[self._state.bufnr]
-  buf.filetype = FILETYPE
-  buf.buflisted = false
-  buf.bufhidden = "hide"
-end
-
----@private
-function Terminal:_set_win_options()
-  local window = self._state.window
-  vim.api.nvim_set_option_value("number", false, { scope = "local", win = window })
-  vim.api.nvim_set_option_value("signcolumn", "no", { scope = "local", win = window })
-  vim.api.nvim_set_option_value("relativenumber", false, { scope = "local", win = window })
-  if self._state.layout == "float" then
-    self:_set_float_options()
-  end
-end
-
----@private
-function Terminal:_set_options()
-  self:_set_ft_options()
-  self:_set_win_options()
 end
 
 ---@private
@@ -767,13 +693,6 @@ end
 function Terminal:_set_initial_mode()
   mode.set_initial(self.start_in_insert)
   return self
-end
-
----@private
-function Terminal:_set_float_options()
-  local window = self._state.window
-  vim.api.nvim_set_option_value("sidescrolloff", 0, { scope = "local", win = window })
-  vim.api.nvim_set_option_value("winblend", self.float_winblend, { scope = "local", win = window })
 end
 
 ---@private

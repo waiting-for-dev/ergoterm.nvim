@@ -1,5 +1,7 @@
 ---@diagnostic disable: invisible
 
+local FILETYPE = "ErgoTerm"
+
 local M = {}
 
 ---@param term Terminal
@@ -14,6 +16,7 @@ function M.start(term)
       term._state.job_id = M._start_job(term)
     end)
     M._setup_buffer_autocommands(term)
+    M._set_buffer_options(term)
     term:on_start()
   end
   return term
@@ -57,6 +60,15 @@ function M._start_job(term)
     env = term.env,
     clear_env = term.clear_env,
   })
+end
+
+---@private
+---@param term Terminal
+function M._set_buffer_options(term)
+  local buf = vim.bo[term._state.bufnr]
+  buf.filetype = FILETYPE
+  buf.buflisted = false
+  buf.bufhidden = "hide"
 end
 
 return setmetatable(M, {

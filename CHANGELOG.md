@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 - DEPRECATED API `require("ergoterm.terminal")` use `require("ergoterm")` instead.
 - `term:update()` accepts a `deep_merge` option to merge table settings instead of replacing them.
 - Added `term:is_cleaned_up()` method to check if terminal has been cleaned up.
+- Show error if invalid layout is provided on opening terminal.
+- Set buffer options on start instead of on opening terminal window.
 
 ## 0.8.0 - 2025-10-15
 

@@ -130,6 +130,30 @@ describe(".start", function()
     assert.is_true(called)
   end)
 
+  it("sets the buffer filetype as ErgoTerm", function()
+    local term = Terminal:new()
+
+    start(term)
+
+    assert.equal("ErgoTerm", vim.bo[term:get_state("bufnr")].filetype)
+  end)
+
+  it("sets the buffer as not listed", function()
+    local term = Terminal:new()
+
+    start(term)
+
+    assert.is_false(vim.bo[term:get_state("bufnr")].buflisted)
+  end)
+
+  it("sets the buffer as hide", function()
+    local term = Terminal:new()
+
+    start(term)
+
+    assert.equal("hide", vim.bo[term:get_state("bufnr")].bufhidden)
+  end)
+
   it("does nothing if already started", function()
     local term = Terminal:new()
     start(term)
