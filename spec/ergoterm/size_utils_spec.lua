@@ -1,37 +1,37 @@
 ---@diagnostic disable: undefined-field
 
-local size = require("ergoterm.size")
+local size_utils = require("ergoterm.size_utils")
 
 describe(".is_percentage", function()
   it("returns true for percentage strings", function()
-    assert.is_true(size.is_percentage("50%"))
+    assert.is_true(size_utils.is_percentage("50%"))
   end)
 
   it("returns false for numeric values", function()
-    assert.is_false(size.is_percentage(50))
+    assert.is_false(size_utils.is_percentage(50))
   end)
 end)
 
 describe(".is_vertical", function()
   it("returns true for left layout", function()
-    assert.is_true(size.is_vertical("left"))
+    assert.is_true(size_utils.is_vertical("left"))
   end)
 
   it("returns true for right layout", function()
-    assert.is_true(size.is_vertical("right"))
+    assert.is_true(size_utils.is_vertical("right"))
   end)
 
   it("returns false for below layout", function()
-    assert.is_false(size.is_vertical("below"))
+    assert.is_false(size_utils.is_vertical("below"))
   end)
 
   it("returns false for above layout", function()
-    assert.is_false(size.is_vertical("above"))
+    assert.is_false(size_utils.is_vertical("above"))
   end)
 
   it("returns false for other layouts", function()
-    assert.is_false(size.is_vertical("float"))
-    assert.is_false(size.is_vertical("tab"))
+    assert.is_false(size_utils.is_vertical("float"))
+    assert.is_false(size_utils.is_vertical("tab"))
   end)
 end)
 
@@ -40,7 +40,7 @@ describe(".percentage_to_absolute", function()
     local original_lines = vim.o.lines
     vim.o.lines = 40
 
-    local result = size.percentage_to_absolute("50%", "below")
+    local result = size_utils.percentage_to_absolute("50%", "below")
 
     assert.equal(20, result)
 
@@ -51,7 +51,7 @@ describe(".percentage_to_absolute", function()
     local original_lines = vim.o.lines
     vim.o.lines = 100
 
-    local result = size.percentage_to_absolute("25%", "above")
+    local result = size_utils.percentage_to_absolute("25%", "above")
 
     assert.equal(25, result)
 
@@ -62,7 +62,7 @@ describe(".percentage_to_absolute", function()
     local original_columns = vim.o.columns
     vim.o.columns = 80
 
-    local result = size.percentage_to_absolute("50%", "right")
+    local result = size_utils.percentage_to_absolute("50%", "right")
 
     assert.equal(40, result)
 
@@ -73,7 +73,7 @@ describe(".percentage_to_absolute", function()
     local original_columns = vim.o.columns
     vim.o.columns = 200
 
-    local result = size.percentage_to_absolute("25%", "left")
+    local result = size_utils.percentage_to_absolute("25%", "left")
 
     assert.equal(50, result)
 
@@ -84,7 +84,7 @@ describe(".percentage_to_absolute", function()
     local original_lines = vim.o.lines
     vim.o.lines = 41
 
-    local result = size.percentage_to_absolute("50%", "below")
+    local result = size_utils.percentage_to_absolute("50%", "below")
 
     assert.equal(21, result)
 

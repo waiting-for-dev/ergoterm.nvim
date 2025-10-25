@@ -3,6 +3,8 @@ local M = {}
 ---@module "ergoterm.lazy"
 local lazy = require("ergoterm.lazy")
 
+---@module "ergoterm.instance.close"
+local close = require("ergoterm.instance.close")
 ---@module "ergoterm.collection"
 local collection = require("ergoterm.collection")
 ---@module "ergoterm.config"
@@ -16,7 +18,7 @@ local start = require("ergoterm.instance.start")
 ---@module "ergoterm.instance.stop"
 local stop = require("ergoterm.instance.stop")
 ---@module "ergoterm.size"
-local size_utils = lazy.require("ergoterm.size")
+local size_utils = lazy.require("ergoterm.size_utils")
 ---@module "ergoterm.text_decorators"
 local text_decorators = lazy.require("ergoterm.text_decorators")
 ---@module "ergoterm.text_selector"
@@ -224,24 +226,16 @@ end
 
 ---Closes the terminal window while keeping the job running
 ---
----The terminal can be reopened later with `open()` or `focus()`. Triggers the
----`on_close` callback. No-op if the terminal is not currently open.
+---If the terminal is the only window open, it replaces its buffer with an empty
+---buffer to avoid closing Vim entirely.
+---
+---It'll also persist the window size if `persist_size` is enabled.
+---
+---Triggers the `on_close` callback.
 ---
 ---@return Terminal self for method chaining
 function Terminal:close()
-  if self:is_open() then
-    self:on_close()
-    if self.persist_size then
-      self:_persist_size()
-    end
-    if #vim.api.nvim_list_wins() == 1 then
-      local empty_buf = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_win_set_buf(self._state.window, empty_buf)
-    else
-      vim.api.nvim_win_close(self._state.window, true)
-    end
-  end
-  return self
+  return close(self)
 end
 
 ---Brings the terminal window into focus and switches to it
@@ -624,27 +618,6 @@ function Terminal:_compute_size()
     end
   end
   return size
-end
-
----@private
-function Terminal:_persist_size()
-  local layout = self._state.layout
-  if not self:is_open() then return end
-  if not vim.tbl_contains({ "above", "below", "left", "right" }, layout) then return end
-
-  local current_axis_absolute_size
-  local current_axis_size
-  if size_utils.is_vertical(layout) then
-    current_axis_absolute_size = vim.api.nvim_win_get_width(self._state.window)
-  else
-    current_axis_absolute_size = vim.api.nvim_win_get_height(self._state.window)
-  end
-  if size_utils.is_percentage(self.size[layout]) then
-    current_axis_size = size_utils.absolute_to_percentage(current_axis_absolute_size, layout)
-  else
-    current_axis_size = current_axis_absolute_size
-  end
-  self._state.size[layout] = current_axis_size
 end
 
 ---@private

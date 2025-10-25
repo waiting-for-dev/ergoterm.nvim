@@ -1,13 +1,18 @@
+local VERTICAL_LAYOUTS = { "left", "right" }
+
 local M = {}
 
+---@private
 function M.is_percentage(value)
   return type(value) == "string" and value:match("%%$") ~= nil
 end
 
+---@private
 function M.is_vertical(layout)
-  return layout == "left" or layout == "right"
+  return vim.tbl_contains(VERTICAL_LAYOUTS, layout)
 end
 
+---@private
 function M.percentage_to_absolute(percentage_str, layout)
   local percentage = tonumber(percentage_str:match("(%d+)%%"))
   if M.is_vertical(layout) then
@@ -17,6 +22,7 @@ function M.percentage_to_absolute(percentage_str, layout)
   end
 end
 
+---@private
 function M.absolute_to_percentage(size, layout)
   local percentage
   if M.is_vertical(layout) then
