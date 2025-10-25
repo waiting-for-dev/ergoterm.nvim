@@ -13,6 +13,8 @@ local mode = lazy.require("ergoterm.mode")
 local open = require("ergoterm.instance.open")
 ---@module "ergoterm.instance.start"
 local start = require("ergoterm.instance.start")
+---@module "ergoterm.instance.stop"
+local stop = require("ergoterm.instance.stop")
 ---@module "ergoterm.size"
 local size_utils = lazy.require("ergoterm.size")
 ---@module "ergoterm.text_decorators"
@@ -171,6 +173,16 @@ function Terminal:is_started()
   return start.is_started(self)
 end
 
+---Terminates the terminal job
+---
+---Stops the underlying job process and closes any open windows. Triggers the
+---`on_stop` callback.
+---
+---@return Terminal
+function Terminal:stop()
+  return stop(self)
+end
+
 ---Checks if the terminal has an active buffer
 ---
 ---A terminal will have an active buffer when started or if already stopped but not
@@ -258,29 +270,6 @@ function Terminal:is_focused()
   return self._state.window == vim.api.nvim_get_current_win()
 end
 
----Terminates the terminal job and cleans up resources
----
----Stops the underlying job process and closes any open windows. Triggers the
----`on_stop` callback. The terminal can be restarted later with `start()`.
----The buffer remains available until the terminal is cleaned up.
----
----@return Terminal self for method chaining
-function Terminal:stop()
-  if self:is_open() then self:close() end
-  if self:is_started() then
-    self:on_stop()
-    vim.fn.jobstop(self._state.job_id)
-  end
-  return self
-end
-
----Checks if the terminal job has been terminated
----
----@return boolean true if no job is currently running
-function Terminal:is_stopped()
-  return self._state.job_id == nil
-end
-
 ---Cleans up the terminal and optionally deletes it from the session
 ---
 ---Always stops the terminal if running and cleans up resources. For sticky terminals,
@@ -292,7 +281,7 @@ function Terminal:cleanup(opts)
   opts = opts or {}
   local force = vim.F.if_nil(opts.force, false)
 
-  if not self:is_stopped() then
+  if self:is_started() then
     self:stop()
   end
   if self:is_open() then

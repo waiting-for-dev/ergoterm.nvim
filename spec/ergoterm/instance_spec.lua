@@ -393,6 +393,18 @@ describe(":is_started", function()
   end)
 end)
 
+describe(":stop", function()
+  it("stops the terminal", function()
+    local term = Terminal:new()
+    term:start()
+
+    term:stop()
+    vim.wait(100)
+
+    assert.is_false(term:is_started())
+  end)
+end)
+
 describe(":is_active", function()
   it("returns true if terminal is started", function()
     local term = Terminal:new():start()
@@ -643,97 +655,6 @@ describe(":is_focused", function()
   end)
 end)
 
-describe(":stop", function()
-  it("closes the terminal if open by default", function()
-    local term = Terminal:new()
-    term:open()
-
-    term:stop()
-
-    assert.is_false(term:is_open())
-  end)
-
-  it("closes the terminal if open when close is true", function()
-    local term = Terminal:new()
-    term:open()
-
-    term:stop()
-
-    assert.is_false(term:is_open())
-  end)
-
-  it("closes the terminal window when stopping", function()
-    local term = Terminal:new()
-    term:open()
-
-    local spy_termclose = spy.on(term, "close")
-    term:stop()
-
-    assert.spy(spy_termclose).was_called()
-  end)
-
-  it("runs the on_stop callback", function()
-    local called = false
-    local term = Terminal:new({
-      on_stop = function() called = true end,
-    })
-    term:start()
-
-    term:stop()
-
-    assert.is_true(called)
-  end)
-
-  it("stops the running process", function()
-    local term = Terminal:new()
-    term:start()
-    local job_id = term:get_state("job_id")
-    local spy_jobstop = spy.on(vim.fn, "jobstop")
-
-    term:stop()
-
-    assert.spy(spy_jobstop).was_called_with(job_id)
-  end)
-
-  it("resets the job id in the state", function()
-    local term = Terminal:new()
-    term:start()
-
-    term:stop()
-    vim.wait(100)
-
-    assert.is_nil(term:get_state("job_id"))
-  end)
-
-  it("preserves the buffer id in the state", function()
-    local term = Terminal:new()
-    term:start()
-    local bufnr = term:get_state("bufnr")
-
-    term:stop()
-
-    assert.equal(bufnr, term:get_state("bufnr"))
-  end)
-end)
-
-describe(":is_stopped", function()
-  it("returns true if the terminal job is stopped", function()
-    local term = Terminal:new()
-    term:start()
-    term:stop()
-    vim.wait(100)
-
-    assert.is_true(term:is_stopped())
-  end)
-
-  it("returns false if the terminal job is running", function()
-    local term = Terminal:new()
-    term:start()
-
-    assert.is_false(term:is_stopped())
-  end)
-end)
-
 describe(":cleanup", function()
   it("stops the terminal if started", function()
     local term = Terminal:new()
@@ -742,7 +663,7 @@ describe(":cleanup", function()
     term:cleanup()
     vim.wait(100)
 
-    assert.is_true(term:is_stopped())
+    assert.is_false(term:is_started())
   end)
 
   it("removes the terminal from the state", function()
