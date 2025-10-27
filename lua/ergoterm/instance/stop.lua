@@ -2,6 +2,7 @@
 
 local M = {}
 
+---@param term Terminal
 function M.stop(term)
   if term:is_started() then
     term:close()

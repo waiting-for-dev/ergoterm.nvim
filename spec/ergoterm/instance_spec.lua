@@ -501,90 +501,23 @@ describe(":is_focused", function()
 end)
 
 describe(":cleanup", function()
-  it("stops the terminal if started", function()
-    local term = Terminal:new()
-    term:start()
-
-    term:cleanup()
-    vim.wait(100)
-
-    assert.is_false(term:is_started())
-  end)
-
-  it("removes the terminal from the state", function()
+  it("cleans up the terminal", function()
     local term = Terminal:new()
 
     term:cleanup()
 
     assert.is_nil(collection.get(term.id))
-  end)
-
-  it("does not remove sticky terminals from state unless force is true", function()
-    local term = Terminal:new({ sticky = true })
-
-    term:cleanup()
-
-    assert.is_not_nil(collection.get(term.id))
-  end)
-
-  it("removes sticky terminals from state when force is true", function()
-    local term = Terminal:new({ sticky = true })
-
-    term:cleanup({ force = true })
-
-    assert.is_nil(collection.get(term.id))
-  end)
-
-  it("removes the terminal from session when cleaning up", function()
-    local term = Terminal:new()
-    term:open()
-
-    term:cleanup()
-
-    assert.is_false(term:is_open())
-    assert.is_nil(collection.get(term.id))
-  end)
-
-  it("removes the terminal from the last focused cache if it was focused", function()
-    local term = Terminal:new()
-    term:focus()
-
-    term:cleanup()
-
-    assert.is_nil(collection.get_last_focused())
-  end)
-
-  it("resets the buffer id in the state", function()
-    local term = Terminal:new()
-    term:start()
-
-    term:cleanup()
-
-    assert.is_nil(term:get_state("bufnr"))
   end)
 end)
 
 describe(":is_cleaned_up", function()
-  it("returns true if the terminal has been started and manually cleaned up", function()
+  it("returns whether the terminal has been cleaned up", function()
     local term = Terminal:new()
     term:start()
 
     term:cleanup()
 
     assert.is_true(term:is_cleaned_up())
-  end)
-
-  it("returns false if the terminal has been started but not cleaned up", function()
-    local term = Terminal:new()
-    term:start()
-
-    assert.is_false(term:is_cleaned_up())
-  end)
-
-  it("returns false if the terminal has not been started yet", function()
-    local term = Terminal:new()
-
-    assert.is_false(term:is_cleaned_up())
   end)
 end)
 

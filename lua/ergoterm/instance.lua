@@ -3,6 +3,8 @@ local M = {}
 ---@module "ergoterm.lazy"
 local lazy = require("ergoterm.lazy")
 
+---@module "ergoterm.instance.cleanup"
+local cleanup = require("ergoterm.instance.cleanup")
 ---@module "ergoterm.instance.close"
 local close = require("ergoterm.instance.close")
 ---@module "ergoterm.collection"
@@ -264,40 +266,28 @@ function Terminal:is_focused()
   return focus.is_focused(self)
 end
 
----Cleans up the terminal and optionally deletes it from the session
+---Cleans up the terminal
 ---
----Always stops the terminal if running and cleans up resources. For sticky terminals,
----only deletes from the session registry if force is true, otherwise they remain
----available for future use. Non-sticky terminals are always deleted from the session.
+---Stops the terminal if needed, and removes the buffer reference.
+---
+---It'll also no longer be the last focused terminal if it was.
+---
+---If the terminal is not sticky, or `opts.force` is true, it will be removed
+---from the collection state entirely.
 ---
 ---@param opts? CleanupOptions options for cleanup
 function Terminal:cleanup(opts)
-  opts = opts or {}
-  local force = vim.F.if_nil(opts.force, false)
-
-  if self:is_started() then
-    self:stop()
-  end
-  if self:is_open() then
-    self:close()
-  end
-  if self._state.bufnr then
-    self._state.bufnr = nil
-  end
-  if collection._state.last_focused == self then
-    collection._state.last_focused = nil
-  end
-  if collection._state.last_focused_bang_target == self then
-    collection._state.last_focused_bang_target = nil
-  end
-  if not self.sticky or force then
-    collection._state.terminals[self.id] = nil
-  end
+  return cleanup(self, opts)
 end
 
+---Checks if the terminal has been cleaned up
+---
+---That means the terminal has been started at least once and its buffer
+---is no longer present.
+---
 ---@return boolean
 function Terminal:is_cleaned_up()
-  return self._state.has_been_started and self._state.bufnr == nil
+  return cleanup.is_cleaned_up(self)
 end
 
 ---Toggles terminal window visibility
