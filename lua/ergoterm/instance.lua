@@ -290,13 +290,12 @@ function Terminal:is_cleaned_up()
   return cleanup.is_cleaned_up(self)
 end
 
----Toggles terminal window visibility
+---Toggles terminal state between focused and closed
 ---
----Closes the terminal if currently open, or focuses it if closed. Provides
----a convenient way to show/hide terminals with a single command.
+---Closes the terminal if currently open, or focuses it if closed.
 ---
----@param layout string? window layout to use when opening
----@return Terminal self for method chaining
+---@param layout layout? window layout to use when opening
+---@return Terminal
 function Terminal:toggle(layout)
   if self:is_open() then
     self:close()

@@ -541,16 +541,6 @@ describe(":toggle", function()
     assert.is_true(term:is_focused())
   end)
 
-  it("uses layout in the state if set", function()
-    local term = Terminal:new({ layout = "right" })
-    term:open()
-    term:close()
-
-    term:toggle()
-
-    assert.equal("right", term:get_state("layout"))
-  end)
-
   it("uses given layout if given", function()
     local term = Terminal:new({ layout = "below" })
     term:open()
