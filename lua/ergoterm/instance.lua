@@ -9,6 +9,8 @@ local close = require("ergoterm.instance.close")
 local collection = require("ergoterm.collection")
 ---@module "ergoterm.config"
 local config = lazy.require("ergoterm.config")
+---@module "ergoterm.instance.focus"
+local focus = require("ergoterm.instance.focus")
 ---@module "ergoterm.mode"
 local mode = lazy.require("ergoterm.mode")
 ---@module "ergoterm.instance.open"
@@ -241,27 +243,25 @@ end
 ---Brings the terminal window into focus and switches to it
 ---
 ---Automatically starts and opens the terminal if needed. Switches to the
----terminal's tabpage and window, making it the active window. Sets up the
----appropriate terminal mode and triggers the `on_focus` callback.
+---terminal's tabpage and window, making it the active window.
+---
+---Sets the terminal as the last focused terminal.
+---
+---Sets up the appropriate terminal mode depending on `persist_mode` setting.
+---
+---It triggers the `on_focus` callback.
 ---
 ---@param layout string? window layout to use if opening for the first time
 ---@return self for method chaining
 function Terminal:focus(layout)
-  if not self:is_open() then self:open(layout) end
-  if not self:is_focused() then
-    vim.api.nvim_set_current_win(self._state.window)
-    self:_set_last_focused()
-    self:_set_return_mode()
-    self:on_focus()
-  end
-  return self
+  return focus(self, layout)
 end
 
 ---Checks if this terminal is the currently active window
 ---
 ---@return boolean true if this terminal's window is the current window
 function Terminal:is_focused()
-  return self._state.window == vim.api.nvim_get_current_win()
+  return focus.is_focused(self)
 end
 
 ---Cleans up the terminal and optionally deletes it from the session
