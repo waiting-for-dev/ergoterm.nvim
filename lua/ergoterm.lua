@@ -45,7 +45,7 @@ M.reset_ids = collection.reset_ids
 
 M.Terminal = instance.Terminal
 
-M.text_decorators = require("ergoterm.text_decorators")
+M.text_decorators = require("ergoterm.instance.send.text_decorators")
 
 --- Create a new terminal instance.
 ---

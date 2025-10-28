@@ -12,8 +12,8 @@
 
 local M = {}
 
----@module "ergoterm.text_decorators"
-local text_decorators = require("ergoterm.text_decorators")
+---@module "ergoterm.instance.send.text_decorators"
+local text_decorators = require("ergoterm.instance.send.text_decorators")
 
 M.NULL_CALLBACK = function(...) end
 

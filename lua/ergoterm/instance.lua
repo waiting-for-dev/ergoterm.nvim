@@ -17,16 +17,14 @@ local focus = require("ergoterm.instance.focus")
 local mode = lazy.require("ergoterm.mode")
 ---@module "ergoterm.instance.open"
 local open = require("ergoterm.instance.open")
+---@module "ergoterm.instance.send"
+local send = require("ergoterm.instance.send")
 ---@module "ergoterm.instance.start"
 local start = require("ergoterm.instance.start")
 ---@module "ergoterm.instance.stop"
 local stop = require("ergoterm.instance.stop")
 ---@module "ergoterm.size"
 local size_utils = lazy.require("ergoterm.size_utils")
----@module "ergoterm.text_decorators"
-local text_decorators = lazy.require("ergoterm.text_decorators")
----@module "ergoterm.text_selector"
-local text_selector = lazy.require("ergoterm.text_selector")
 ---@module "ergoterm.instance.update"
 local update = require("ergoterm.instance.update")
 ---@module "ergoterm.utils"
@@ -305,105 +303,42 @@ function Terminal:toggle(layout)
   return self
 end
 
----@class SendOptions
----@field action? "focus"|"open"|"start" terminal interaction mode (default: "focus")
----@field trim? boolean remove leading/trailing whitespace (default: true)
----@field new_line? boolean append newline for command execution (default: true)
----@field decorator? string | fun(text: string[]): string[] transform text before sending
-
 ---Sends text input to the terminal job
 ---
----Before sending text, ensures the terminal is in the appropriate state based on opts.action:
----"focus" focuses the terminal for user interaction (default),
----"open" opens the terminal without stealing focus,
----"start" only starts the terminal without opening any window.
----Text is trimmed by default and gets a trailing newline for command execution.
+---Input can be given as:
+---• A table of strings, each representing a line to send.
+---• A string representing a selection type:
+---  - "single_line" - sends the current line
+---  - "visual_lines" - sends the lines covered by the current visual line selection
+---  - "visual_selection" - sends the exact text covered by the current visual selection
+---  - "last" - resends the last sent text
 ---
----Input can be provided as:
----• Array of strings - sends the text directly
----• "single_line" - sends the current line under cursor
----• "visual_lines" - sends the current visual line selection
----• "visual_selection" - sends the current visual character selection
----• "last" - resends the last sent text
+--- Following options can be configured via `opts`:
+--- • `action` - what to do before sending text:
+---   - "focus" - focus the terminal (default)
+---   - "open" - open the terminal without focusing
+---   - "start" - start the terminal without opening or focusing
+--- • `trim` - whether to trim leading/trailing whitespace from each line (default: true)
+--- • `new_line` - whether to append a newline character to each line for command execution (default: true)
+--- • `decorator` - a string key or function to transform the text before sending:
+---  - If a string key is provided, it looks up the decorator function from the global configuration.
+---  - If a function is provided, it is used directly to transform the text.
 ---
----@param input string[]|"single_line"|"visual_lines"|"visual_selection"|"last" lines of text to send or selection type
+---@param input send_input_type | string[]
 ---@param opts? SendOptions options for sending text
----@return self for method chaining
+---@return self
 function Terminal:send(input, opts)
-  opts = opts or {}
-  local action = opts.action or "focus"
-
-  local deprecated_actions = {
-    silent = "start",
-    visible = "open",
-    interactive = "focus"
-  }
-  if deprecated_actions[action] then
-    utils.notify(
-      string.format("Action '%s' is deprecated, use '%s' instead", action,
-        deprecated_actions[action]),
-      "warn"
-    )
-    action = deprecated_actions[action]
-  end
-
-  local trim = opts.trim == nil or opts.trim
-  local new_line = opts.new_line == nil or opts.new_line
-  local decorator
-  if type(opts.decorator) == "string" then
-    local all_decorators = config.get_text_decorators()
-    decorator = all_decorators[opts.decorator] or text_decorators.identity
-  else
-    decorator = opts.decorator or text_decorators.identity
-  end
-  if type(input) == "string" then
-    local valid_selection_types = { "single_line", "visual_lines", "visual_selection", "last" }
-    if not vim.tbl_contains(valid_selection_types, input) then
-      utils.notify(
-        string.format("Invalid input type '%s'. Must be a table with one item per line or one of: %s", input,
-          table.concat(valid_selection_types, ", ")),
-        "error"
-      )
-      return self
-    end
-  end
-  local text_input
-  if input == "last" then
-    text_input = vim.deepcopy(self._state.last_sent)
-  elseif type(input) == "string" then
-    text_input = text_selector.select(input)
-  else
-    text_input = input
-  end
-  self._state.last_sent = vim.deepcopy(text_input)
-  if new_line then
-    table.insert(text_input, "")
-  end
-  if trim then
-    for i, line in ipairs(text_input) do
-      text_input[i] = line:gsub("^%s+", ""):gsub("%s+$", "")
-    end
-  end
-  local decorated_input = decorator(text_input)
-  if action == "start" then
-    self:start()
-  elseif action == "open" then
-    self:open()
-  elseif action == "focus" then
-    self:focus()
-  end
-  vim.fn.chansend(self._state.job_id, decorated_input)
-  self:_scroll_bottom()
-  return self
+  return send(self, input, opts)
 end
 
 ---Clears the terminal display
 ---
 ---Sends the appropriate clear command for the current platform (`cls` on Windows,
 ---`clear` on Unix systems). Opens and focuses the terminal to show the result.
-function Terminal:clear()
-  local clear = utils.is_windows() and "cls" or "clear"
-  self:send({ clear })
+---
+---@param action? send_action terminal interaction mode before clearing
+function Terminal:clear(action)
+  return send.clear(self, action)
 end
 
 ---Handles buffer enter events for the terminal

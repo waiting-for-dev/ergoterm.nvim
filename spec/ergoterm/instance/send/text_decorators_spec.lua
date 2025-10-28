@@ -1,4 +1,4 @@
-local decorators = require("ergoterm.text_decorators")
+local decorators = require("ergoterm.instance.send.text_decorators")
 
 ---@diagnostic disable: undefined-field
 

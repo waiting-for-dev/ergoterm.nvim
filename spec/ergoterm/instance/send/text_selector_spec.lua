@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-field
 
-local selector = require("ergoterm.text_selector")
+local selector = require("ergoterm.instance.send.text_selector")
 
 local function set_selection_mock(val)
   local selection_mock = { get = function() return val end }

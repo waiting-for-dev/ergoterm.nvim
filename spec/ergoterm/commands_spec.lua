@@ -134,8 +134,7 @@ describe("M.select", function()
 end)
 
 describe("M.send", function()
-  local text_selector = require("ergoterm.text_selector")
-  local text_decorators = require("ergoterm.text_decorators")
+  local text_selector = require("ergoterm.instance.send.text_selector")
   local select_only_picker = {
     select = function(terminals, _, callbacks)
       callbacks.default.fn(terminals[1])

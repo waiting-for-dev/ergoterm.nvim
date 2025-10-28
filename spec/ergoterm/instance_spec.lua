@@ -555,7 +555,7 @@ end)
 
 describe(":send", function()
   it("sends input to the terminal process", function()
-    local term = Terminal:new({ cmd = "cat" }):start()
+    local term = Terminal:new():start()
 
     term:send({ "hello" })
     vim.wait(100)
@@ -564,52 +564,7 @@ describe(":send", function()
     assert.is_true(vim.tbl_contains(lines, "hello"))
   end)
 
-  it("sends text using selection type", function()
-    local text_selector = require("ergoterm.text_selector")
-    local original_select = text_selector.select
-    --- @diagnostic disable-next-line: duplicate-set-field
-    text_selector.select = function(selection_type)
-      assert.equal("single_line", selection_type)
-      return { "selected text" }
-    end
-
-    local term = Terminal:new({ cmd = "cat" }):start()
-    term:send("single_line")
-    vim.wait(100)
-
-    local lines = vim.api.nvim_buf_get_lines(term:get_state("bufnr"), 0, -1, false)
-    assert.is_true(vim.tbl_contains(lines, "selected text"))
-
-    text_selector.select = original_select
-  end)
-
-  it("resends last text when input is `last`", function()
-    local term = Terminal:new({ cmd = "cat" }):start()
-
-    term:send({ "first" })
-    vim.wait(100)
-    term:send("last")
-    vim.wait(100)
-
-    local lines = vim.api.nvim_buf_get_lines(term:get_state("bufnr"), 0, -1, false)
-    assert.is_true(vim.tbl_contains(lines, "first"))
-    assert.is_true(vim.tbl_contains(lines, "first"))
-  end)
-
-  it("adds a newline by default", function()
-    local term = Terminal:new():start()
-    local spy_chansend = spy.on(vim.fn, "chansend")
-
-    term:send({ "foo" })
-    vim.wait(100)
-
-    assert.spy(spy_chansend).was_called_with(
-      term:get_state("job_id"),
-      { "foo", "" }
-    )
-  end)
-
-  it("does not add a newline if new_line is false", function()
+  it("sends input to the terminal process with given options", function()
     local term = Terminal:new():start()
     local spy_chansend = spy.on(vim.fn, "chansend")
 
@@ -620,135 +575,6 @@ describe(":send", function()
       term:get_state("job_id"),
       { "foo" }
     )
-  end)
-
-  it("trims input by default", function()
-    local term = Terminal:new({ cmd = "cat" }):start()
-    term:send({ "  baz  " })
-
-    vim.wait(100)
-    local lines = vim.api.nvim_buf_get_lines(term:get_state("bufnr"), 0, -1, false)
-
-    assert.is_true(vim.tbl_contains(lines, "baz"))
-    assert.is_false(vim.tbl_contains(lines, "  baz  "))
-  end)
-
-  it("does not trim input if trim is false", function()
-    local term = Terminal:new({ cmd = "cat" }):start()
-    term:send({ "  qux  " }, { trim = false })
-
-    vim.wait(100)
-    local lines = vim.api.nvim_buf_get_lines(term:get_state("bufnr"), 0, -1, false)
-
-    assert.is_true(vim.tbl_contains(lines, "  qux  "))
-  end)
-
-  it("applies decorator function to input", function()
-    local term = Terminal:new():start()
-    local spy_chansend = spy.on(vim.fn, "chansend")
-    local decorator = function(text)
-      local result = {}
-      for _, line in ipairs(text) do
-        table.insert(result, "decorated: " .. line)
-      end
-      return result
-    end
-
-    term:send({ "foo" }, { decorator = decorator })
-    vim.wait(100)
-
-    assert.spy(spy_chansend).was_called_with(
-      term:get_state("job_id"),
-      { "decorated: foo", "decorated: " }
-    )
-  end)
-
-  it("applies decorator string to input", function()
-    local term = Terminal:new():start()
-    local spy_chansend = spy.on(vim.fn, "chansend")
-
-    term:send({ "foo" }, { decorator = "identity" })
-    vim.wait(100)
-
-    assert.spy(spy_chansend).was_called_with(
-      term:get_state("job_id"),
-      { "foo", "" }
-    )
-  end)
-
-  it("falls back to identity decorator for unknown string decorator", function()
-    local term = Terminal:new():start()
-    local spy_chansend = spy.on(vim.fn, "chansend")
-
-    term:send({ "foo" }, { decorator = "unknown_decorator" })
-    vim.wait(100)
-
-    assert.spy(spy_chansend).was_called_with(
-      term:get_state("job_id"),
-      { "foo", "" }
-    )
-  end)
-
-  it("uses identity function as default decorator", function()
-    local term = Terminal:new():start()
-    local spy_chansend = spy.on(vim.fn, "chansend")
-
-    term:send({ "foo" })
-    vim.wait(100)
-
-    assert.spy(spy_chansend).was_called_with(
-      term:get_state("job_id"),
-      { "foo", "" }
-    )
-  end)
-
-  it("opens the terminal if action is open", function()
-    local term = Terminal:new({ cmd = "cat" }):start()
-    term:close()
-
-    term:send({ "foo" }, { action = "open" })
-    vim.wait(100)
-
-    assert.is_true(term:is_open())
-  end)
-
-  it("focuses the terminal if action is focus", function()
-    local term = Terminal:new({ cmd = "cat" }):start()
-    term:close()
-
-    term:send({ "foo" }, { action = "focus" })
-    vim.wait(100)
-
-    assert.is_true(term:is_focused())
-  end)
-
-  it("scrolls to the bottom after sending", function()
-    local term = Terminal:new({ cmd = "cat" }):start()
-    term:open()
-    vim.api.nvim_win_set_cursor(term:get_state("window"), { 1, 0 })
-
-    term:send({ "foo" })
-    vim.wait(100)
-
-    local cursor = vim.api.nvim_win_get_cursor(term:get_state("window"))
-    local lines = vim.api.nvim_buf_line_count(term:get_state("bufnr"))
-    assert.equal(lines, cursor[1])
-  end)
-
-  it("notifies error for invalid string input type", function()
-    local term = Terminal:new():start()
-
-    local result = test_helpers.mocking_notify(function()
-      ---@diagnostic disable-next-line: param-type-mismatch
-      term:send("invalid_type")
-    end)
-
-    ---@diagnostic disable: need-check-nil
-    assert.equal(
-      "Invalid input type 'invalid_type'. Must be a table with one item per line or one of: single_line, visual_lines, visual_selection, last",
-      result.msg)
-    assert.equal("error", result.level)
-    ---@diagnostic enable: need-check-nil
   end)
 end)
 
@@ -763,28 +589,25 @@ describe(":clear", function()
     utils.is_windows = original_is_windows
   end)
 
-  it("sends 'clear' to the terminal on Unix", function()
+  it("sends command to clear the terminal", function()
     ---@diagnostic disable-next-line: duplicate-set-field
     utils.is_windows = function() return false end
-    local term = Terminal:new():start()
-    local spy_chansend = spy.on(vim.fn, "chansend")
+    local term = Terminal:new()
 
     term:clear()
     vim.wait(100)
 
-    assert.spy(spy_chansend).was_called_with(term:get_state("job_id"), { "clear", "" })
+    local lines = vim.api.nvim_buf_get_lines(term:get_state("bufnr"), 0, -1, false)
+    assert.is_true(vim.tbl_contains(lines, "clear"))
   end)
 
-  it("sends 'cls' to the terminal on Windows", function()
-    ---@diagnostic disable-next-line: duplicate-set-field
-    utils.is_windows = function() return true end
+  it("delegates action option to send", function()
     local term = Terminal:new():start()
-    local spy_chansend = spy.on(vim.fn, "chansend")
 
-    term:clear()
+    term:clear("open")
     vim.wait(100)
 
-    assert.spy(spy_chansend).was_called_with(term:get_state("job_id"), { "cls", "" })
+    assert.is_true(term:is_open())
   end)
 end)
 
