@@ -5,7 +5,7 @@ local terms = require("ergoterm")
 local test_helpers = require("test_helpers")
 
 after_each(function()
-  terms.cleanup_all({ close = true, force = true })
+  terms.cleanup_all({ force = true })
   terms.reset_ids()
 end)
 

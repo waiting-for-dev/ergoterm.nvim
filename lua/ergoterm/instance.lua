@@ -17,6 +17,10 @@ local focus = require("ergoterm.instance.focus")
 local mode = lazy.require("ergoterm.mode")
 ---@module "ergoterm.events.on_buf_enter"
 local on_buf_enter = require("ergoterm.events.on_buf_enter")
+---@module "ergoterm.events.on_exit"
+local on_exit = require("ergoterm.events.on_exit")
+---@module "ergoterm.events.on_output"
+local on_output = require("ergoterm.events.on_output")
 ---@module "ergoterm.events.on_vim_resized"
 local on_vim_resized = require("ergoterm.events.on_vim_resized")
 ---@module "ergoterm.events.on_win_leave"
@@ -423,44 +427,14 @@ end
 ---@private
 function Terminal:_compute_exit_handler(callback)
   return function(job, exit_code, event)
-    callback(self, job, exit_code, event)
-    self._state.job_id = nil
-    self._state.last_exit_code = exit_code
-
-    local should_cleanup = false
-    local should_show = false
-    if exit_code == 0 then
-      should_cleanup = self.cleanup_on_success
-      should_show = self.show_on_success
-    else
-      should_cleanup = self.cleanup_on_failure
-      should_show = self.show_on_failure
-    end
-
-    if should_show then
-      vim.schedule(function()
-        self:_show()
-      end)
-    end
-
-    if should_cleanup then
-      vim.schedule(function()
-        self:cleanup()
-      end)
-    end
+    on_exit(self, job, exit_code, event, callback)
   end
 end
 
 ---@private
 function Terminal:_compute_output_handler(callback)
   return function(channel_id, data, name)
-    if self.auto_scroll then self:_scroll_bottom() end
-    if self.watch_files then
-      vim.schedule(function()
-        vim.cmd('checktime')
-      end)
-    end
-    callback(self, channel_id, data, name)
+    on_output(self, channel_id, data, name, callback)
   end
 end
 

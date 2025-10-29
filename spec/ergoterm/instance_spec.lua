@@ -5,11 +5,10 @@ local instance = require("ergoterm.instance")
 local Terminal = instance.Terminal
 local config = require("ergoterm.config")
 local utils = require("ergoterm.utils")
-local mode = require("ergoterm.mode")
 local test_helpers = require("test_helpers")
 
 after_each(function()
-  collection.cleanup_all({ close = true, force = true })
+  collection.cleanup_all({ force = true })
   collection.reset_ids()
 end)
 
@@ -707,9 +706,8 @@ describe(":_setup_buffer_autocommands", function()
 end)
 
 describe("on job exit", function()
-  it("cleans up on successful exit when cleanup_on_success is true", function()
-    local term = Terminal:new({ cleanup_on_success = true, cleanup_on_failure = false })
-    term:start()
+  it("handles exit with cleanup", function()
+    local term = Terminal:new({ cleanup_on_success = true }):start()
     local exit_handler = term:get_state("on_job_exit")
     local original_schedule = vim.schedule
     ---@diagnostic disable-next-line: duplicate-set-field
@@ -719,137 +717,6 @@ describe("on job exit", function()
 
     assert.is_nil(collection.get(term.id))
     vim.schedule = original_schedule
-  end)
-
-  it("does not clean up on successful exit when cleanup_on_success is false", function()
-    local term = Terminal:new({ cleanup_on_success = false, cleanup_on_failure = true })
-    term:start()
-    local exit_handler = term:get_state("on_job_exit")
-    local original_schedule = vim.schedule
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.schedule = function(fn) fn() end
-
-    exit_handler(1, 0, "exit")
-
-    assert.is_not_nil(collection.get(term.id))
-    vim.schedule = original_schedule
-  end)
-
-  it("cleans up on failed exit when cleanup_on_failure is true", function()
-    local term = Terminal:new({ cleanup_on_success = false, cleanup_on_failure = true })
-    term:start()
-    local exit_handler = term:get_state("on_job_exit")
-    local original_schedule = vim.schedule
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.schedule = function(fn) fn() end
-
-    exit_handler(1, 1, "exit")
-
-    assert.is_nil(collection.get(term.id))
-    vim.schedule = original_schedule
-  end)
-
-  it("does not clean up on failed exit when cleanup_on_failure is false", function()
-    local term = Terminal:new({ cleanup_on_success = true, cleanup_on_failure = false })
-    term:start()
-    local exit_handler = term:get_state("on_job_exit")
-    local original_schedule = vim.schedule
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.schedule = function(fn) fn() end
-
-    exit_handler(1, 1, "exit")
-
-    assert.is_not_nil(collection.get(term.id))
-    vim.schedule = original_schedule
-  end)
-
-  it("calls user's on_job_exit handler before cleanup", function()
-    local called = false
-    local term = Terminal:new({
-      cleanup_on_success = true,
-      on_job_exit = function() called = true end
-    })
-    term:start()
-    local exit_handler = term:get_state("on_job_exit")
-    local original_schedule = vim.schedule
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.schedule = function(fn) fn() end
-
-    exit_handler(1, 0, "exit")
-
-    assert.is_true(called)
-    assert.is_nil(collection.get(term.id))
-    vim.schedule = original_schedule
-  end)
-
-  it("opens on successful exit when show_on_success is true", function()
-    local term = Terminal:new({ cleanup_on_success = false, show_on_success = true })
-    term:start()
-    local exit_handler = term:get_state("on_job_exit")
-
-    exit_handler(1, 0, "exit")
-    vim.wait(100)
-
-    assert.is_true(term:is_open())
-  end)
-
-  it("does not open on successful exit when show_on_success is false", function()
-    local term = Terminal:new({ cleanup_on_success = false, show_on_success = false })
-    term:start()
-    local exit_handler = term:get_state("on_job_exit")
-
-    exit_handler(1, 0, "exit")
-    vim.wait(100)
-
-    assert.is_false(term:is_open())
-  end)
-
-  it("opens on failed exit when show_on_failure is true", function()
-    local term = Terminal:new({ cleanup_on_failure = false, show_on_failure = true })
-    term:start()
-    local exit_handler = term:get_state("on_job_exit")
-
-    exit_handler(1, 1, "exit")
-    vim.wait(100)
-
-    assert.is_true(term:is_open())
-  end)
-
-  it("does not open on failed exit when show_on_failure is false", function()
-    local term = Terminal:new({ show_on_success = true, show_on_failure = false })
-    term:start()
-    local exit_handler = term:get_state("on_job_exit")
-
-    exit_handler(1, 1, "exit")
-    vim.wait(100)
-
-    assert.is_false(term:is_open())
-  end)
-
-  it("does not restart process when show_on_success triggers", function()
-    local term = Terminal:new({ cleanup_on_success = false, show_on_success = true })
-    term:start()
-    local exit_handler = term:get_state("on_job_exit")
-
-    exit_handler(1, 0, "exit")
-    vim.wait(100)
-
-    assert.is_nil(term:get_state("job_id"))
-    assert.is_true(term:is_open())
-    assert.is_false(term:is_started())
-  end)
-
-  it("does not restart process when show_on_failure triggers", function()
-    local term = Terminal:new({ cleanup_on_failure = false, show_on_failure = true })
-    term:start()
-    local exit_handler = term:get_state("on_job_exit")
-
-    exit_handler(1, 1, "exit")
-    vim.wait(100)
-
-    assert.is_nil(term:get_state("job_id"))
-    assert.is_true(term:is_open())
-    assert.is_false(term:is_started())
   end)
 end)
 
@@ -891,61 +758,5 @@ describe(":get_status_icon", function()
     local term = Terminal:new({ sticky = true })
 
     assert.equal("○", term:get_status_icon())
-  end)
-end)
-
-describe("on stdout", function()
-  it("calls checktime after stdout when watch_files is true", function()
-    local term = Terminal:new({ watch_files = true })
-    term:start()
-    local stdout_handler = term:get_state("on_job_stdout")
-    local spy_cmd = spy.on(vim, "cmd")
-    local original_schedule = vim.schedule
-    local scheduled_fn
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.schedule = function(fn) scheduled_fn = fn end
-
-    stdout_handler(1, { "data" }, "stdout")
-    scheduled_fn()
-
-    assert.spy(spy_cmd).was_called_with("checktime")
-
-    vim.schedule = original_schedule
-  end)
-
-  it("calls checktime after stderr when watch_files is true", function()
-    local term = Terminal:new({ watch_files = true })
-    term:start()
-    local stderr_handler = term:get_state("on_job_stderr")
-    local spy_cmd = spy.on(vim, "cmd")
-    local original_schedule = vim.schedule
-    local scheduled_fn
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.schedule = function(fn) scheduled_fn = fn end
-
-    stderr_handler(1, { "data" }, "stderr")
-    scheduled_fn()
-
-    assert.spy(spy_cmd).was_called_with("checktime")
-
-    vim.schedule = original_schedule
-  end)
-
-  it("does not call checktime when watch_files is false", function()
-    local term = Terminal:new({ watch_files = false })
-    term:start()
-    local stdout_handler = term:get_state("on_job_stdout")
-    local spy_cmd = spy.on(vim, "cmd")
-    local original_schedule = vim.schedule
-    local scheduled_fn
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.schedule = function(fn) scheduled_fn = fn end
-
-    stdout_handler(1, { "data" }, "stdout")
-    if scheduled_fn then scheduled_fn() end
-
-    assert.spy(spy_cmd).was_not_called_with("checktime")
-
-    vim.schedule = original_schedule
   end)
 end)
