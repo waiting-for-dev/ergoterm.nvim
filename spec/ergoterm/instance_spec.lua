@@ -612,34 +612,7 @@ describe(":clear", function()
 end)
 
 describe(":on_buf_enter", function()
-  it("restores last mode if persist_mode is true", function()
-    local term = Terminal:new({ persist_mode = true, start_in_insert = false }):start()
-    local spy_mode_set = spy.on(mode, "set")
-
-    term:on_buf_enter()
-
-    assert.spy(spy_mode_set).was_called_with("n")
-  end)
-
-  it("starts in insert mode if persist_mode is false and start_in_insert is true", function()
-    local term = Terminal:new({ persist_mode = false, start_in_insert = true }):start()
-    local spy_mode_set_initial = spy.on(mode, "set_initial")
-
-    term:on_buf_enter()
-
-    assert.spy(spy_mode_set_initial).was_called_with(true)
-  end)
-
-  it("starts in normal mode if persist_mode is false and start_in_insert is false", function()
-    local term = Terminal:new({ persist_mode = false, start_in_insert = false }):start()
-    local spy_mode_set_initial = spy.on(mode, "set_initial")
-
-    term:on_buf_enter()
-
-    assert.spy(spy_mode_set_initial).was_called_with(false)
-  end)
-
-  it("sets the terminal as last focused", function()
+  it("handles buffer enter event", function()
     local term = Terminal:new():start()
 
     term:on_buf_enter()
@@ -649,80 +622,23 @@ describe(":on_buf_enter", function()
 end)
 
 describe(":on_win_leave", function()
-  it("persists mode if persist_mode is true", function()
-    local term = Terminal:new({ persist_mode = true, start_in_insert = true }):start()
-    local original_mode_get = mode.get
-    ---@diagnostic disable-next-line: duplicate-set-field
-    mode.get = function() return "n" end
-
-    term:on_win_leave()
-
-    assert.equal("n", term:get_state("mode"))
-
-    mode.get = original_mode_get
-  end)
-
-  it("does not persist mode if persist_mode is false", function()
-    local term = Terminal:new({ persist_mode = false, start_in_insert = true }):start()
-    local original_mode_get = mode.get
-    ---@diagnostic disable-next-line: duplicate-set-field
-    mode.get = function() return "n" end
-
-    term:on_win_leave()
-
-    assert.equal("i", term:get_state("mode"))
-
-    mode.get = original_mode_get
-  end)
-
-
-  it("closes terminal if layout is float", function()
+  it("handles window leave event", function()
     local term = Terminal:new({ layout = "float" }):open()
 
     term:on_win_leave()
 
     assert.is_false(term:is_open())
   end)
-
-  it("does not close terminal if layout is not float", function()
-    local term = Terminal:new({ layout = "below" }):open()
-
-    term:on_win_leave()
-
-    assert.is_true(term:is_open())
-  end)
 end)
 
-
 describe(":on_vim_resized", function()
-  it("applies new win config to float terminal", function()
-    local term = Terminal:new({ layout = "float", float_opts = { width = 60, height = 30 } })
-    term:open()
+  it("handles vim resize event", function()
+    local term = Terminal:new({ layout = "float" }):open()
     local spy_win_set_config = spy.on(vim.api, "nvim_win_set_config")
 
     term:on_vim_resized()
 
     assert.spy(spy_win_set_config).was_called_with(term:get_state("window"), match.is_table())
-  end)
-
-  it("applies new win config to a split terminal", function()
-    local term = Terminal:new({ layout = "right" })
-    term:open()
-    local spy_win_set_config = spy.on(vim.api, "nvim_win_set_config")
-
-    term:on_vim_resized()
-
-    assert.spy(spy_win_set_config).was_called_with(term:get_state("window"), match.is_table())
-  end)
-
-  it("does nothing if layout is not float", function()
-    local term = Terminal:new({ layout = "tab" })
-    term:open()
-    local spy_win_set_config = spy.on(vim.api, "nvim_win_set_config")
-
-    term:on_vim_resized()
-
-    assert.spy(spy_win_set_config).was_not_called()
   end)
 end)
 

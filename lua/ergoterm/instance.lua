@@ -15,6 +15,12 @@ local config = lazy.require("ergoterm.config")
 local focus = require("ergoterm.instance.focus")
 ---@module "ergoterm.mode"
 local mode = lazy.require("ergoterm.mode")
+---@module "ergoterm.events.on_buf_enter"
+local on_buf_enter = require("ergoterm.events.on_buf_enter")
+---@module "ergoterm.events.on_vim_resized"
+local on_vim_resized = require("ergoterm.events.on_vim_resized")
+---@module "ergoterm.events.on_win_leave"
+local on_win_leave = require("ergoterm.events.on_win_leave")
 ---@module "ergoterm.instance.open"
 local open = require("ergoterm.instance.open")
 ---@module "ergoterm.instance.send"
@@ -344,28 +350,23 @@ end
 ---Handles buffer enter events for the terminal
 ---
 ---Restores the appropriate terminal mode and sets the last focused terminal.
----Called automatically when entering the terminal buffer.
 function Terminal:on_buf_enter()
-  self:_set_return_mode()
-  self:_set_last_focused()
+  return on_buf_enter(self)
 end
 
 ---Handles window leave events for the terminal
 ---
 ---Saves the current mode if persist_mode is enabled, and automatically closes
----floating terminals when focus is lost to prevent them from lingering.
+---floating terminals.
 function Terminal:on_win_leave()
-  if self.persist_mode then self:_persist_mode() end
-  if self._state.layout == "float" then self:close() end
+  return on_win_leave(self)
 end
 
 ---Handles Vim resize events for the terminal
 ---
----Updates the floating window configuration if the terminal is in float layout.
+---Updates the window configuration if the terminal is split or float layout.
 function Terminal:on_vim_resized()
-  if vim.tbl_contains({ "float", "above", "below", "left", "right" }, self._state.layout) and self:is_open() then
-    vim.api.nvim_win_set_config(self._state.window, self:_compute_win_config(self._state.layout))
-  end
+  return on_vim_resized(self)
 end
 
 ---Accesses internal terminal state
