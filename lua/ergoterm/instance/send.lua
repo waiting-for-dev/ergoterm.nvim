@@ -14,7 +14,8 @@ local utils = lazy.require("ergoterm.utils")
 
 local M = {}
 
----@alias send_input_type "single_line" | "visual_lines" | "visual_selection" | "line" | "char" | "last"
+---@alias send_last "last"
+---@alias send_input_type selection_type | send_last
 ---@alias send_action "focus" | "open" | "start"
 
 ---@class SendOptions
