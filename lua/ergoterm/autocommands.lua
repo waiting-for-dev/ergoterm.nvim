@@ -34,7 +34,6 @@ function M.setup()
     callback = M.on_buf_enter
   })
 
-
   vim.api.nvim_create_autocmd("WinLeave", {
     group = AUGROUP,
     pattern = ergoterm_pattern,

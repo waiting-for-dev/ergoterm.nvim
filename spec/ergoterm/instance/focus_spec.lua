@@ -34,7 +34,7 @@ describe(".focus", function()
     assert.equal(term:get_state("window"), vim.api.nvim_get_current_win())
   end)
 
-  it("sets the terminal as the last focused", function()
+  it("triggers on_buf_enter", function()
     local term = Terminal:new()
 
     focus(term)

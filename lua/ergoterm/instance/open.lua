@@ -74,7 +74,7 @@ function M._open_in_tab(term)
   local current_window = vim.api.nvim_get_current_win()
   vim.cmd("tabnew")
   vim.bo.bufhidden = "wipe"
-  vim.api.nvim_set_current_buf(term._state.bufnr)
+  vim.cmd("noautocmd call nvim_set_current_buf(" .. term._state.bufnr .. ")")
   local window = vim.api.nvim_get_current_win()
   vim.api.nvim_set_current_win(current_window)
   vim.defer_fn(function() vim.cmd("stopinsert") end, 100)

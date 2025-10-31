@@ -520,39 +520,8 @@ function Terminal:_compute_size()
 end
 
 ---@private
-function Terminal:_restore_mode()
-  mode.set(self._state.mode)
-  return self
-end
-
----@private
-function Terminal:_set_last_focused()
-  collection._state.last_focused = self
-  if self.bang_target then
-    collection._state.last_focused_bang_target = self
-  end
-  return self
-end
-
----@private
-function Terminal:_set_return_mode()
-  if self.persist_mode then
-    self:_restore_mode()
-  else
-    self:_set_initial_mode()
-  end
-  return self
-end
-
----@private
 function Terminal:_persist_mode()
   self._state.mode = mode.get()
-  return self
-end
-
----@private
-function Terminal:_set_initial_mode()
-  mode.set_initial(self.start_in_insert)
   return self
 end
 
