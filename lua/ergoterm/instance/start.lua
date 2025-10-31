@@ -1,6 +1,6 @@
 ---@diagnostic disable: invisible
 
-local FILETYPE = "ErgoTerm"
+local FILETYPE = "ergoterm"
 
 local M = {}
 
@@ -65,10 +65,10 @@ end
 ---@private
 ---@param term Terminal
 function M._set_buffer_options(term)
-  local buf = vim.bo[term._state.bufnr]
-  buf.filetype = FILETYPE
-  buf.buflisted = false
-  buf.bufhidden = "hide"
+  local bufnr = term._state.bufnr
+  vim.api.nvim_set_option_value("filetype", FILETYPE, { scope = "local", buf = bufnr })
+  vim.api.nvim_set_option_value("buflisted", false, { scope = "local", buf = bufnr })
+  vim.api.nvim_set_option_value("bufhidden", "hide", { scope = "local", buf = bufnr })
 end
 
 return setmetatable(M, {

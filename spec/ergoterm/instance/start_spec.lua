@@ -135,7 +135,7 @@ describe(".start", function()
 
     start(term)
 
-    assert.equal("ErgoTerm", vim.bo[term:get_state("bufnr")].filetype)
+    assert.equal("ergoterm", vim.bo[term:get_state("bufnr")].filetype)
   end)
 
   it("sets the buffer as not listed", function()

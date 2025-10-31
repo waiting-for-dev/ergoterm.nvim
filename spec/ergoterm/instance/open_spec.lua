@@ -192,6 +192,22 @@ describe(".open", function()
     assert.is_false(vim.wo[term:get_state("window")].relativenumber)
   end)
 
+  it("sets the window with foldmethod manual", function()
+    local term = Terminal:new()
+
+    open.open(term)
+
+    assert.equal("manual", vim.wo[term:get_state("window")].foldmethod)
+  end)
+
+  it("sets the window with foldtext foldtext()", function()
+    local term = Terminal:new()
+
+    open.open(term)
+
+    assert.equal("foldtext()", vim.wo[term:get_state("window")].foldtext)
+  end)
+
   it("sets the window as no side scroll when layout is float", function()
     local term = Terminal:new()
 

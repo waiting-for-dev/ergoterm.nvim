@@ -95,6 +95,8 @@ function M._set_win_options(term)
   vim.api.nvim_set_option_value("number", false, { scope = "local", win = window })
   vim.api.nvim_set_option_value("signcolumn", "no", { scope = "local", win = window })
   vim.api.nvim_set_option_value("relativenumber", false, { scope = "local", win = window })
+  vim.api.nvim_set_option_value("foldmethod", "manual", { scope = "local", win = window })
+  vim.api.nvim_set_option_value("foldtext", "foldtext()", { scope = "local", win = window })
   if term._state.layout == "float" then
     M._set_float_options(term)
   end

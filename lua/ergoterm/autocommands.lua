@@ -22,12 +22,6 @@ function M.on_win_leave()
   end
 end
 
-function M.on_filetype(ev)
-  local bufnr = ev.buf
-  vim.api.nvim_buf_set_option(bufnr, "foldmethod", "manual")
-  vim.api.nvim_buf_set_option(bufnr, "foldtext", "foldtext()")
-end
-
 -- Setup autocommands for the plugin.
 function M.setup()
   vim.api.nvim_create_augroup(AUGROUP, { clear = true })
@@ -45,12 +39,6 @@ function M.setup()
     group = AUGROUP,
     pattern = ergoterm_pattern,
     callback = M.on_win_leave
-  })
-
-  vim.api.nvim_create_autocmd("FileType", {
-    group = AUGROUP,
-    pattern = ergoterm_pattern,
-    callback = M.on_filetype
   })
 end
 
