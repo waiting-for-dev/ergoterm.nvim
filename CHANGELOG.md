@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Added `term:is_cleaned_up()` method to check if terminal has been cleaned up.
 - Show error if invalid layout is provided on opening terminal.
 - Set buffer options on start instead of on opening terminal window.
+- Add `term:unfocus(winid?)`.
 
 ## 0.8.0 - 2025-10-15
 

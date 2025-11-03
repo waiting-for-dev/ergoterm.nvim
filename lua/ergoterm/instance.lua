@@ -15,6 +15,8 @@ local config = lazy.require("ergoterm.config")
 local focus = require("ergoterm.instance.focus")
 ---@module "ergoterm.mode"
 local mode = lazy.require("ergoterm.mode")
+---@module "ergoterm.instance.unfocus"
+local unfocus = require("ergoterm.instance.unfocus")
 ---@module "ergoterm.events.on_buf_enter"
 local on_buf_enter = require("ergoterm.events.on_buf_enter")
 ---@module "ergoterm.events.on_exit"
@@ -89,6 +91,7 @@ local utils = lazy.require("ergoterm.utils")
 ---@field name string
 ---@field on_close on_close
 ---@field on_focus on_focus
+---@field on_unfocus on_unfocus
 ---@field on_job_exit on_job_exit
 ---@field on_job_stdout on_job_stdout
 ---@field on_job_stderr on_job_stderr
@@ -136,6 +139,7 @@ function Terminal:new(args)
   term.sticky = vim.F.if_nil(term.sticky, config.get("terminal_defaults.sticky"))
   term.on_close = vim.F.if_nil(term.on_close, config.get("terminal_defaults.on_close"))
   term.on_focus = vim.F.if_nil(term.on_focus, config.get("terminal_defaults.on_focus"))
+  term.on_unfocus = vim.F.if_nil(term.on_unfocus, config.get("terminal_defaults.on_unfocus"))
   term.on_job_stderr = vim.F.if_nil(term.on_job_stderr, config.get("terminal_defaults.on_job_stderr"))
   term.on_job_stdout = vim.F.if_nil(term.on_job_stdout, config.get("terminal_defaults.on_job_stdout"))
   term.on_job_exit = vim.F.if_nil(term.on_job_exit, config.get("terminal_defaults.on_job_exit"))
@@ -272,6 +276,19 @@ end
 ---@return boolean true if this terminal's window is the current window
 function Terminal:is_focused()
   return focus.is_focused(self)
+end
+
+---Removes focus from the terminal window
+---
+---Persists mode if configured, and closes floating terminals.
+---Optionally switches to a different window.
+---
+---Triggers the `on_unfocus` callback.
+---
+---@param win_id number? optional window ID to switch to after unfocusing
+---@return Terminal self for method chaining
+function Terminal:unfocus(win_id)
+  return unfocus(self, win_id)
 end
 
 ---Cleans up the terminal

@@ -281,6 +281,7 @@ All options default to values from your configuration:
 - `on_close` - Called when the terminal window is closed. Receives the terminal instance as its only argument
 - `on_create` - Called when the terminal buffer is first created. Receives the terminal instance as its only argument
 - `on_focus` - Called when the terminal window gains focus. Receives the terminal instance as its only argument
+- `on_unfocus` - Called when the terminal window loses focus. Receives the terminal instance as its only argument
 - `on_job_exit` - Called when the terminal process exits. Receives the terminal instance, job ID, exit code, and event name
 - `on_job_stderr` - Called when the terminal process outputs to stderr. Receives the terminal instance, channel ID, data lines, and stream name
 - `on_job_stdout` - Called when the terminal process outputs to stdout. Receives the terminal instance, channel ID, data lines, and stream name
@@ -332,6 +333,7 @@ term:open()   -- Just create the window (calls start() if needed)
 - `start()` - Creates buffer and starts job process
 - `open(layout?)` - Creates window with optional layout override
 - `focus(layout?)` - Brings terminal into focus, cascades through start/open
+- `unfocus(win_id?)` - Removes focus from terminal, optionally switching to given window
 - `close()` - Closes window but keeps job running
 - `stop()` - Terminates job and cleans up buffer
 - `cleanup()` - Cleans up terminal resources
@@ -549,6 +551,7 @@ require("ergoterm").setup({
     on_close = function(term) end,
     on_create = function(term) end,
     on_focus = function(term) end,
+    on_unfocus = function(term) end,
     on_job_exit = function(term, job_id, exit_code, event_name) end,
     on_job_stderr = function(term, channel_id, data_lines, stream_name) end,
     on_job_stdout = function(term, channel_id, data_lines, stream_name) end,

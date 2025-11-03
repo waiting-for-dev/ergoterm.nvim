@@ -118,7 +118,7 @@ Syntax: >vim
 
 All terminal configuration options are available (see |ergoterm-options| for
 the complete list), except callback functions (on_create, on_open, on_close,
-on_focus, on_start, on_stop, on_job_exit, on_job_stdout, on_job_stderr).
+on_focus, on_unfocus, on_start, on_stop, on_job_exit, on_job_stdout, on_job_stderr).
 
 Special syntax for nested and list settings:
     • Dot notation for table settings: Use table.key=value to set individual
@@ -620,8 +620,15 @@ terminal_defaults.on_create ~
 terminal_defaults.on_focus ~
     Type: `function(term)`
     Default: No-op
-    
+
     Called when a terminal window gains focus.
+
+                                                         *ergoterm-on_unfocus*
+terminal_defaults.on_unfocus ~
+    Type: `function(term)`
+    Default: No-op
+
+    Called when a terminal window loses focus.
 
                                                         *ergoterm-on_job_exit*
 terminal_defaults.on_job_exit ~
@@ -772,6 +779,14 @@ Terminal:open({layout})                                 *Terminal:open()*
 Terminal:focus({layout})                                *Terminal:focus()*
     Bring terminal into focus. Cascades through start() and open()
     if needed. Optional layout parameter for first-time opening.
+
+Terminal:unfocus({win_id})                              *Terminal:unfocus()*
+    Remove focus from terminal window. Persists mode if configured,
+    and closes floating terminals. Optionally switches to a different
+    window if win_id is provided.
+
+    Parameters:
+        {win_id} - number, optional window ID to switch to after unfocusing
 
 Terminal:close()                                        *Terminal:close()*
     Close terminal window but keep job running.
