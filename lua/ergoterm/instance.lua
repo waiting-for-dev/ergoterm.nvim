@@ -530,12 +530,6 @@ function Terminal:_compute_size()
 end
 
 ---@private
-function Terminal:_persist_mode()
-  self._state.mode = mode.get()
-  return self
-end
-
----@private
 function Terminal:_scroll_bottom()
   if self:is_open() then
     vim.api.nvim_buf_call(self._state.bufnr, function()
