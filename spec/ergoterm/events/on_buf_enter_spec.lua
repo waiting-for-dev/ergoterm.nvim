@@ -45,4 +45,15 @@ describe(".on_buf_enter", function()
 
     assert.spy(spy_mode_set_initial).was_called_with(false)
   end)
+
+  it("runs the on_focus callback", function()
+    local called = false
+    local term = Terminal:new({
+      on_focus = function() called = true end,
+    })
+
+    on_buf_enter(term)
+
+    assert.is_true(called)
+  end)
 end)

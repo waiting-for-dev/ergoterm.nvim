@@ -14,6 +14,7 @@ local M = {}
 function M.on_buf_enter(term)
   M._set_last_focused(term)
   M._set_return_mode(term)
+  term:on_focus()
 end
 
 ---@private

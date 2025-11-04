@@ -35,18 +35,6 @@ describe(".unfocus", function()
     vim.api.nvim_win_close(other_win, true)
   end)
 
-  it("runs the on_unfocus callback", function()
-    local called = false
-    local term = Terminal:new({
-      on_unfocus = function() called = true end,
-    })
-    term:focus()
-
-    unfocus(term)
-
-    assert.is_true(called)
-  end)
-
   it("does nothing if terminal is not focused", function()
     local called = false
     local term = Terminal:new({

@@ -52,4 +52,16 @@ describe(".on_win_leave", function()
 
     assert.is_true(term:is_open())
   end)
+
+  it("runs the on_unfocus callback", function()
+    local called = false
+    local term = Terminal:new({
+      on_unfocus = function() called = true end,
+    })
+    term:focus()
+
+    on_win_leave(term)
+
+    assert.is_true(called)
+  end)
 end)

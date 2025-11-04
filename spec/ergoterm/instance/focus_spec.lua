@@ -41,17 +41,6 @@ describe(".focus", function()
 
     assert.equal(term, collection.get_last_focused())
   end)
-
-  it("runs the on_focus callback", function()
-    local called = false
-    local term = Terminal:new({
-      on_focus = function() called = true end,
-    })
-
-    focus(term)
-
-    assert.is_true(called)
-  end)
 end)
 
 describe(".is_focused", function()

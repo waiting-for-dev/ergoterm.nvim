@@ -13,7 +13,6 @@ function M.unfocus(term, win_id)
     if win_id and vim.api.nvim_win_is_valid(win_id) then
       vim.api.nvim_set_current_win(win_id)
     end
-    term:on_unfocus()
   end
   return term
 end

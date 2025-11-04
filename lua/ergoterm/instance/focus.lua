@@ -12,7 +12,6 @@ function M.focus(term, layout)
   if not M.is_focused(term) then
     vim.api.nvim_set_current_win(term._state.window)
     on_buf_enter(term)
-    term:on_focus()
   end
   return term
 end

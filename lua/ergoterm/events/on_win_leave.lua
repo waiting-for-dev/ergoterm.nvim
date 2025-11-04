@@ -6,6 +6,7 @@ local M = {}
 function M.on_win_leave(term)
   if term.persist_mode then term:_persist_mode() end
   if term._state.layout == "float" then term:close() end
+  term:on_unfocus()
 end
 
 return setmetatable(M, {
