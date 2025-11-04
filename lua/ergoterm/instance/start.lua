@@ -2,6 +2,8 @@
 
 ---@module "ergoterm.events.on_win_closed"
 local on_win_closed = require("ergoterm.events.on_win_closed")
+---@module "ergoterm.events.on_vim_resized"
+local on_vim_resized = require("ergoterm.events.on_vim_resized")
 
 local FILETYPE = "ergoterm"
 
@@ -37,7 +39,7 @@ function M._setup_buffer_autocommands(term)
   vim.api.nvim_create_autocmd("VimResized", {
     buffer = term._state.bufnr,
     group = group,
-    callback = function() term:on_vim_resized() end
+    callback = function() on_vim_resized(term) end
   })
   vim.api.nvim_create_autocmd("BufWipeout", {
     buffer = term._state.bufnr,

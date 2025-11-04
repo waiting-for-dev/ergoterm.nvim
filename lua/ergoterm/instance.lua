@@ -383,13 +383,6 @@ function Terminal:on_win_leave()
   return on_win_leave(self)
 end
 
----Handles Vim resize events for the terminal
----
----Updates the window configuration if the terminal is split or float layout.
-function Terminal:on_vim_resized()
-  return on_vim_resized(self)
-end
-
 ---Accesses internal terminal state
 ---
 ---Primarily used for debugging and testing.

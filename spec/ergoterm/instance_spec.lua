@@ -630,17 +630,6 @@ describe(":on_win_leave", function()
   end)
 end)
 
-describe(":on_vim_resized", function()
-  it("handles vim resize event", function()
-    local term = Terminal:new({ layout = "float" }):open()
-    local spy_win_set_config = spy.on(vim.api, "nvim_win_set_config")
-
-    term:on_vim_resized()
-
-    assert.spy(spy_win_set_config).was_called_with(term:get_state("window"), match.is_table())
-  end)
-end)
-
 describe(":_setup_buffer_autocommands", function()
   it("adds a VimResized autocommand", function()
     local term = Terminal:new()
