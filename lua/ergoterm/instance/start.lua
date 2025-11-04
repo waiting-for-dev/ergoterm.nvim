@@ -1,5 +1,8 @@
 ---@diagnostic disable: invisible
 
+---@module "ergoterm.events.on_win_closed"
+local on_win_closed = require("ergoterm.events.on_win_closed")
+
 local FILETYPE = "ergoterm"
 
 local M = {}
@@ -44,7 +47,7 @@ function M._setup_buffer_autocommands(term)
   vim.api.nvim_create_autocmd("WinClosed", {
     buffer = term._state.bufnr,
     group = group,
-    callback = function() term:close() end
+    callback = function() on_win_closed(term) end
   })
 end
 
