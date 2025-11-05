@@ -1,22 +1,16 @@
----@module "ergoterm.lazy"
-local lazy = require("ergoterm.lazy")
-
----@module "ergoterm"
-local terms = lazy.require("ergoterm")
-
 local AUGROUP = "ErgoTermAutoCommands"
 
 local M = {}
 
 function M.on_buf_enter()
-  local term = terms.identify()
+  local term = require("ergoterm").identify()
   if term then
     term:on_buf_enter()
   end
 end
 
 function M.on_win_leave()
-  local term = terms.identify()
+  local term = require("ergoterm").identify()
   if term then
     term:on_win_leave()
   end

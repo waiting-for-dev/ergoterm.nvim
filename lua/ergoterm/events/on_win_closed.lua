@@ -1,10 +1,7 @@
 ---@diagnostic disable: invisible
 
----@module "ergoterm.lazy"
-local lazy = require("ergoterm.lazy")
-
 ---@module "ergoterm.size"
-local size_utils = lazy.require("ergoterm.size_utils")
+local size_utils = require("ergoterm.size_utils")
 
 local SPLIT_LAYOUTS = { "above", "below", "left", "right" }
 

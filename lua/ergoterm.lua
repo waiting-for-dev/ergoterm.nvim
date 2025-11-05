@@ -1,14 +1,11 @@
 --- Entry point for the plugin.
 ---
----@module "ergoterm.lazy"
-local lazy = require("ergoterm.lazy")
-
 ---@module "ergoterm.autocommands"
-local autocommands = lazy.require("ergoterm.autocommands")
+local autocommands = require("ergoterm.autocommands")
 ---@module "ergoterm.commands"
-local commands = lazy.require("ergoterm.commands")
+local commands = require("ergoterm.commands")
 ---@module "ergoterm.config"
-local config = lazy.require("ergoterm.config")
+local config = require("ergoterm.config")
 ---@module "ergoterm.collection"
 local collection = require("ergoterm.collection")
 ---@module "ergoterm.instance"

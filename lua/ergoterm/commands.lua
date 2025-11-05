@@ -1,16 +1,11 @@
 ---ErgoTerm vim commands
 
----@module "ergoterm.lazy"
-local lazy = require("ergoterm.lazy")
-
 ---@module "ergoterm.commandline"
-local commandline = lazy.require("ergoterm.commandline")
+local commandline = require("ergoterm.commandline")
 ---@module "ergoterm.config"
-local config = lazy.require("ergoterm.config")
----@module "ergoterm"
-local terms = lazy.require("ergoterm")
+local config = require("ergoterm.config")
 ---@module "ergoterm.utils"
-local utils = lazy.require("ergoterm.utils")
+local utils = require("ergoterm.utils")
 
 local M = {}
 
@@ -46,7 +41,7 @@ function M.new(args)
     tags = { parsed.tags, "table", true },
     meta = { parsed.meta, "table", true }
   })
-  return terms.Terminal:new({
+  return require("ergoterm").Terminal:new({
     cmd = parsed.cmd,
     dir = parsed.dir,
     layout = parsed.layout,
@@ -239,7 +234,7 @@ end
 ---
 ---@return boolean the new state after toggling
 function M.toggle_universal_selection()
-  local new_state = terms.toggle_universal_selection()
+  local new_state = require("ergoterm").toggle_universal_selection()
   local status = new_state and "enabled" or "disabled"
   utils.notify("Universal selection " .. status, "info")
   return new_state
@@ -247,7 +242,7 @@ end
 
 ---@private
 M._execute_on_last_focused = function(action_fn)
-  local term = terms.get_last_focused()
+  local term = require("ergoterm").get_last_focused()
   if not term then
     utils.notify("No terminals are open", "error")
     return false
@@ -267,7 +262,7 @@ M._execute_on_terminal = function(target, bang, action_fn, picker, prompt)
   if bang then
     return M._execute_on_last_focused(action_fn)
   elseif target then
-    local term = terms.get_by_name(target)
+    local term = require("ergoterm").get_by_name(target)
     if not term then
       utils.notify(string.format("Terminal '%s' not found", target), "error")
       return false
@@ -275,7 +270,7 @@ M._execute_on_terminal = function(target, bang, action_fn, picker, prompt)
     action_fn(term)
     return true
   else
-    return terms.select({
+    return require("ergoterm").select({
       prompt = prompt,
       callbacks = { default = { fn = action_fn, desc = "action" } },
       picker = picker

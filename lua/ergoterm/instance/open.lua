@@ -1,10 +1,7 @@
 ---@diagnostic disable: invisible
 
----@module "ergoterm.lazy"
-local lazy = require("ergoterm.lazy")
-
 ---@module "ergoterm.utils"
-local utils = lazy.require("ergoterm.utils")
+local utils = require("ergoterm.utils")
 
 local NEW_WINDOW_LAYOUTS = { "above", "below", "left", "right", "float" }
 local TAB_LAYOUT = "tab"

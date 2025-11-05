@@ -1,9 +1,7 @@
 ---@diagnostic disable: invisible
 
----@module "ergoterm.lazy"
-local lazy = require("ergoterm.lazy")
 ---@module "ergoterm.mode"
-local mode = lazy.require("ergoterm.mode")
+local mode = require("ergoterm.mode")
 
 local M = {}
 

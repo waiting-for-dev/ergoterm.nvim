@@ -1,8 +1,5 @@
 local M = {}
 
----@module "ergoterm.lazy"
-local lazy = require("ergoterm.lazy")
-
 ---@module "ergoterm.instance.cleanup"
 local cleanup = require("ergoterm.instance.cleanup")
 ---@module "ergoterm.instance.close"
@@ -10,11 +7,11 @@ local close = require("ergoterm.instance.close")
 ---@module "ergoterm.collection"
 local collection = require("ergoterm.collection")
 ---@module "ergoterm.config"
-local config = lazy.require("ergoterm.config")
+local config = require("ergoterm.config")
 ---@module "ergoterm.instance.focus"
 local focus = require("ergoterm.instance.focus")
 ---@module "ergoterm.mode"
-local mode = lazy.require("ergoterm.mode")
+local mode = require("ergoterm.mode")
 ---@module "ergoterm.instance.unfocus"
 local unfocus = require("ergoterm.instance.unfocus")
 ---@module "ergoterm.events.on_buf_enter"
@@ -34,11 +31,11 @@ local start = require("ergoterm.instance.start")
 ---@module "ergoterm.instance.stop"
 local stop = require("ergoterm.instance.stop")
 ---@module "ergoterm.size"
-local size_utils = lazy.require("ergoterm.size_utils")
+local size_utils = require("ergoterm.size_utils")
 ---@module "ergoterm.instance.update"
 local update = require("ergoterm.instance.update")
 ---@module "ergoterm.utils"
-local utils = lazy.require("ergoterm.utils")
+local utils = require("ergoterm.utils")
 
 ---@class TerminalState
 ---@field bufnr number?

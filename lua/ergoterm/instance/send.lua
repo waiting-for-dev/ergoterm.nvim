@@ -1,16 +1,13 @@
 ---@diagnostic disable: invisible
 
----@module "ergoterm.lazy"
-local lazy = require("ergoterm.lazy")
-
 ---@module "ergoterm.config"
-local config = lazy.require("ergoterm.config")
+local config = require("ergoterm.config")
 ---@module "ergoterm.instance.send.text_decorators"
-local text_decorators = lazy.require("ergoterm.instance.send.text_decorators")
+local text_decorators = require("ergoterm.instance.send.text_decorators")
 ---@module "ergoterm.instance.send.text_selector"
-local text_selector = lazy.require("ergoterm.instance.send.text_selector")
+local text_selector = require("ergoterm.instance.send.text_selector")
 ---@module "ergoterm.utils"
-local utils = lazy.require("ergoterm.utils")
+local utils = require("ergoterm.utils")
 
 local M = {}
 

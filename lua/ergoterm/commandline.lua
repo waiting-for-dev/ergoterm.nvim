@@ -1,12 +1,9 @@
----@module "ergoterm.lazy"
-local lazy = require("ergoterm.lazy")
-
 ---@module "ergoterm.utils"
-local utils = lazy.require("ergoterm.utils")
+local utils = require("ergoterm.utils")
 ---@module "ergoterm.config"
-local config = lazy.require("ergoterm.config")
+local config = require("ergoterm.config")
 ---@module "ergoterm.collection"
-local collection = lazy.require("ergoterm.collection")
+local collection = require("ergoterm.collection")
 
 local M = {}
 
