@@ -73,19 +73,27 @@ end
 ---Allows selection of a terminal
 ---
 ---Bang mode (!) focuses the last focused terminal directly.
+---Target option selects a terminal by name.
 ---
----Without bang mode, it displays all available terminals in the configured picker interface.
+---Without bang or target, it displays all available terminals in the configured picker interface.
 ---Available actions depend on the picker's `select_actions` configuration.
 ---
+---@param args string command-line arguments
 ---@param bang boolean true to use last focused terminal
 ---@param picker Picker the picker implementation to use for selection
 ---@return boolean success status of the operation
-function M.select(bang, picker)
-  if bang then
-    return M._execute_on_last_focused(function(t) t:focus() end)
-  else
-    return terms.select({ prompt = "Please select a terminal to open (or focus): ", picker = picker })
-  end
+function M.select(args, bang, picker)
+  local parsed = commandline.parse(args)
+  vim.validate({
+    target = { parsed.target, "string", true },
+  })
+  return M._execute_on_terminal(
+    parsed.target,
+    bang,
+    function(t) t:focus() end,
+    picker,
+    "Please select a terminal to open (or focus): "
+  )
 end
 
 ---Sends text to a terminal with flexible input sources
@@ -105,8 +113,9 @@ end
 ---• new_line: appends newline for command execution (default: true)
 ---• decorator: transforms text before sending (identity, markdown_code)
 ---
----Bang mode (!) uses the last focused terminal directly, otherwise prompts
----for terminal selection via picker.
+---Bang mode (!) uses the last focused terminal directly.
+---Target option selects a terminal by name.
+---Otherwise prompts for terminal selection via picker.
 ---
 ---@param args string command-line arguments with send options
 ---@param range number 0 for no range, >0 for visual range
@@ -116,6 +125,7 @@ end
 function M.send(args, range, bang, picker)
   local parsed = commandline.parse(args)
   vim.validate({
+    target = { parsed.target, "string", true },
     text = { parsed.text, "string", true },
     action = { parsed.action, "string", true },
     decorator = { parsed.decorator, "string", true },
@@ -134,15 +144,13 @@ function M.send(args, range, bang, picker)
       decorator = parsed.decorator
     })
   end
-  if bang then
-    return M._execute_on_last_focused(send_to_terminal)
-  else
-    return terms.select({
-      prompt = "Please select a terminal to send text: ",
-      callbacks = { default = { fn = send_to_terminal, desc = "send-text" } },
-      picker = picker
-    })
-  end
+  return M._execute_on_terminal(
+    parsed.target,
+    bang,
+    send_to_terminal,
+    picker,
+    "Please select a terminal to send text: "
+  )
 end
 
 ---Updates terminal configuration after creation
@@ -151,8 +159,9 @@ end
 ---Updatable fields include layout, name, auto_scroll, persist_mode, persist_size,
 ---selectable, and start_in_insert. Changes take effect immediately.
 ---
----Bang mode (!) targets the last focused terminal directly, otherwise
----prompts for terminal selection.
+---Bang mode (!) targets the last focused terminal directly.
+---Target option selects a terminal by name.
+---Otherwise prompts for terminal selection.
 ---
 ---@param args string command-line arguments with update options
 ---@param bang boolean true to use last focused terminal
@@ -161,6 +170,7 @@ end
 function M.update(args, bang, picker)
   local parsed = commandline.parse(args)
   vim.validate({
+    target = { parsed.target, "string", true },
     layout = { parsed.layout, "string", true },
     name = { parsed.name, "string", true },
     auto_scroll = { parsed.auto_scroll, "boolean", true },
@@ -180,18 +190,18 @@ function M.update(args, bang, picker)
     tags = { parsed.tags, "table", true },
     meta = { parsed.meta, "table", true }
   })
+  local target = parsed.target
+  parsed.target = nil
   local update_terminal = function(t)
     t:update(parsed, { deep_merge = true })
   end
-  if bang then
-    return M._execute_on_last_focused(update_terminal)
-  else
-    return terms.select({
-      prompt = "Please select a terminal to update: ",
-      callbacks = { default = { fn = update_terminal, desc = "update-terminal" } },
-      picker = picker
-    })
-  end
+  return M._execute_on_terminal(
+    target,
+    bang,
+    update_terminal,
+    picker,
+    "Please select a terminal to update: "
+  )
 end
 
 ---Inspects a terminal's internal state
@@ -199,25 +209,26 @@ end
 ---Displays the terminal object's internal structure using vim.inspect().
 ---Useful for debugging and understanding terminal configuration.
 ---
----Bang mode (!) inspects the last focused terminal directly, otherwise
----prompts for terminal selection.
+---Bang mode (!) inspects the last focused terminal directly.
+---Target option selects a terminal by name.
+---Otherwise prompts for terminal selection.
 ---
+---@param args string command-line arguments
 ---@param bang boolean true to use last focused terminal
 ---@param picker Picker interface for terminal selection
 ---@return boolean success status of the operation
-function M.inspect(bang, picker)
-  local inspect_terminal = function(t)
-    vim.print(vim.inspect(t))
-  end
-  if bang then
-    return M._execute_on_last_focused(inspect_terminal)
-  else
-    return terms.select({
-      prompt = "Please select a terminal to inspect: ",
-      callbacks = { default = { fn = inspect_terminal, desc = "inspect-terminal" } },
-      picker = picker
-    })
-  end
+function M.inspect(args, bang, picker)
+  local parsed = commandline.parse(args)
+  vim.validate({
+    target = { parsed.target, "string", true },
+  })
+  return M._execute_on_terminal(
+    parsed.target,
+    bang,
+    function(t) vim.print(vim.inspect(t)) end,
+    picker,
+    "Please select a terminal to inspect: "
+  )
 end
 
 ---Toggles universal selection mode
@@ -246,6 +257,32 @@ M._execute_on_last_focused = function(action_fn)
   end
 end
 
+---@private
+M._execute_on_terminal = function(target, bang, action_fn, picker, prompt)
+  if target and bang then
+    utils.notify("Cannot use both target and ! options", "error")
+    return false
+  end
+
+  if bang then
+    return M._execute_on_last_focused(action_fn)
+  elseif target then
+    local term = terms.get_by_name(target)
+    if not term then
+      utils.notify(string.format("Terminal '%s' not found", target), "error")
+      return false
+    end
+    action_fn(term)
+    return true
+  else
+    return terms.select({
+      prompt = prompt,
+      callbacks = { default = { fn = action_fn, desc = "action" } },
+      picker = picker
+    })
+  end
+end
+
 
 ---Registers ErgoTerm user commands with Neovim
 ---
@@ -263,8 +300,8 @@ function M.setup(conf)
   end, { complete = commandline.term_new_complete, nargs = "*" })
 
   command("TermSelect", function(opts)
-    M.select(opts.bang, picker)
-  end, { nargs = 0, bang = true })
+    M.select(opts.args, opts.bang, picker)
+  end, { nargs = "?", complete = commandline.term_select_complete, bang = true })
 
   command("TermSend", function(opts)
     M.send(opts.args, opts.range, opts.bang, picker)
@@ -275,8 +312,8 @@ function M.setup(conf)
   end, { nargs = 1, complete = commandline.term_update_complete, bang = true })
 
   command("TermInspect", function(opts)
-    M.inspect(opts.bang, picker)
-  end, { nargs = 0, bang = true })
+    M.inspect(opts.args, opts.bang, picker)
+  end, { nargs = "?", complete = commandline.term_inspect_complete, bang = true })
 
   command("TermToggleUniversalSelection", function()
     M.toggle_universal_selection()

@@ -1,6 +1,8 @@
 ---@diagnostic disable: undefined-field
 
+local collection = require("ergoterm.collection")
 local commandline = require("ergoterm.commandline")
+local terms = require("ergoterm")
 
 describe("commandline.parse", function()
   it("parses simple key=value pairs", function()
@@ -95,6 +97,7 @@ describe("commandline.term_send_complete", function()
   it("completes available options", function()
     local result = commandline.term_send_complete("", "", 0)
 
+    assert.is_true(vim.tbl_contains(result, "target="))
     assert.is_true(vim.tbl_contains(result, "text="))
     assert.is_true(vim.tbl_contains(result, "action="))
     assert.is_true(vim.tbl_contains(result, "decorator="))
@@ -130,6 +133,34 @@ describe("commandline.term_send_complete", function()
     assert.is_true(vim.tbl_contains(result, "action="))
     assert.is_false(vim.tbl_contains(result, "text="))
     assert.is_false(vim.tbl_contains(result, "trim="))
+  end)
+
+  it("completes target with terminal names", function()
+    terms.Terminal:new({ name = "term1" })
+    terms.Terminal:new({ name = "term2" })
+
+    local result = commandline.term_send_complete("target=", "target=", 7)
+
+    assert.is_true(vim.tbl_contains(result, "target=term1"))
+    assert.is_true(vim.tbl_contains(result, "target=term2"))
+
+    collection.cleanup_all()
+    collection.reset_ids()
+  end)
+
+  it("completes target with partial terminal names", function()
+    terms.Terminal:new({ name = "term1" })
+    terms.Terminal:new({ name = "term2" })
+    terms.Terminal:new({ name = "other" })
+
+    local result = commandline.term_send_complete("target=term", "target=term", 11)
+
+    assert.is_true(vim.tbl_contains(result, "target=term1"))
+    assert.is_true(vim.tbl_contains(result, "target=term2"))
+    assert.is_false(vim.tbl_contains(result, "target=other"))
+
+    collection.cleanup_all()
+    collection.reset_ids()
   end)
 end)
 
@@ -260,6 +291,7 @@ describe("commandline.term_update_complete", function()
   it("completes available options", function()
     local result = commandline.term_update_complete("", "", 0)
 
+    assert.is_true(vim.tbl_contains(result, "target="))
     assert.is_true(vim.tbl_contains(result, "layout="))
     assert.is_true(vim.tbl_contains(result, "name="))
     assert.is_true(vim.tbl_contains(result, "auto_scroll="))
@@ -283,5 +315,28 @@ describe("commandline.term_update_complete", function()
     assert.is_true(vim.tbl_contains(result, "float_opts.title="))
     assert.is_true(vim.tbl_contains(result, "tags="))
     assert.is_true(vim.tbl_contains(result, "meta.="))
+  end)
+end)
+
+describe("commandline.term_inspect_complete", function()
+  it("completes available options", function()
+    local result = commandline.term_inspect_complete("", "", 0)
+
+    assert.is_true(vim.tbl_contains(result, "target="))
+  end)
+
+  it("completes target with terminal names", function()
+    local terms = require("ergoterm")
+    local collection = require("ergoterm.collection")
+    collection.reset_ids()
+    collection._state.terminals = {}
+
+    terms.Terminal:new({ name = "inspect-term1" })
+    terms.Terminal:new({ name = "inspect-term2" })
+
+    local result = commandline.term_inspect_complete("target=", "target=", 7)
+
+    assert.is_true(vim.tbl_contains(result, "target=inspect-term1"))
+    assert.is_true(vim.tbl_contains(result, "target=inspect-term2"))
   end)
 end)

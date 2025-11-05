@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - BREAKING: Remove `term:is_stopped()` method. Use `not term:is_started()` instead.
 - BREAKING: Filetype renamed from `ErgoTerm` to `ergoterm`.
 - DEPRECATED API `require("ergoterm.terminal")` use `require("ergoterm")` instead.
+- Add `target` option to commands to specify terminal by name.
 - `term:update()` accepts a `deep_merge` option to merge table settings instead of replacing them.
 - Added `term:is_cleaned_up()` method to check if terminal has been cleaned up.
 - Show error if invalid layout is provided on opening terminal.

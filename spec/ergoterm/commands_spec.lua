@@ -84,14 +84,16 @@ describe("M.select", function()
         return { terminals, prompt, callbacks }
       end
     }
-    local term = terms.Terminal:new():start()
+    local term1 = terms.Terminal:new():start()
+    local term2 = terms.Terminal:new():start()
 
-    local result = commands.select(false, picker)
+    local result = commands.select("", false, picker)
 
     assert.equal("Please select a terminal to open (or focus): ", result[2])
     assert.is_table(result[3])
-    assert.equal(1, #result[1])
-    assert.is_true(vim.tbl_contains(result[1], term))
+    assert.equal(2, #result[1])
+    assert.is_true(vim.tbl_contains(result[1], term1))
+    assert.is_true(vim.tbl_contains(result[1], term2))
   end)
 
   it("focuses last focused terminal when called with bang", function()
@@ -102,7 +104,7 @@ describe("M.select", function()
       select = function() return nil end
     }
 
-    local result = commands.select(true, null_picker)
+    local result = commands.select("", true, null_picker)
 
     assert.spy(spy_focus).was_called()
     assert.is_true(result)
@@ -115,19 +117,57 @@ describe("M.select", function()
     term_not_selectable:focus()
     local spy_focus = spy.on(term, "focus")
 
-    commands.select(true, {})
+    commands.select("", true, {})
 
     assert.spy(spy_focus).was_called()
   end)
 
   it("notifies when bang is given but no last focused terminal exists", function()
     local notify_result = test_helpers.mocking_notify(function()
-      local result = commands.select(true, {})
+      local result = commands.select("", true, {})
+      assert.is_false(result)
+    end)
+
+    assert.equal("No terminals are open", notify_result.msg)
+    assert.equal("error", notify_result.level)
+  end)
+
+  it("focuses terminal by name when target option is provided", function()
+    local term1 = terms.Terminal:new({ name = "target-term" }):start()
+    local term2 = terms.Terminal:new({ name = "other-term" }):start()
+    local spy_focus1 = spy.on(term1, "focus")
+    local spy_focus2 = spy.on(term2, "focus")
+
+    local result = commands.select("target=target-term", false, {})
+
+    assert.spy(spy_focus1).was_called()
+    assert.spy(spy_focus2).was_not_called()
+    assert.is_true(result)
+  end)
+
+  it("notifies when target terminal does not exist", function()
+    terms.Terminal:new({ name = "existing-term" }):start()
+    local notify_result = test_helpers.mocking_notify(function()
+      local result = commands.select("target=nonexistent", false, {})
       assert.is_false(result)
     end)
 
     --- @diagnostic disable: need-check-nil
-    assert.equal("No terminals are open", notify_result.msg)
+    assert.equal("Terminal 'nonexistent' not found", notify_result.msg)
+    assert.equal("error", notify_result.level)
+    --- @diagnostic enable: need-check-nil
+  end)
+
+  it("notifies when both target and bang are provided", function()
+    local term = terms.Terminal:new({ name = "test-term" }):start()
+    term:focus()
+    local notify_result = test_helpers.mocking_notify(function()
+      local result = commands.select("target=test-term", true, {})
+      assert.is_false(result)
+    end)
+
+    --- @diagnostic disable: need-check-nil
+    assert.equal("Cannot use both target and ! options", notify_result.msg)
     assert.equal("error", notify_result.level)
     --- @diagnostic enable: need-check-nil
   end)
@@ -332,6 +372,36 @@ describe("M.send", function()
       decorator = nil
     })
   end)
+
+  it("sends to terminal by name when target option is provided", function()
+    local term1 = terms.Terminal:new({ name = "target-term" }):start()
+    local term2 = terms.Terminal:new({ name = "other-term" }):start()
+    local spy_send1 = spy.on(term1, "send")
+    local spy_send2 = spy.on(term2, "send")
+
+    commands.send("target=target-term text='test'", 0, false, select_only_picker)
+
+    assert.spy(spy_send1).was_called_with(match._, { "test" }, {
+      action = nil,
+      trim = nil,
+      new_line = nil,
+      decorator = nil
+    })
+    assert.spy(spy_send2).was_not_called()
+  end)
+
+  it("notifies when target terminal does not exist for send", function()
+    terms.Terminal:new({ name = "existing-term" }):start()
+    local notify_result = test_helpers.mocking_notify(function()
+      local result = commands.send("target=nonexistent text='test'", 0, false, null_picker)
+      assert.is_false(result)
+    end)
+
+    --- @diagnostic disable: need-check-nil
+    assert.equal("Terminal 'nonexistent' not found", notify_result.msg)
+    assert.equal("error", notify_result.level)
+    --- @diagnostic enable: need-check-nil
+  end)
 end)
 
 describe("M.update", function()
@@ -390,6 +460,27 @@ describe("M.update", function()
 
     assert.equal("left", term.layout)
   end)
+
+  it("updates terminal by name when target option is provided", function()
+    local term1 = terms.Terminal:new({ name = "target-term", sticky = true })
+    local term2 = terms.Terminal:new({ name = "other-term", sticky = true })
+
+    commands.update("target=target-term layout=right", false, select_only_picker)
+
+    assert.equal("right", term1.layout)
+    assert.equal("below", term2.layout)
+  end)
+
+  it("notifies when target terminal does not exist for update", function()
+    terms.Terminal:new({ name = "existing-term", sticky = true })
+    local notify_result = test_helpers.mocking_notify(function()
+      local result = commands.update("target=nonexistent layout=left", false, null_picker)
+      assert.is_false(result)
+    end)
+
+    assert.equal("Terminal 'nonexistent' not found", notify_result.msg)
+    assert.equal("error", notify_result.level)
+  end)
 end)
 
 describe("M.inspect", function()
@@ -413,7 +504,7 @@ describe("M.inspect", function()
       print_arg = passed_arg
     end
 
-    commands.inspect(false, select_only_picker)
+    commands.inspect("", false, select_only_picker)
 
     assert.is_true(print_called)
     assert.is_string(print_arg)
@@ -434,7 +525,7 @@ describe("M.inspect", function()
       print_arg = passed_arg
     end
 
-    commands.inspect(true, null_picker)
+    commands.inspect("", true, null_picker)
 
     assert.is_true(print_called)
     assert.is_string(print_arg)
@@ -442,6 +533,38 @@ describe("M.inspect", function()
     assert.is_true(string.find(print_arg, 'name = "foo"', 1, true) ~= nil)
 
     vim.print = original_print
+  end)
+
+  it("inspects terminal by name when target option is provided", function()
+    terms.Terminal:new({ name = "foo", sticky = true })
+    local original_print = vim.print
+    local print_called = false
+    local print_arg = nil
+    --- @diagnostic disable-next-line: duplicate-set-field
+    vim.print = function(passed_arg)
+      print_called = true
+      print_arg = passed_arg
+    end
+
+    commands.inspect("target=foo", false, select_only_picker)
+
+    assert.is_true(print_called)
+    assert.is_string(print_arg)
+    ---@cast print_arg string
+    assert.is_true(string.find(print_arg, 'name = "foo"', 1, true) ~= nil)
+
+    vim.print = original_print
+  end)
+
+  it("notifies when target terminal does not exist for inspect", function()
+    terms.Terminal:new({ name = "existing-term", sticky = true })
+    local notify_result = test_helpers.mocking_notify(function()
+      local result = commands.inspect("target=nonexistent", false, null_picker)
+      assert.is_false(result)
+    end)
+
+    assert.equal("Terminal 'nonexistent' not found", notify_result.msg)
+    assert.equal("error", notify_result.level)
   end)
 end)
 

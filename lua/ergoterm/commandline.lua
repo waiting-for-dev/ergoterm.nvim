@@ -5,6 +5,8 @@ local lazy = require("ergoterm.lazy")
 local utils = lazy.require("ergoterm.utils")
 ---@module "ergoterm.config"
 local config = lazy.require("ergoterm.config")
+---@module "ergoterm.collection"
+local collection = lazy.require("ergoterm.collection")
 
 local M = {}
 
@@ -40,6 +42,7 @@ end
 ---@field cmd string?
 ---@field dir string?
 ---@field name string?
+---@field target string?
 ---@field action string?
 ---@field decorator string?
 ---@field trim boolean?
@@ -242,6 +245,16 @@ M._all_options = {
   --- match the signature of other options
   name = function() return {} end,
 
+  target = function(typed_name)
+    local terminals = collection.get_all()
+    local names = vim.tbl_map(function(term) return term.name end, terminals)
+    if utils.str_is_empty(typed_name) then return names end
+    return vim.tbl_filter(
+      function(name) return name:match("^" .. vim.pesc(typed_name)) ~= nil end,
+      names
+    )
+  end,
+
   action = function(typed_action)
     local actions = {
       "focus",
@@ -379,6 +392,7 @@ M._term_new_options = {
 }
 
 M._term_update_options = {
+  target = M._all_options.target,
   layout = M._all_options.layout,
   name = M._all_options.name,
   auto_scroll = M._all_options.auto_scroll,
@@ -411,11 +425,20 @@ M._term_update_options = {
 }
 
 M._term_send_options = {
+  target = M._all_options.target,
   text = M._all_options.cmd,
   action = M._all_options.action,
   decorator = M._all_options.decorator,
   trim = M._all_options.trim,
   new_line = M._all_options.new_line,
+}
+
+M._term_select_options = {
+  target = M._all_options.target,
+}
+
+M._term_inspect_options = {
+  target = M._all_options.target,
 }
 
 ---@param value string
@@ -467,5 +490,9 @@ M.term_send_complete = M._complete(M._term_send_options)
 M.term_new_complete = M._complete(M._term_new_options)
 
 M.term_update_complete = M._complete(M._term_update_options)
+
+M.term_select_complete = M._complete(M._term_select_options)
+
+M.term_inspect_complete = M._complete(M._term_inspect_options)
 
 return M
