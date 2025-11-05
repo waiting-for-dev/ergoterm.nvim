@@ -19,28 +19,26 @@ local M = {}
 ---@return Terminal the created and focused terminal
 function M.new(args)
   local parsed = commandline.parse(args)
-  vim.validate({
-    cmd = { parsed.cmd, "string", true },
-    dir = { parsed.dir, "string", true },
-    layout = { parsed.layout, "string", true },
-    name = { parsed.name, "string", true },
-    auto_scroll = { parsed.auto_scroll, "boolean", true },
-    bang_target = { parsed.bang_target, "boolean", true },
-    watch_files = { parsed.watch_files, "boolean", true },
-    persist_mode = { parsed.persist_mode, "boolean", true },
-    persist_size = { parsed.persist_size, "boolean", true },
-    selectable = { parsed.selectable, "boolean", true },
-    start_in_insert = { parsed.start_in_insert, "boolean", true },
-    sticky = { parsed.sticky, "boolean", true },
-    cleanup_on_success = { parsed.cleanup_on_success, "boolean", true },
-    cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true },
-    show_on_success = { parsed.show_on_success, "boolean", true },
-    show_on_failure = { parsed.show_on_failure, "boolean", true },
-    size = { parsed.size, "table", true },
-    float_opts = { parsed.float_opts, "table", true },
-    tags = { parsed.tags, "table", true },
-    meta = { parsed.meta, "table", true }
-  })
+  vim.validate("cmd", parsed.cmd, "string", true)
+  vim.validate("dir", parsed.dir, "string", true)
+  vim.validate("layout", parsed.layout, "string", true)
+  vim.validate("name", parsed.name, "string", true)
+  vim.validate("auto_scroll", parsed.auto_scroll, "boolean", true)
+  vim.validate("bang_target", parsed.bang_target, "boolean", true)
+  vim.validate("watch_files", parsed.watch_files, "boolean", true)
+  vim.validate("persist_mode", parsed.persist_mode, "boolean", true)
+  vim.validate("persist_size", parsed.persist_size, "boolean", true)
+  vim.validate("selectable", parsed.selectable, "boolean", true)
+  vim.validate("start_in_insert", parsed.start_in_insert, "boolean", true)
+  vim.validate("sticky", parsed.sticky, "boolean", true)
+  vim.validate("cleanup_on_success", parsed.cleanup_on_success, "boolean", true)
+  vim.validate("cleanup_on_failure", parsed.cleanup_on_failure, "boolean", true)
+  vim.validate("show_on_success", parsed.show_on_success, "boolean", true)
+  vim.validate("show_on_failure", parsed.show_on_failure, "boolean", true)
+  vim.validate("size", parsed.size, "table", true)
+  vim.validate("float_opts", parsed.float_opts, "table", true)
+  vim.validate("tags", parsed.tags, "table", true)
+  vim.validate("meta", parsed.meta, "table", true)
   return require("ergoterm").Terminal:new({
     cmd = parsed.cmd,
     dir = parsed.dir,
@@ -79,9 +77,7 @@ end
 ---@return boolean success status of the operation
 function M.select(args, bang, picker)
   local parsed = commandline.parse(args)
-  vim.validate({
-    target = { parsed.target, "string", true },
-  })
+  vim.validate("target", parsed.target, "string", true)
   return M._execute_on_terminal(
     parsed.target,
     bang,
@@ -119,14 +115,12 @@ end
 ---@return boolean success status of the operation
 function M.send(args, range, bang, picker)
   local parsed = commandline.parse(args)
-  vim.validate({
-    target = { parsed.target, "string", true },
-    text = { parsed.text, "string", true },
-    action = { parsed.action, "string", true },
-    decorator = { parsed.decorator, "string", true },
-    trim = { parsed.trim, "boolean", true },
-    new_line = { parsed.new_line, "boolean", true },
-  })
+  vim.validate("target", parsed.target, "string", true)
+  vim.validate("text", parsed.text, "string", true)
+  vim.validate("action", parsed.action, "string", true)
+  vim.validate("decorator", parsed.decorator, "string", true)
+  vim.validate("trim", parsed.trim, "boolean", true)
+  vim.validate("new_line", parsed.new_line, "boolean", true)
   local selection = range == 0 and "single_line" or
       (vim.fn.visualmode() == "V" and "visual_lines" or "visual_selection")
   local input = parsed.text and { parsed.text } or selection
@@ -164,27 +158,25 @@ end
 ---@return boolean success status of the operation
 function M.update(args, bang, picker)
   local parsed = commandline.parse(args)
-  vim.validate({
-    target = { parsed.target, "string", true },
-    layout = { parsed.layout, "string", true },
-    name = { parsed.name, "string", true },
-    auto_scroll = { parsed.auto_scroll, "boolean", true },
-    bang_target = { parsed.bang_target, "boolean", true },
-    watch_files = { parsed.watch_files, "boolean", true },
-    persist_mode = { parsed.persist_mode, "boolean", true },
-    persist_size = { parsed.persist_size, "boolean", true },
-    selectable = { parsed.selectable, "boolean", true },
-    start_in_insert = { parsed.start_in_insert, "boolean", true },
-    sticky = { parsed.sticky, "boolean", true },
-    cleanup_on_success = { parsed.cleanup_on_success, "boolean", true },
-    cleanup_on_failure = { parsed.cleanup_on_failure, "boolean", true },
-    show_on_success = { parsed.show_on_success, "boolean", true },
-    show_on_failure = { parsed.show_on_failure, "boolean", true },
-    size = { parsed.size, "table", true },
-    float_opts = { parsed.float_opts, "table", true },
-    tags = { parsed.tags, "table", true },
-    meta = { parsed.meta, "table", true }
-  })
+  vim.validate("target", parsed.target, "string", true)
+  vim.validate("layout", parsed.layout, "string", true)
+  vim.validate("name", parsed.name, "string", true)
+  vim.validate("auto_scroll", parsed.auto_scroll, "boolean", true)
+  vim.validate("bang_target", parsed.bang_target, "boolean", true)
+  vim.validate("watch_files", parsed.watch_files, "boolean", true)
+  vim.validate("persist_mode", parsed.persist_mode, "boolean", true)
+  vim.validate("persist_size", parsed.persist_size, "boolean", true)
+  vim.validate("selectable", parsed.selectable, "boolean", true)
+  vim.validate("start_in_insert", parsed.start_in_insert, "boolean", true)
+  vim.validate("sticky", parsed.sticky, "boolean", true)
+  vim.validate("cleanup_on_success", parsed.cleanup_on_success, "boolean", true)
+  vim.validate("cleanup_on_failure", parsed.cleanup_on_failure, "boolean", true)
+  vim.validate("show_on_success", parsed.show_on_success, "boolean", true)
+  vim.validate("show_on_failure", parsed.show_on_failure, "boolean", true)
+  vim.validate("size", parsed.size, "table", true)
+  vim.validate("float_opts", parsed.float_opts, "table", true)
+  vim.validate("tags", parsed.tags, "table", true)
+  vim.validate("meta", parsed.meta, "table", true)
   local target = parsed.target
   parsed.target = nil
   local update_terminal = function(t)
@@ -214,9 +206,7 @@ end
 ---@return boolean success status of the operation
 function M.inspect(args, bang, picker)
   local parsed = commandline.parse(args)
-  vim.validate({
-    target = { parsed.target, "string", true },
-  })
+  vim.validate("target", parsed.target, "string", true)
   return M._execute_on_terminal(
     parsed.target,
     bang,
