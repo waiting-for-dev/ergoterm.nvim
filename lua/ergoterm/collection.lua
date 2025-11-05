@@ -66,9 +66,7 @@ function M.get(id)
   return M._state.terminals[id]
 end
 
----Finds the first terminal with the specified name
----
----Names are not guaranteed to be unique, so this returns the first match found.
+---Finds the terminal with the specified name
 ---
 ---@param name string
 ---@return Terminal?

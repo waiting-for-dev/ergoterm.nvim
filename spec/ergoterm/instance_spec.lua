@@ -79,6 +79,14 @@ describe(":new", function()
     assert.equal("echo hello", term.name)
   end)
 
+  it("appends numeric suffix to make name uniq", function()
+    local term1 = Terminal:new({ name = "foo" })
+    local term2 = Terminal:new({ name = "foo" })
+
+    assert.equal("foo", term1.name)
+    assert.equal("foo-2", term2.name)
+  end)
+
   it("defaults to config's float_opts for non-given options", function()
     local term = Terminal:new({ float_opts = { width = 100, height = 20 } })
 

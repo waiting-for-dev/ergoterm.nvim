@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Show error if invalid layout is provided on opening terminal.
 - Set buffer options on start instead of on opening terminal window.
 - Add `term:unfocus(winid?)`.
+- Names are guaranteed to be unique now by appending a number suffix if needed.
 
 ## 0.8.0 - 2025-10-15
 

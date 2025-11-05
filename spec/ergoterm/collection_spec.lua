@@ -138,12 +138,12 @@ end)
 
 describe(".filter", function()
   it("returns all terminals matching given predicate", function()
-    local term1 = Terminal:new({ name = "test" })
-    local term2 = Terminal:new({ name = "test" })
-    Terminal:new({ name = "foo" })
+    local term1 = Terminal:new({ tags = { "test" } })
+    local term2 = Terminal:new({ tags = { "test" } })
+    Terminal:new({ tags = { "foo" } })
 
     local result = collection.filter(function(t)
-      return t.name == "test"
+      return vim.tbl_contains(t.tags, "test")
     end)
 
     assert.equal(2, #result)

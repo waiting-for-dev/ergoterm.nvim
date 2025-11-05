@@ -23,8 +23,6 @@ local on_buf_enter = require("ergoterm.events.on_buf_enter")
 local on_exit = require("ergoterm.events.on_exit")
 ---@module "ergoterm.events.on_output"
 local on_output = require("ergoterm.events.on_output")
----@module "ergoterm.events.on_vim_resized"
-local on_vim_resized = require("ergoterm.events.on_vim_resized")
 ---@module "ergoterm.events.on_win_leave"
 local on_win_leave = require("ergoterm.events.on_win_leave")
 ---@module "ergoterm.instance.open"
@@ -110,6 +108,9 @@ Terminal.__index = Terminal
 ---
 ---Combines provided arguments with global configuration defaults.
 ---
+---name will be made unique if a terminal with the same name already exists by
+---appending a numeric suffix.
+---
 ---The terminal is registered in the module state but not started until `start()` is called.
 ---
 ---@param args TerminalCreateSettings?
@@ -121,13 +122,13 @@ function Terminal:new(args)
   term.bang_target = vim.F.if_nil(term.bang_target, config.get("terminal_defaults.bang_target"))
   term.watch_files = vim.F.if_nil(term.watch_files, config.get("terminal_defaults.watch_files"))
   term.cmd = term.cmd or config.get("terminal_defaults.shell")
+  term.name = term:_compute_name()
   term.clear_env = vim.F.if_nil(term.clear_env, config.get("terminal_defaults.clear_env"))
   term.cleanup_on_success = vim.F.if_nil(term.cleanup_on_success, config.get("terminal_defaults.cleanup_on_success"))
   term.cleanup_on_failure = vim.F.if_nil(term.cleanup_on_failure, config.get("terminal_defaults.cleanup_on_failure"))
   term.default_action = vim.F.if_nil(term.default_action, config.get("terminal_defaults.default_action"))
   term.layout = term.layout or config.get("terminal_defaults.layout")
   term.env = term.env
-  term.name = term.name or term.cmd
   term.meta = term.meta or {}
   term.float_opts = vim.tbl_deep_extend("keep", term.float_opts or {}, config.get("terminal_defaults.float_opts"))
   term.float_winblend = term.float_winblend or config.get("terminal_defaults.float_winblend")
@@ -467,6 +468,20 @@ function Terminal:_initialize_state()
     tabpage = nil,
     window = nil
   }
+end
+
+---@private
+function Terminal:_compute_name()
+  local base_name = self.name or self.cmd
+  local name = base_name
+  local suffix = 2
+
+  while collection.get_by_name(name) do
+    name = string.format("%s-%d", base_name, suffix)
+    suffix = suffix + 1
+  end
+
+  return name
 end
 
 ---@private

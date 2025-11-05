@@ -68,43 +68,10 @@ end
 function M._build_display_name_mapping(terminals)
   M._state.display_to_terminal = {}
 
-  local name_groups = M._group_terminals_by_name(terminals)
-
   for _, term in pairs(terminals) do
-    local display_name = M._create_unique_display_name(term, name_groups)
+    local display_name = term:get_status_icon() .. " " .. term.name
     M._state.display_to_terminal[display_name] = term
   end
-end
-
-function M._group_terminals_by_name(terminals)
-  local groups = {}
-  for _, term in pairs(terminals) do
-    local name = term.name
-    if not groups[name] then
-      groups[name] = {}
-    end
-    table.insert(groups[name], term)
-  end
-  return groups
-end
-
-function M._create_unique_display_name(term, name_groups)
-  local status_icon = term:get_status_icon()
-  local name = term.name
-  local base_display_name = status_icon .. " " .. name
-  local group = name_groups[name]
-
-  if #group == 1 then
-    return base_display_name
-  end
-
-  for i, terminal in ipairs(group) do
-    if terminal == term then
-      return base_display_name .. " (" .. i .. ")"
-    end
-  end
-
-  return base_display_name
 end
 
 function M.get_options(terminals)
@@ -112,7 +79,7 @@ function M.get_options(terminals)
 
   local options = {}
   for _, term in pairs(terminals) do
-    local display_name = M._create_unique_display_name(term, M._group_terminals_by_name(terminals))
+    local display_name = term:get_status_icon() .. " " .. term.name
     table.insert(options, display_name)
   end
 

@@ -9,7 +9,7 @@ local M = {}
 
 ---@param term Terminal
 function M.on_win_leave(term)
-  if term.persist_mode then M._persist_mode() end
+  if term.persist_mode then M._persist_mode(term) end
   if term._state.layout == "float" then term:close() end
   term:on_unfocus()
 end
