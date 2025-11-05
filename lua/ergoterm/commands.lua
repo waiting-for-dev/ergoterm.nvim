@@ -92,7 +92,7 @@ function M.select(args, bang, picker)
     bang,
     function(t) t:focus() end,
     picker,
-    "Please select a terminal to open (or focus): "
+    "Please select a terminal: "
   )
 end
 
