@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## 0.9.0 - 2025-11-07
+
 - BREAKING: Fix `term:start()` calling `on_create` callback instead of `on_start`. `on_create` has been removed.
 - BREAKING: Remove `term:is_stopped()` method. Use `not term:is_started()` instead.
 - BREAKING: Filetype renamed from `ErgoTerm` to `ergoterm`.
