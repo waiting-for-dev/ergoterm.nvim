@@ -169,6 +169,29 @@ describe(":send", function()
     assert.is_true(vim.tbl_contains(lines, "foo"))
   end)
 
+  it("clears before sending if clear is true", function()
+    local original_is_windows = utils.is_windows
+    ---@diagnostic disable-next-line: duplicate-set-field
+    utils.is_windows = function() return false end
+
+    local term = Terminal:new():start()
+    local spy_chansend = spy.on(vim.fn, "chansend")
+
+    send.send(term, { "line" }, { clear = true })
+    vim.wait(100)
+
+    assert.spy(spy_chansend).was_called_with(
+      term:get_state("job_id"),
+      { "clear", "" }
+    )
+    assert.spy(spy_chansend).was_called_with(
+      term:get_state("job_id"),
+      { "line", "" }
+    )
+
+    utils.is_windows = original_is_windows
+  end)
+
   it("only starts the terminal if action is start", function()
     local term = Terminal:new()
 

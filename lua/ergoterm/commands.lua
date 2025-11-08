@@ -121,6 +121,7 @@ function M.send(args, range, bang, picker)
   vim.validate("decorator", parsed.decorator, "string", true)
   vim.validate("trim", parsed.trim, "boolean", true)
   vim.validate("new_line", parsed.new_line, "boolean", true)
+  vim.validate("clear", parsed.clear, "boolean", true)
   local selection = range == 0 and "single_line" or
       (vim.fn.visualmode() == "V" and "visual_lines" or "visual_selection")
   local input = parsed.text and { parsed.text } or selection
@@ -130,7 +131,8 @@ function M.send(args, range, bang, picker)
       action = parsed.action,
       trim = parsed.trim,
       new_line = parsed.new_line,
-      decorator = parsed.decorator
+      decorator = parsed.decorator,
+      clear = parsed.clear
     })
   end
   return M._execute_on_terminal(

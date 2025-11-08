@@ -19,6 +19,7 @@ local M = {}
 ---@field action? send_action terminal interaction mode (default: "focus")
 ---@field trim? boolean remove leading/trailing whitespace (default: true)
 ---@field new_line? boolean append newline for command execution (default: true)
+---@field clear? boolean clear terminal before sending (default: false)
 ---@field decorator? string | fun(text: string[]): string[] transform text before sending
 
 ---@param term Terminal
@@ -30,6 +31,7 @@ function M.send(term, input, opts)
   local action = opts.action or "focus"
   local trim = opts.trim == nil or opts.trim
   local new_line = opts.new_line == nil or opts.new_line
+  local clear = opts.clear or false
   local decorator = M._parse_decorator(opts.decorator)
   if not M._validate_selection_type(input) then return term end
   local computed_input = M._parse_input(input, term)
@@ -37,6 +39,7 @@ function M.send(term, input, opts)
   computed_input = M._maybe_add_new_line(computed_input, new_line)
   computed_input = M._maybe_trim_input(computed_input, trim)
   computed_input = decorator(computed_input)
+  M._maybe_clear(term, clear)
   M._perform_action(term, action)
   vim.fn.chansend(term._state.job_id, computed_input)
   term:_scroll_bottom()
@@ -48,6 +51,15 @@ end
 function M.clear(term, action)
   local clear = utils.is_windows() and "cls" or "clear"
   return M.send(term, { clear }, { action = action })
+end
+
+---@param term Terminal
+---@param clear boolean
+---@private
+function M._maybe_clear(term, clear)
+  if clear then
+    M.clear(term, "start")
+  end
 end
 
 function M._validate_selection_type(input)

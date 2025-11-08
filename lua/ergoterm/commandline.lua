@@ -41,6 +41,7 @@ end
 ---@field name string?
 ---@field target string?
 ---@field action string?
+---@field clear boolean?
 ---@field decorator string?
 ---@field trim boolean?
 ---@field new_line boolean?
@@ -95,6 +96,7 @@ function M.parse(args)
       new_line = true,
       auto_scroll = true,
       bang_target = true,
+      clear = true,
       watch_files = true,
       persist_mode = true,
       persist_size = true,
@@ -283,6 +285,8 @@ M._all_options = {
 
   bang_target = M._boolean_options,
 
+  clear = M._boolean_options,
+
   watch_files = M._boolean_options,
 
   persist_mode = M._boolean_options,
@@ -432,6 +436,7 @@ M._term_send_options = {
   decorator = M._all_options.decorator,
   trim = M._all_options.trim,
   new_line = M._all_options.new_line,
+  clear = M._all_options.clear
 }
 
 M._term_select_options = {

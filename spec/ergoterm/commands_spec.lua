@@ -265,6 +265,18 @@ describe("M.send", function()
     })
   end)
 
+  it("clear screehn if specified", function()
+    local term = terms.Terminal:new():start()
+    local spy_chansend = spy.on(vim.fn, "chansend")
+
+    commands.send("clear=true text='after clear'", 0, false, select_only_picker)
+
+    assert.spy(spy_chansend).was_called_with(
+      term:get_state("job_id"),
+      { "clear", "" }
+    )
+  end)
+
   it("uses last focused terminal when called with the bang option", function()
     local term = terms.Terminal:new():start()
     term:focus()

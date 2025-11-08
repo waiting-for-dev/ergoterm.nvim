@@ -103,6 +103,7 @@ describe("commandline.term_send_complete", function()
     assert.is_true(vim.tbl_contains(result, "decorator="))
     assert.is_true(vim.tbl_contains(result, "trim="))
     assert.is_true(vim.tbl_contains(result, "new_line="))
+    assert.is_true(vim.tbl_contains(result, "clear="))
   end)
 
   it("completes boolean values for trim", function()
@@ -110,6 +111,20 @@ describe("commandline.term_send_complete", function()
 
     assert.is_true(vim.tbl_contains(result, "trim=true"))
     assert.is_true(vim.tbl_contains(result, "trim=false"))
+  end)
+
+  it("completes boolean values for new_line", function()
+    local result = commandline.term_send_complete("new_line=", "new_line=", 9)
+
+    assert.is_true(vim.tbl_contains(result, "new_line=true"))
+    assert.is_true(vim.tbl_contains(result, "new_line=false"))
+  end)
+
+  it("completes boolean values for clear", function()
+    local result = commandline.term_send_complete("clear=", "clear=", 6)
+
+    assert.is_true(vim.tbl_contains(result, "clear=true"))
+    assert.is_true(vim.tbl_contains(result, "clear=false"))
   end)
 
   it("completes action values", function()
