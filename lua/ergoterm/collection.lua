@@ -50,7 +50,7 @@ end
 ---of its `bang_target` flag. Otherwise, returns the last focused terminal that is a bang target.
 ---
 ---@return Terminal?
-function M.get_last_focused()
+function M.get_target_for_bang()
   if M._state.universal_selection then
     return M._state.last_focused
   else

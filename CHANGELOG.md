@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- BREAKING: Rename `.get_last_focused()` to `.get_target_for_bang()`.
+
 ## 0.9.0 - 2025-11-07
 
 - BREAKING: Fix `term:start()` calling `on_create` callback instead of `on_start`. `on_create` has been removed.

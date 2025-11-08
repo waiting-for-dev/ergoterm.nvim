@@ -869,7 +869,7 @@ but deprecated.
 require("ergoterm").get_focused()                       *ergoterm.get_focused()*
     Returns terminal that currently has window focus.
 
-require("ergoterm").get_last_focused()                  *ergoterm.get_last_focused()*
+require("ergoterm").get_target_for_bang()                  *ergoterm.get_target_for_bang()*
     Returns most recently focused terminal.
 
 require("ergoterm").get_all()                           *ergoterm.get_all()*
@@ -981,7 +981,7 @@ Option 1 - Pass decorator function directly: >lua
     end
 
     local ergoterm = require("ergoterm")
-    local term = ergoterm.get_last_focused()
+    local term = ergoterm.get_target_for_bang()
     term:send("single_line", { decorator = timestamp_decorator })
 <
 
@@ -1003,7 +1003,7 @@ Option 2 - Register named decorator in configuration: >lua
 
     -- Then use by name
     local ergoterm = require("ergoterm")
-    local term = ergoterm.get_last_focused()
+    local term = ergoterm.get_target_for_bang()
     term:send("single_line", { decorator = "timestamp" })
     -- Or from command line
     :TermSend decorator=timestamp

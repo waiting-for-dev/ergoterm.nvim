@@ -77,14 +77,14 @@ describe(".identify", function()
   end)
 end)
 
-describe(".get_last_focused", function()
+describe(".get_target_for_bang", function()
   it("returns last focused terminal with `bang_target` flag when universal selection is disabled", function()
     local term1 = Terminal:new({ bang_target = false })
     local term2 = Terminal:new()
     term2:focus()
     term1:focus()
 
-    local result = collection.get_last_focused()
+    local result = collection.get_target_for_bang()
 
     assert.equal(result, term2)
   end)
@@ -96,7 +96,7 @@ describe(".get_last_focused", function()
     term1:focus()
     collection.toggle_universal_selection()
 
-    local result = collection.get_last_focused()
+    local result = collection.get_target_for_bang()
 
     assert.equal(result, term1)
 
@@ -104,7 +104,7 @@ describe(".get_last_focused", function()
   end)
 
   it("returns nil when no terminal has been focused", function()
-    assert.is_nil(collection.get_last_focused())
+    assert.is_nil(collection.get_target_for_bang())
   end)
 end)
 

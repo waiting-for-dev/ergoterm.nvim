@@ -16,7 +16,7 @@ describe(".on_buf_enter", function()
 
     on_buf_enter(term)
 
-    assert.equal(term, collection.get_last_focused())
+    assert.equal(term, collection.get_target_for_bang())
   end)
 
   it("restores last mode if persist_mode is true", function()

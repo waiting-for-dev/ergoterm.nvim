@@ -232,7 +232,7 @@ end
 
 ---@private
 M._execute_on_last_focused = function(action_fn)
-  local term = require("ergoterm").get_last_focused()
+  local term = require("ergoterm").get_target_for_bang()
   if not term then
     utils.notify("No terminals are open", "error")
     return false

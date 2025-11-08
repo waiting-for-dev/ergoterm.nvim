@@ -35,7 +35,7 @@ describe(".cleanup", function()
 
     cleanup(term)
 
-    assert.is_nil(collection.get_last_focused())
+    assert.is_nil(collection.get_target_for_bang())
   end)
 
   it("removes the terminal from the state if not sticky terminal", function()

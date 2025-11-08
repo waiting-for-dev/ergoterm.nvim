@@ -624,7 +624,7 @@ describe(":on_buf_enter", function()
 
     term:on_buf_enter()
 
-    assert.equal(term, collection.get_last_focused())
+    assert.equal(term, collection.get_target_for_bang())
   end)
 end)
 
