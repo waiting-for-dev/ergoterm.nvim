@@ -371,6 +371,13 @@ terminal_defaults.cleanup_on_failure ~
 
     Close terminal window when the job process exits with failure (exit code non-zero).
 
+                                                      *ergoterm-scrollback*
+terminal_defaults.scrollback ~
+    Default: `vim.o.scrollback`
+    Type: `number`
+
+    Number of lines to keep in terminal scrollback buffer.
+
                                                       *ergoterm-show_on_success*
 terminal_defaults.show_on_success ~
     Default: `false`

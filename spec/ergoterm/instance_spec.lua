@@ -55,6 +55,12 @@ describe(":new", function()
     assert.is_function(term.default_action)
   end)
 
+  it("defaults to config's scrollback", function()
+    local term = Terminal:new()
+
+    assert.equal(vim.o.scrollback, term.scrollback)
+  end)
+
   it("defaults to config's show_on_success", function()
     local term = Terminal:new()
 

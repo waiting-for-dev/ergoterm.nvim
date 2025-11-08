@@ -267,6 +267,7 @@ All options default to values from your configuration:
 - `clear_env` - Use clean environment for the job
 - `cleanup_on_success` - Cleanup terminal when process exits successfully (exit code 0)
 - `cleanup_on_failure` - Cleanup terminal when process exits with failure (exit code non-zero)
+- `scrollback` - Number of lines to keep in scrollback buffer.
 - `show_on_success` - Open terminal window when process exits successfully (exit code 0). Requires `cleanup_on_success` to be `false`.
 - `show_on_failure` - Open terminal window when process exits with failure (exit code non-zero). Requires `cleanup_on_failure` to be `false`.
 - `default_action` - Function to invoke when selecting terminal in picker with `<Enter>`

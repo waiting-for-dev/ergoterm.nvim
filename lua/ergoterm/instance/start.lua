@@ -17,11 +17,11 @@ function M.start(term)
     term._state.dir = term:_compute_dir()
     term._state.bufnr = vim.api.nvim_create_buf(false, false)
     term._state.has_been_started = true
+    M._set_buffer_options(term)
     vim.api.nvim_buf_call(term._state.bufnr, function()
       term._state.job_id = M._start_job(term)
     end)
     M._setup_buffer_autocommands(term)
-    M._set_buffer_options(term)
     term:on_start()
   end
   return term
@@ -74,6 +74,7 @@ function M._set_buffer_options(term)
   vim.api.nvim_set_option_value("filetype", FILETYPE, { scope = "local", buf = bufnr })
   vim.api.nvim_set_option_value("buflisted", false, { scope = "local", buf = bufnr })
   vim.api.nvim_set_option_value("bufhidden", "hide", { scope = "local", buf = bufnr })
+  vim.api.nvim_set_option_value("scrollback", term.scrollback, { scope = "local", buf = bufnr })
 end
 
 return setmetatable(M, {

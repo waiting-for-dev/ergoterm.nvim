@@ -66,6 +66,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field on_open on_open?
 ---@field on_stop on_stop?
 ---@field on_start on_start?
+---@field scrollback number?
 ---@field show_on_success boolean?
 ---@field show_on_failure boolean?
 ---@field persist_mode boolean?
@@ -130,6 +131,7 @@ local config = {
     on_start = M.NULL_CALLBACK,
     on_job_stderr = M.NULL_CALLBACK,
     on_job_stdout = M.NULL_CALLBACK,
+    scrollback = vim.o.scrollback,
     show_on_success = false,
     show_on_failure = false,
     shell = vim.o.shell,

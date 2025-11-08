@@ -93,6 +93,7 @@ local utils = require("ergoterm.utils")
 ---@field on_open on_open
 ---@field on_start on_start
 ---@field on_stop on_stop
+---@field scrollback number
 ---@field show_on_success boolean
 ---@field show_on_failure boolean
 ---@field tags string[]
@@ -152,6 +153,7 @@ function Terminal:new(args)
   term.on_open = vim.F.if_nil(term.on_open, config.get("terminal_defaults.on_open"))
   term.on_start = vim.F.if_nil(term.on_start, config.get("terminal_defaults.on_start"))
   term.on_stop = vim.F.if_nil(term.on_stop, config.get("terminal_defaults.on_stop"))
+  term.scrollback = term.scrollback or config.get("terminal_defaults.scrollback")
   term.show_on_success = vim.F.if_nil(term.show_on_success, config.get("terminal_defaults.show_on_success"))
   term.show_on_failure = vim.F.if_nil(term.show_on_failure, config.get("terminal_defaults.show_on_failure"))
   term.tags = term.tags or vim.tbl_deep_extend("keep", {}, config.get("terminal_defaults.tags") or {})

@@ -154,6 +154,14 @@ describe(".start", function()
     assert.equal("hide", vim.bo[term:get_state("bufnr")].bufhidden)
   end)
 
+  it("sets the buffer scrollback from term's setting", function()
+    local term = Terminal:new({ scrollback = 5000 })
+
+    start(term)
+
+    assert.equal(5000, vim.bo[term:get_state("bufnr")].scrollback)
+  end)
+
   it("does nothing if already started", function()
     local term = Terminal:new()
     start(term)

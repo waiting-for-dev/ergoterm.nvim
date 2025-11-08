@@ -145,8 +145,7 @@ end
 ---Updates terminal configuration after creation
 ---
 ---Allows modification of terminal settings without recreating the terminal.
----Updatable fields include layout, name, auto_scroll, persist_mode, persist_size,
----auto_list, and start_in_insert. Changes take effect immediately.
+---Use autocompletion to see which settings can be updated.
 ---
 ---Bang mode (!) targets the last focused terminal directly.
 ---Target option selects a terminal by name.

@@ -54,6 +54,7 @@ end
 ---@field sticky boolean?
 ---@field cleanup_on_success boolean?
 ---@field cleanup_on_failure boolean?
+---@field scrollback number?
 ---@field show_on_success boolean?
 ---@field show_on_failure boolean?
 ---@field text string?
@@ -298,6 +299,8 @@ M._all_options = {
 
   cleanup_on_failure = M._boolean_options,
 
+  scrollback = function() return {} end,
+
   show_on_success = M._boolean_options,
 
   show_on_failure = M._boolean_options,
@@ -369,6 +372,7 @@ M._term_new_options = {
   sticky = M._all_options.sticky,
   cleanup_on_success = M._all_options.cleanup_on_success,
   cleanup_on_failure = M._all_options.cleanup_on_failure,
+  scrollback = M._all_options.scrollback,
   show_on_success = M._all_options.show_on_success,
   show_on_failure = M._all_options.show_on_failure,
   ["size.below"] = M._all_options["size.below"],
