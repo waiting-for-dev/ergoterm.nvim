@@ -1,5 +1,3 @@
----@diagnostic disable: invisible
-
 local M = {}
 
 ---@param term Terminal

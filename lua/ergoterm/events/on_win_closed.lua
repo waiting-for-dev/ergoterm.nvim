@@ -1,5 +1,3 @@
----@diagnostic disable: invisible
-
 ---@module "ergoterm.size"
 local size_utils = require("ergoterm.size_utils")
 

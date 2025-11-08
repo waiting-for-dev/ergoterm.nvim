@@ -1,5 +1,3 @@
----@diagnostic disable: invisible
-
 ---@module "ergoterm.collection"
 local collection = require("ergoterm.collection")
 ---@module "ergoterm.mode"

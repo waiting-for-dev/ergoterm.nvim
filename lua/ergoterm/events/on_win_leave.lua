@@ -1,5 +1,3 @@
----@diagnostic disable: invisible
-
 ---@module "ergoterm.mode"
 local mode = require("ergoterm.mode")
 

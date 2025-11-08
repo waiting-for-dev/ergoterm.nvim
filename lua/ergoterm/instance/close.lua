@@ -1,5 +1,3 @@
----@diagnostic disable: invisible
-
 local on_win_closed = require("ergoterm.events.on_win_closed")
 
 local M = {}

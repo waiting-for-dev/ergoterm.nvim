@@ -1,5 +1,3 @@
----@diagnostic disable: invisible
-
 ---@module "ergoterm.collection"
 local on_buf_enter = require("ergoterm.events.on_buf_enter")
 

@@ -1,5 +1,3 @@
----@diagnostic disable: invisible
-
 ---@module "ergoterm.events.on_win_leave"
 local on_win_leave = require("ergoterm.events.on_win_leave")
 
