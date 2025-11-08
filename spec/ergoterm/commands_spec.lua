@@ -3,6 +3,7 @@
 local commands = require("ergoterm.commands")
 local terms = require("ergoterm")
 local test_helpers = require("test_helpers")
+local utils = require("ergoterm.utils")
 
 after_each(function()
   terms.cleanup_all({ force = true })
@@ -265,7 +266,11 @@ describe("M.send", function()
     })
   end)
 
-  it("clear screehn if specified", function()
+  it("clear screen if specified", function()
+    local original_is_windows = utils.is_windows
+    ---@diagnostic disable-next-line: duplicate-set-field
+    utils.is_windows = function() return false end
+
     local term = terms.Terminal:new():start()
     local spy_chansend = spy.on(vim.fn, "chansend")
 
@@ -275,6 +280,8 @@ describe("M.send", function()
       term:get_state("job_id"),
       { "clear", "" }
     )
+
+    utils.is_windows = original_is_windows
   end)
 
   it("uses last focused terminal when called with the bang option", function()
