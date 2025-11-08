@@ -112,9 +112,9 @@ describe("M.select", function()
 
   it("ignores non bang target terminals when called with bang", function()
     local term = terms.Terminal:new():start()
-    local term_not_selectable = terms.Terminal:new({ bang_target = false }):start()
+    local term_not_auto_list = terms.Terminal:new({ bang_target = false }):start()
     term:focus()
-    term_not_selectable:focus()
+    term_not_auto_list:focus()
     local spy_focus = spy.on(term, "focus")
 
     commands.select("", true, {})

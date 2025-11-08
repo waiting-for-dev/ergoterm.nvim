@@ -49,7 +49,7 @@ end
 ---@field watch_files boolean?
 ---@field persist_mode boolean?
 ---@field persist_size boolean?
----@field selectable boolean?
+---@field auto_list boolean?
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
 ---@field cleanup_on_success boolean?
@@ -97,7 +97,7 @@ function M.parse(args)
       watch_files = true,
       persist_mode = true,
       persist_size = true,
-      selectable = true,
+      auto_list = true,
       start_in_insert = true,
       sticky = true,
       cleanup_on_success = true,
@@ -288,7 +288,7 @@ M._all_options = {
 
   persist_size = M._boolean_options,
 
-  selectable = M._boolean_options,
+  auto_list = M._boolean_options,
 
   start_in_insert = M._boolean_options,
 
@@ -364,7 +364,7 @@ M._term_new_options = {
   watch_files = M._all_options.watch_files,
   persist_mode = M._all_options.persist_mode,
   persist_size = M._all_options.persist_size,
-  selectable = M._all_options.selectable,
+  auto_list = M._all_options.auto_list,
   start_in_insert = M._all_options.start_in_insert,
   sticky = M._all_options.sticky,
   cleanup_on_success = M._all_options.cleanup_on_success,
@@ -397,7 +397,7 @@ M._term_update_options = {
   watch_files = M._all_options.watch_files,
   persist_mode = M._all_options.persist_mode,
   persist_size = M._all_options.persist_size,
-  selectable = M._all_options.selectable,
+  auto_list = M._all_options.auto_list,
   start_in_insert = M._all_options.start_in_insert,
   sticky = M._all_options.sticky,
   cleanup_on_success = M._all_options.cleanup_on_success,

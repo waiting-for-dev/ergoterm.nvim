@@ -9,7 +9,7 @@ local select = require("ergoterm.collection.select")
 ---@field last_focused_bang_target Terminal? Last focused terminal with `bang_target` setting
 ---@field ids number[] All used terminal IDs in this session, even when terminals are deleted
 ---@field terminals Terminal[] All terminals in this session, excluding those that have been deleted
----@field universal_selection boolean Whether to ignore `selectable` setting in selection and command' bang behavior
+---@field universal_selection boolean Whether to ignore `auto_list` setting in selection and command' bang behavior
 M._state = {
   last_focused = nil,
   last_focused_bang_target = nil,
@@ -108,7 +108,7 @@ end
 ---
 ---The available terminals default to:
 ---
----- If `universal_selection` is disabled (default): all terminals that are selectable and
+---- If `universal_selection` is disabled (default): all terminals that are auto_list and
 ---  either active (started or stopped but still with active buffer) or sticky.
 ---- If `universal_selection` is enabled: all terminals.
 ---
@@ -117,7 +117,7 @@ end
 function M.select(defaults)
   defaults = defaults or {}
   defaults.terminals = defaults.terminals or (M._state.universal_selection and M.get_all() or
-    M._find_selectable_terminals_for_picker())
+    M._find_auto_list_terminals_for_picker())
 
   return select(defaults)
 end
@@ -153,8 +153,8 @@ end
 ---Toggles universal selection mode
 ---
 ---When universal selection is enabled, all terminals are shown in pickers and
----can be set as last focused, regardless of their selectable flag. This provides
----a temporary override for the selectable setting.
+---can be set as last focused, regardless of their auto_list flag. This provides
+---a temporary override for the auto_list setting.
 ---
 ---@return boolean the new state of universal_selection after toggling
 function M.toggle_universal_selection()
@@ -177,15 +177,15 @@ function M._filter_defaults_for_picker()
     return M.get_all()
   else
     return M.filter(function(term)
-      return term.selectable and (term:is_active() or term.sticky)
+      return term.auto_list and (term:is_active() or term.sticky)
     end)
   end
 end
 
 ---@private
-function M._find_selectable_terminals_for_picker()
+function M._find_auto_list_terminals_for_picker()
   return M.filter(function(term)
-    return term.selectable and (term:is_active() or term.sticky)
+    return term.auto_list and (term:is_active() or term.sticky)
   end)
 end
 

@@ -20,7 +20,7 @@ local ALLOWED_SETTINGS = {
   "float_props",
   "float_winblend",
   "persist_mode",
-  "selectable",
+  "auto_list",
   "size",
   "start_in_insert",
   "sticky",

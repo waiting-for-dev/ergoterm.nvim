@@ -158,7 +158,7 @@ Syntax: >vim
 
 Uses your configured picker (Telescope, fzf-lua, or built-in vim.ui.select)
 to display all available terminals. Only shows terminals that have been
-started and have `selectable` set to true.
+started and have `auto_list` set to true.
 
 The bang (!) version focuses the last focused terminal directly without
 opening a picker, similar to other bang commands.
@@ -284,10 +284,10 @@ Syntax: >vim
     :TermToggleUniversalSelection
 <
 
-When universal selection is enabled, all terminals become selectable and can
-be targeted by bang commands, regardless of their individual `selectable` and
+When universal selection is enabled, all terminals become auto_list and can
+be targeted by bang commands, regardless of their individual `auto_list` and
 `bang_target` settings. This provides a temporary override for accessing
-non-selectable terminals through pickers and non-bang-target terminals through
+non-auto_list terminals through pickers and non-bang-target terminals through
 bang commands.
 
 ==============================================================================
@@ -416,8 +416,8 @@ terminal_defaults.start_in_insert ~
     
     Start terminals in insert mode by default.
 
-                                                         *ergoterm-selectable*
-terminal_defaults.selectable ~
+                                                         *ergoterm-auto_list*
+terminal_defaults.auto_list ~
     Default: `true`
     Type: `boolean`
 
@@ -434,7 +434,7 @@ terminal_defaults.sticky ~
 
     Keep terminals visible in picker even when stopped. When set to true,
     the terminal remains available for selection in pickers regardless of
-    whether it has been started or stopped, as long as `selectable` is also true.
+    whether it has been started or stopped, as long as `auto_list` is also true.
     This is useful for persistent terminal configurations that you want to
     access quickly even when not currently running.
 
@@ -687,7 +687,7 @@ Example: >lua
       cmd = "lazygit", 
       layout = "float",
       dir = "git_dir",
-      selectable = false,
+      auto_list = false,
       bang_target = false
     })
   
@@ -696,7 +696,7 @@ Example: >lua
       cmd = "npm start",
       layout = "right",
       dir = "~/my-project",
-      selectable = false
+      auto_list = false
     })
     
     -- Map to keybindings
@@ -921,8 +921,8 @@ require("ergoterm").cleanup_all()                       *ergoterm.cleanup_all()*
 
 require("ergoterm").toggle_universal_selection()         *ergoterm.toggle_universal_selection()*
     Toggle universal selection mode. Returns the new state (boolean).
-    When enabled, all terminals are selectable regardless of their
-    individual selectable setting.
+    When enabled, all terminals are auto_list regardless of their
+    individual auto_list setting.
 
 require("ergoterm").with_defaults({custom_defaults})      *ergoterm.with_defaults()*
     Create a terminal factory with custom defaults.
@@ -938,7 +938,7 @@ require("ergoterm").with_defaults({custom_defaults})      *ergoterm.with_default
     Example: >lua
         local task = require("ergoterm").with_defaults({
           tags = { "task" },
-          selectable = false
+          auto_list = false
         })
         local term = task:new({ name = "foo" })
     <
@@ -1053,7 +1053,7 @@ Example integration with Claude for AI-assisted development: >lua
       cmd = "claude",
       layout = "right", 
       dir = "git_dir",
-      selectable = false,
+      auto_list = false,
       watch_files = true
     })
     
@@ -1093,7 +1093,7 @@ Example integration with Claude for AI-assisted development: >lua
 Common Issues and Solutions:
 
 **Terminal doesn't appear in picker**
-    Check that `selectable` is true and the terminal has been started.
+    Check that `auto_list` is true and the terminal has been started.
 
 **Commands not working**
     Ensure ErgoTerm is properly installed and setup() has been called.

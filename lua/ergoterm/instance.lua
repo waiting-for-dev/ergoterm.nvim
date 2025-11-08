@@ -79,7 +79,7 @@ local utils = require("ergoterm.utils")
 ---@field float_winblend number
 ---@field persist_mode boolean
 ---@field persist_size boolean
----@field selectable boolean
+---@field auto_list boolean
 ---@field size Size
 ---@field start_in_insert boolean
 ---@field sticky boolean
@@ -131,7 +131,15 @@ function Terminal:new(args)
   term.float_winblend = term.float_winblend or config.get("terminal_defaults.float_winblend")
   term.persist_mode = vim.F.if_nil(term.persist_mode, config.get("terminal_defaults.persist_mode"))
   term.persist_size = vim.F.if_nil(term.persist_size, config.get("terminal_defaults.persist_size"))
-  term.selectable = vim.F.if_nil(term.selectable, config.get("terminal_defaults.selectable"))
+  if term.selectable ~= nil then
+    utils.notify(
+      "[ergoterm] `selectable` option is deprecated and will be removed soon. Use `auto_list` instead.",
+      "warn"
+    )
+    term.auto_list = term.selectable
+    term.selectable = nil
+  end
+  term.auto_list = vim.F.if_nil(term.auto_list, config.get("terminal_defaults.auto_list"))
   term.size = vim.tbl_deep_extend("keep", term.size or {}, config.get("terminal_defaults.size"))
   term.start_in_insert = vim.F.if_nil(term.start_in_insert, config.get("terminal_defaults.start_in_insert"))
   term.sticky = vim.F.if_nil(term.sticky, config.get("terminal_defaults.sticky"))

@@ -117,10 +117,10 @@ describe(":new", function()
     assert.is_true(term.start_in_insert)
   end)
 
-  it("defaults to config's selectable", function()
+  it("defaults to config's auto_list", function()
     local term = Terminal:new()
 
-    assert.is_true(term.selectable)
+    assert.is_true(term.auto_list)
   end)
 
   it("defaults to config's sticky", function()

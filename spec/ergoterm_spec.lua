@@ -56,24 +56,24 @@ describe(".with_defaults()", function()
   end)
 
   it("creates terminals with provided defaults", function()
-    local factory = ergoterm.with_defaults({ selectable = false })
+    local factory = ergoterm.with_defaults({ auto_list = false })
     local term = factory:new()
 
-    assert.is_false(term.selectable)
+    assert.is_false(term.auto_list)
   end)
 
   it("allows overriding default", function()
-    local factory = ergoterm.with_defaults({ selectable = false })
-    local term = factory:new({ selectable = true })
+    local factory = ergoterm.with_defaults({ auto_list = false })
+    local term = factory:new({ auto_list = true })
 
-    assert.is_true(term.selectable)
+    assert.is_true(term.auto_list)
   end)
 
   it("falls back to global defaults for unspecified settings", function()
     local factory = ergoterm.with_defaults({ name = "factory_term" })
     local term = factory:new()
 
-    assert.is_true(term.selectable)
+    assert.is_true(term.auto_list)
     assert.equal("below", term.layout)
   end)
 

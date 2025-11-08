@@ -227,14 +227,14 @@ describe(".select", function()
     assert.equal(callbacks, result[3])
   end)
 
-  it("includes selectable started terminals", function()
+  it("includes auto_list started terminals", function()
     local picker = {
       select = function(terminals, prompt, callbacks)
         return { terminals, prompt, callbacks }
       end
     }
-    local term = Terminal:new({ selectable = true }):start()
-    Terminal:new({ selectable = false }):start()
+    local term = Terminal:new({ auto_list = true }):start()
+    Terminal:new({ auto_list = false }):start()
 
     local result = collection.select({ prompt = "prompt", callbacks = {}, picker = picker })
 
@@ -242,14 +242,14 @@ describe(".select", function()
     assert.is_true(vim.tbl_contains(result[1], term))
   end)
 
-  it("includes selectable stopped but not cleaned up terminals", function()
+  it("includes auto_list stopped but not cleaned up terminals", function()
     local picker = {
       select = function(terminals, prompt, callbacks)
         return { terminals, prompt, callbacks }
       end
     }
-    local term1 = Terminal:new({ selectable = true }):start():stop()
-    local term2 = Terminal:new({ selectable = false }):start():stop()
+    local term1 = Terminal:new({ auto_list = true }):start():stop()
+    local term2 = Terminal:new({ auto_list = false }):start():stop()
     vim.api.nvim_buf_delete(term2:get_state("bufnr"), { force = true })
 
     local result = collection.select({ prompt = "prompt", callbacks = {}, picker = picker })
@@ -258,14 +258,14 @@ describe(".select", function()
     assert.is_true(vim.tbl_contains(result[1], term1))
   end)
 
-  it("includes selectable sticky terminals", function()
+  it("includes auto_list sticky terminals", function()
     local picker = {
       select = function(terminals, prompt, callbacks)
         return { terminals, prompt, callbacks }
       end
     }
-    local term = Terminal:new({ selectable = true, sticky = true })
-    Terminal:new({ selectable = false, sticky = true })
+    local term = Terminal:new({ auto_list = true, sticky = true })
+    Terminal:new({ auto_list = false, sticky = true })
 
     local result = collection.select({ prompt = "prompt", callbacks = {}, picker = picker })
 
@@ -279,10 +279,10 @@ describe(".select", function()
         return { terminals, prompt, callbacks }
       end
     }
-    local term1 = Terminal:new({ selectable = true }):start()
-    local term2 = Terminal:new({ selectable = false }):start()
-    local term3 = Terminal:new({ selectable = true, sticky = true })
-    local term4 = Terminal:new({ selectable = false, sticky = true })
+    local term1 = Terminal:new({ auto_list = true }):start()
+    local term2 = Terminal:new({ auto_list = false }):start()
+    local term3 = Terminal:new({ auto_list = true, sticky = true })
+    local term4 = Terminal:new({ auto_list = false, sticky = true })
     collection.toggle_universal_selection()
 
     local result = collection.select({ prompt = "prompt", callbacks = {}, picker = picker })
@@ -424,20 +424,20 @@ describe(".with_defaults", function()
   end)
 
   it("creates terminals with custom defaults merged with provided args", function()
-    local factory = ergoterm.with_defaults({ tags = { "task" }, selectable = false })
+    local factory = ergoterm.with_defaults({ tags = { "task" }, auto_list = false })
     local term = factory:new({ name = "foo" })
 
     assert.equal("foo", term.name)
-    assert.is_false(term.selectable)
+    assert.is_false(term.auto_list)
     assert.equal(1, #term.tags)
     assert.is_true(vim.tbl_contains(term.tags, "task"))
   end)
 
   it("allows provided args to override custom defaults", function()
-    local factory = ergoterm.with_defaults({ selectable = false, name = "default" })
-    local term = factory:new({ selectable = true, name = "override" })
+    local factory = ergoterm.with_defaults({ auto_list = false, name = "default" })
+    local term = factory:new({ auto_list = true, name = "override" })
 
-    assert.is_true(term.selectable)
+    assert.is_true(term.auto_list)
     assert.equal("override", term.name)
   end)
 

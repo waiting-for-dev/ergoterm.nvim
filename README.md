@@ -159,13 +159,13 @@ Displays the terminal object's internal structure using `vim.inspect()`, useful 
 
 ### 🌐 Universal Selection Mode
 
-Toggle universal selection mode to temporarily override the `selectable` and `bang_target` settings for all terminals:
+Toggle universal selection mode to temporarily override the `auto_list` and `bang_target` settings for all terminals:
 
 ```vim
 :TermToggleUniversalSelection
 ```
 
-When enabled, all terminals become selectable and can be targeted by bang commands, regardless of their individual `selectable` and `bang_target` settings. This provides a way to access any terminals through pickers and bang commands when needed.
+When enabled, all terminals become auto_list and can be targeted by bang commands, regardless of their individual `auto_list` and `bang_target` settings. This provides a way to access any terminals through pickers and bang commands when needed.
 
 ## ⌨️ Example Keymaps
 
@@ -214,7 +214,7 @@ local lazygit = ergoterm:new({
   cmd = "lazygit",
   layout = "float",
   dir = "git_dir",
-  selectable = false,
+  auto_list = false,
   bang_target = false
 })
 
@@ -223,7 +223,7 @@ local claude = ergoterm:new({
   cmd = "claude",
   layout = "right",
   dir = "git_dir",
-  selectable = false,
+  auto_list = false,
   watch_files = true
 })
 
@@ -290,8 +290,8 @@ All options default to values from your configuration:
 - `on_stop` - Called when the terminal job process stops. Receives the terminal instance as its only argument
 - `persist_mode` - Remember terminal mode between visits
 - `persist_size` - Remember terminal size between visits
-- `selectable` - Include terminal in selection picker (can be overridden by universal selection mode)
-- `sticky` - Keep terminal visible in picker even when stopped (requires `selectable` to also be `true`)
+- `auto_list` - Include terminal in selection picker (can be overridden by universal selection mode)
+- `sticky` - Keep terminal visible in picker even when stopped (requires `auto_list` to also be `true`)
 - `size` - Size configuration for different window layouts (table with `above`, `below`, `left`, `right` keys)
   - Each direction accepts either a string with percentage (e.g., `"30%"`) or a number for absolute size
   - Example: `{ below = 20, right = "40%" }` - 20 lines high for below splits, 40% width for right splits
@@ -434,7 +434,7 @@ local claude = ergoterm:new({
   cmd = "claude",
   layout = "right",
   dir = "git_dir",
-  selectable = false,
+  auto_list = false,
   watch_files = true
 })
 
@@ -517,9 +517,9 @@ require("ergoterm").setup({
     start_in_insert = true,
 
     -- Show terminals in picker by default
-    selectable = true,
+    auto_list = true,
 
-    -- Keep terminals visible in picker even when stopped, provided `selectable` is also true
+    -- Keep terminals visible in picker even when stopped, provided `auto_list` is also true
     sticky = false,
 
     -- Floating window options

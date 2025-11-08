@@ -28,7 +28,7 @@ function M.new(args)
   vim.validate("watch_files", parsed.watch_files, "boolean", true)
   vim.validate("persist_mode", parsed.persist_mode, "boolean", true)
   vim.validate("persist_size", parsed.persist_size, "boolean", true)
-  vim.validate("selectable", parsed.selectable, "boolean", true)
+  vim.validate("auto_list", parsed.auto_list, "boolean", true)
   vim.validate("start_in_insert", parsed.start_in_insert, "boolean", true)
   vim.validate("sticky", parsed.sticky, "boolean", true)
   vim.validate("cleanup_on_success", parsed.cleanup_on_success, "boolean", true)
@@ -49,7 +49,7 @@ function M.new(args)
     watch_files = parsed.watch_files,
     persist_mode = parsed.persist_mode,
     persist_size = parsed.persist_size,
-    selectable = parsed.selectable,
+    auto_list = parsed.auto_list,
     start_in_insert = parsed.start_in_insert,
     sticky = parsed.sticky,
     cleanup_on_success = parsed.cleanup_on_success,
@@ -146,7 +146,7 @@ end
 ---
 ---Allows modification of terminal settings without recreating the terminal.
 ---Updatable fields include layout, name, auto_scroll, persist_mode, persist_size,
----selectable, and start_in_insert. Changes take effect immediately.
+---auto_list, and start_in_insert. Changes take effect immediately.
 ---
 ---Bang mode (!) targets the last focused terminal directly.
 ---Target option selects a terminal by name.
@@ -166,7 +166,7 @@ function M.update(args, bang, picker)
   vim.validate("watch_files", parsed.watch_files, "boolean", true)
   vim.validate("persist_mode", parsed.persist_mode, "boolean", true)
   vim.validate("persist_size", parsed.persist_size, "boolean", true)
-  vim.validate("selectable", parsed.selectable, "boolean", true)
+  vim.validate("auto_list", parsed.auto_list, "boolean", true)
   vim.validate("start_in_insert", parsed.start_in_insert, "boolean", true)
   vim.validate("sticky", parsed.sticky, "boolean", true)
   vim.validate("cleanup_on_success", parsed.cleanup_on_success, "boolean", true)
@@ -218,9 +218,9 @@ end
 
 ---Toggles universal selection mode
 ---
----When enabled, all terminals become selectable and can be set as last focused,
----regardless of their individual selectable setting. This provides a temporary
----override for accessing non-selectable terminals.
+---When enabled, all terminals become auto_list and can be set as last focused,
+---regardless of their individual auto_list setting. This provides a temporary
+---override for accessing non-auto_list terminals.
 ---
 ---@return boolean the new state after toggling
 function M.toggle_universal_selection()

@@ -70,7 +70,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field show_on_failure boolean?
 ---@field persist_mode boolean?
 ---@field persist_size boolean?
----@field selectable boolean?
+---@field auto_list boolean?
 ---@field size Size?
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
@@ -113,7 +113,7 @@ local config = {
     float_winblend = 10,
     persist_mode = false,
     persist_size = true,
-    selectable = true,
+    auto_list = true,
     sticky = false,
     size = {
       below = "50%",
