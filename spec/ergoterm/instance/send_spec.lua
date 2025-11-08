@@ -234,25 +234,31 @@ describe(".clear", function()
   it("sends 'clear' to the terminal on Unix", function()
     ---@diagnostic disable-next-line: duplicate-set-field
     utils.is_windows = function() return false end
-    local term = Terminal:new()
+    local term = Terminal:new():start()
+    local spy_chansend = spy.on(vim.fn, "chansend")
 
     send.clear(term)
     vim.wait(100)
 
-    local lines = vim.api.nvim_buf_get_lines(term:get_state("bufnr"), 0, -1, false)
-    assert.is_true(vim.tbl_contains(lines, "clear"))
+    assert.spy(spy_chansend).was_called_with(
+      term:get_state("job_id"),
+      { "clear", "" }
+    )
   end)
 
   it("sends 'cls' to the terminal on Windows", function()
     ---@diagnostic disable-next-line: duplicate-set-field
     utils.is_windows = function() return true end
     local term = Terminal:new():start()
+    local spy_chansend = spy.on(vim.fn, "chansend")
 
     send.clear(term)
     vim.wait(100)
 
-    local lines = vim.api.nvim_buf_get_lines(term:get_state("bufnr"), 0, -1, false)
-    assert.is_true(vim.tbl_contains(lines, "cls"))
+    assert.spy(spy_chansend).was_called_with(
+      term:get_state("job_id"),
+      { "cls", "" }
+    )
   end)
 
   it("delegates action option to send", function()
