@@ -209,6 +209,7 @@ describe("commandline.term_new_complete", function()
     assert.is_true(vim.tbl_contains(result, "float_opts.title="))
     assert.is_true(vim.tbl_contains(result, "tags="))
     assert.is_true(vim.tbl_contains(result, "meta.="))
+    assert.is_true(vim.tbl_contains(result, "env.="))
   end)
 
   it("completes boolean values for auto_scroll", function()

@@ -39,6 +39,7 @@ function M.new(args)
   vim.validate("float_opts", parsed.float_opts, "table", true)
   vim.validate("tags", parsed.tags, "table", true)
   vim.validate("meta", parsed.meta, "table", true)
+  vim.validate("env", parsed.env, "table", true)
   return require("ergoterm").Terminal:new({
     cmd = parsed.cmd,
     dir = parsed.dir,
@@ -59,7 +60,8 @@ function M.new(args)
     size = parsed.size,
     float_opts = parsed.float_opts,
     tags = parsed.tags,
-    meta = parsed.meta
+    meta = parsed.meta,
+    env = parsed.env
   }):focus()
 end
 

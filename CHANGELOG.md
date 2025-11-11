@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - BREAKING: Rename `.get_last_focused()` to `.get_target_for_bang()`.
 - Added `scrollback` setting to configure terminal scrollback buffer size.
 - Added `clear` option to `term:send()` to clear the terminal before sending input.
+- Allow passing `env.` settings in `:TermNew`
 
 ## 0.9.0 - 2025-11-07
 

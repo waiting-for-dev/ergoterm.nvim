@@ -15,6 +15,7 @@ local p = {
 M.nested_table_settings = {
   size = { "below", "above", "left", "right" },
   float_opts = { "title_pos", "width", "height", "relative", "border", "zindex", "title", "row", "col" },
+  env = {},
   meta = {}
 }
 
@@ -63,6 +64,7 @@ end
 ---@field size Size?
 ---@field float_opts FloatOpts?
 ---@field tags string[]?
+---@field env table<string, string>?
 ---@field meta table<string, string|number>?
 
 ---@see https://stackoverflow.com/a/27007701
@@ -358,6 +360,8 @@ M._all_options = {
 
   tags = function() return {} end,
 
+  ["env."] = function() return {} end,
+
   ["meta."] = function() return {} end
 }
 
@@ -372,6 +376,7 @@ M._term_new_options = {
   persist_mode = M._all_options.persist_mode,
   persist_size = M._all_options.persist_size,
   auto_list = M._all_options.auto_list,
+  ["env."] = M._all_options["env."],
   start_in_insert = M._all_options.start_in_insert,
   sticky = M._all_options.sticky,
   cleanup_on_success = M._all_options.cleanup_on_success,
