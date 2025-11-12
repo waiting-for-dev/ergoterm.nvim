@@ -42,6 +42,7 @@ describe(".update", function()
 
   it("recomputes mode", function()
     local term = Terminal:new({ start_in_insert = false })
+
     update(term, { start_in_insert = true })
 
     assert.equal("i", term:get_state("mode"))
@@ -49,6 +50,7 @@ describe(".update", function()
 
   it("recomputes layout", function()
     local term = Terminal:new({ layout = "below" })
+
     update(term, { layout = "right" })
 
     assert.equal("right", term:get_state("layout"))
@@ -57,6 +59,7 @@ describe(".update", function()
   it("recomputes on_job_exit", function()
     local foo = nil
     local term = Terminal:new({ on_job_exit = function() foo = "foo" end })
+
     update(term, { on_job_exit = function() foo = "bar" end })
 
     term:get_state("on_job_exit")(1, 2, "event")
@@ -66,6 +69,7 @@ describe(".update", function()
   it("recomputes on_job_stdout", function()
     local foo = nil
     local term = Terminal:new({ on_job_stdout = function() foo = "foo" end })
+
     update(term, { on_job_stdout = function() foo = "bar" end })
 
     term:get_state("on_job_stdout")(1, { "data" }, "name")
@@ -74,7 +78,9 @@ describe(".update", function()
 
   it("recomputes on_job_stderr", function()
     local foo = nil
+
     local term = Terminal:new({ on_job_stderr = function() foo = "foo" end })
+
     update(term, { on_job_stderr = function() foo = "bar" end })
 
     term:get_state("on_job_stderr")(1, { "data" }, "name")
@@ -83,6 +89,7 @@ describe(".update", function()
 
   it("replaces table settings by default", function()
     local term = Terminal:new({ env = { FOO = "foo", BAR = "bar" } })
+
     update(term, { env = { BAZ = "baz" } })
 
     assert.equal(nil, term.env.FOO)
@@ -92,10 +99,18 @@ describe(".update", function()
 
   it("deep merges table settings when deep_merge = true", function()
     local term = Terminal:new({ env = { FOO = "foo", BAR = "bar" } })
+
     update(term, { env = { BAZ = "baz" } }, { deep_merge = true })
 
     assert.equal("foo", term.env.FOO)
     assert.equal("bar", term.env.BAR)
     assert.equal("baz", term.env.BAZ)
+  end)
+
+  it("replaces list settings even with deep_merge = true", function()
+    local term = Terminal:new({ tags = { "foo", "bar" } })
+    update(term, { tags = { "baz" } }, { deep_merge = true })
+
+    assert.are.same({ "baz" }, term.tags)
   end)
 end)

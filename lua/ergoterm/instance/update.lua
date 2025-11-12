@@ -75,7 +75,12 @@ end
 ---@param value any
 ---@param deep_merge boolean
 function M._update_setting(term, setting, value, deep_merge)
-  if deep_merge and type(value) == "table" and type(term[setting]) == "table" then
+  local should_merge = deep_merge
+    and type(value) == "table"
+    and type(term[setting]) == "table"
+    and not vim.islist(value)
+
+  if should_merge then
     term[setting] = vim.tbl_deep_extend("force", term[setting], value)
   else
     term[setting] = value
