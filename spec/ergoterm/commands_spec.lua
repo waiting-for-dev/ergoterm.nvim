@@ -97,6 +97,22 @@ describe("M.select", function()
     assert.is_true(vim.tbl_contains(result[1], term2))
   end)
 
+  it("doesn't short circuit when there's only one terminal but it's not called with either bang or target", function()
+    local picker = {
+      select = function(terminals, prompt, callbacks)
+        return { terminals, prompt, callbacks }
+      end
+    }
+    local term = terms.Terminal:new():start()
+
+    local result = commands.select("", false, picker)
+
+    assert.equal("Please select a terminal: ", result[2])
+    assert.is_table(result[3])
+    assert.equal(1, #result[1])
+    assert.is_true(vim.tbl_contains(result[1], term))
+  end)
+
   it("focuses last focused terminal when called with bang", function()
     local term = terms.Terminal:new():start()
     term:focus()
@@ -108,7 +124,6 @@ describe("M.select", function()
     local result = commands.select("", true, null_picker)
 
     assert.spy(spy_focus).was_called()
-    assert.is_true(result)
   end)
 
   it("ignores non bang target terminals when called with bang", function()
@@ -125,8 +140,7 @@ describe("M.select", function()
 
   it("notifies when bang is given but no last focused terminal exists", function()
     local notify_result = test_helpers.mocking_notify(function()
-      local result = commands.select("", true, {})
-      assert.is_false(result)
+      commands.select("", true, {})
     end)
 
     assert.equal("No terminals are open", notify_result.msg)
@@ -139,18 +153,16 @@ describe("M.select", function()
     local spy_focus1 = spy.on(term1, "focus")
     local spy_focus2 = spy.on(term2, "focus")
 
-    local result = commands.select("target=target-term", false, {})
+    commands.select("target=target-term", false, {})
 
     assert.spy(spy_focus1).was_called()
     assert.spy(spy_focus2).was_not_called()
-    assert.is_true(result)
   end)
 
   it("notifies when target terminal does not exist", function()
     terms.Terminal:new({ name = "existing-term" }):start()
     local notify_result = test_helpers.mocking_notify(function()
       local result = commands.select("target=nonexistent", false, {})
-      assert.is_false(result)
     end)
 
     --- @diagnostic disable: need-check-nil
@@ -164,7 +176,6 @@ describe("M.select", function()
     term:focus()
     local notify_result = test_helpers.mocking_notify(function()
       local result = commands.select("target=test-term", true, {})
-      assert.is_false(result)
     end)
 
     --- @diagnostic disable: need-check-nil
@@ -332,8 +343,7 @@ describe("M.send", function()
 
   it("notifies when no terminals are focused in bang mode", function()
     local notify_result = test_helpers.mocking_notify(function()
-      local result = commands.send("text='no focus'", 0, true, null_picker)
-      assert.is_false(result)
+      commands.send("text='no focus'", 0, true, null_picker)
     end)
 
     assert.equal("No terminals are open", notify_result.msg)
@@ -412,8 +422,7 @@ describe("M.send", function()
   it("notifies when target terminal does not exist for send", function()
     terms.Terminal:new({ name = "existing-term" }):start()
     local notify_result = test_helpers.mocking_notify(function()
-      local result = commands.send("target=nonexistent text='test'", 0, false, null_picker)
-      assert.is_false(result)
+      commands.send("target=nonexistent text='test'", 0, false, null_picker)
     end)
 
     --- @diagnostic disable: need-check-nil
@@ -493,8 +502,7 @@ describe("M.update", function()
   it("notifies when target terminal does not exist for update", function()
     terms.Terminal:new({ name = "existing-term", sticky = true })
     local notify_result = test_helpers.mocking_notify(function()
-      local result = commands.update("target=nonexistent layout=left", false, null_picker)
-      assert.is_false(result)
+      commands.update("target=nonexistent layout=left", false, null_picker)
     end)
 
     assert.equal("Terminal 'nonexistent' not found", notify_result.msg)
@@ -578,8 +586,7 @@ describe("M.inspect", function()
   it("notifies when target terminal does not exist for inspect", function()
     terms.Terminal:new({ name = "existing-term", sticky = true })
     local notify_result = test_helpers.mocking_notify(function()
-      local result = commands.inspect("target=nonexistent", false, null_picker)
-      assert.is_false(result)
+      commands.inspect("target=nonexistent", false, null_picker)
     end)
 
     assert.equal("Terminal 'nonexistent' not found", notify_result.msg)

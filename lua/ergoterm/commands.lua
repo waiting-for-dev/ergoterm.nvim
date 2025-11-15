@@ -76,17 +76,23 @@ end
 ---@param args string command-line arguments
 ---@param bang boolean true to use last focused terminal
 ---@param picker Picker the picker implementation to use for selection
----@return boolean success status of the operation
+---@return boolean? success status of the operation or nil if error occurs
 function M.select(args, bang, picker)
   local parsed = commandline.parse(args)
   vim.validate("target", parsed.target, "string", true)
-  return M._execute_on_terminal(
+  local execution_with_single_terminal = M._execute_if_single_terminal(
     parsed.target,
     bang,
-    function(t) t:focus() end,
-    picker,
-    "Please select a terminal: "
+    function(t) t:focus() end
   )
+  if execution_with_single_terminal == false then
+    return require("ergoterm").select({
+      prompt = "Please select a terminal: ",
+      picker = picker
+    })
+  else
+    return execution_with_single_terminal
+  end
 end
 
 ---Sends text to a terminal with flexible input sources
@@ -238,7 +244,7 @@ M._execute_on_last_focused = function(action_fn)
   local term = require("ergoterm").get_target_for_bang()
   if not term then
     utils.notify("No terminals are open", "error")
-    return false
+    return nil
   else
     action_fn(term)
     return true
@@ -246,23 +252,35 @@ M._execute_on_last_focused = function(action_fn)
 end
 
 ---@private
-M._execute_on_terminal = function(target, bang, action_fn, picker, prompt)
+M._execute_on_target_terminal = function(target, action_fn)
+  local term = require("ergoterm").get_by_name(target)
+  if not term then
+    utils.notify(string.format("Terminal '%s' not found", target), "error")
+    return nil
+  else
+    action_fn(term)
+    return true
+  end
+end
+
+M._execute_if_single_terminal = function(target, bang, action_fn)
   if target and bang then
     utils.notify("Cannot use both target and ! options", "error")
-    return false
+    return nil
   end
 
   if bang then
     return M._execute_on_last_focused(action_fn)
   elseif target then
-    local term = require("ergoterm").get_by_name(target)
-    if not term then
-      utils.notify(string.format("Terminal '%s' not found", target), "error")
-      return false
-    end
-    action_fn(term)
-    return true
+    return M._execute_on_target_terminal(target, action_fn)
   else
+    return false
+  end
+end
+
+---@private
+M._execute_on_terminal = function(target, bang, action_fn, picker, prompt)
+  if M._execute_if_single_terminal(target, bang, action_fn) == false then
     return require("ergoterm").select({
       prompt = prompt,
       callbacks = { default = { fn = action_fn, desc = "action" } },

@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Added `clear` option to `term:send()` to clear the terminal before sending input.
 - Allow passing `env.` settings in `:TermNew`
 - Fix: don't deep merge list settings on `term:update()`
+- Fix: `:TermSelect` doesn't short-circuit when only one terminal but no tang or bang options
 
 ## 0.9.0 - 2025-11-07
 
