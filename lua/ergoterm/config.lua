@@ -176,6 +176,13 @@ function M.build_picker(conf)
   end
 end
 
+function M.get_all_picker_select_callbacks()
+  return vim.tbl_extend("force",
+    config.picker.select_actions,
+    config.picker.extra_select_actions
+  )
+end
+
 function M._detect_picker()
   if pcall(require, "telescope") then
     return require("ergoterm.pickers.p_telescope")

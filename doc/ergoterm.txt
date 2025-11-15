@@ -1,59 +1,56 @@
-*ergoterm.txt*	A Neovim plugin for enjoyable terminal management
-
-Author: waiting-from-dev
-License: GPL-3.0
+*ergoterm.txt*  Flexible terminal management for Neovim
 
 ==============================================================================
-CONTENTS                                                    *ergoterm-contents*
+CONTENTS                                                   *ergoterm-contents*
 
-1. Introduction ............................ |ergoterm-introduction|
-2. Installation ............................ |ergoterm-installation|
-3. Quick Start ............................. |ergoterm-quickstart|
-4. Commands ................................ |ergoterm-commands|
-   4.1 TermNew ............................. |ergoterm-termnew|
-   4.2 TermSelect .......................... |ergoterm-termselect|
-   4.3 TermSend ............................ |ergoterm-termsend|
-   4.4 TermUpdate .......................... |ergoterm-termupdate|
-   4.5 TermInspect ......................... |ergoterm-terminspect|
-   4.6 TermToggleUniversalSelection ........ |ergoterm-termtoggleuniversalselection|
-5. Configuration ........................... |ergoterm-configuration|
-   5.1 Setup ............................... |ergoterm-setup|
-   5.2 Options ............................. |ergoterm-options|
-   5.3 Callbacks ........................... |ergoterm-callbacks|
-6. Standalone Terminals .................... |ergoterm-standalone|
-7. API Reference ........................... |ergoterm-api|
-   7.1 Terminal Lifecycle .................. |ergoterm-lifecycle|
-   7.2 Core Methods ........................ |ergoterm-methods|
-   7.3 State Queries ....................... |ergoterm-queries|
-8. Examples ................................ |ergoterm-examples|
-   8.1 Keymaps ............................. |ergoterm-keymaps|
-   8.2 AI Integration ...................... |ergoterm-ai|
-9. Troubleshooting ......................... |ergoterm-troubleshooting|
+    1. Introduction ........................... |ergoterm-introduction|
+    2. Setup .................................. |ergoterm-setup|
+    3. Use Cases .............................. |ergoterm-use-cases|
+        3.1 On-Demand Terminal Access ........ |ergoterm-on-demand|
+        3.2 Interactive AI Assistants ........ |ergoterm-ai-assistants|
+        3.3 Test Runner ...................... |ergoterm-test-runner|
+        3.4 Task Runner ...................... |ergoterm-task-runner|
+        3.5 Development Environment .......... |ergoterm-dev-environment|
+        3.6 Project Initialization ........... |ergoterm-project-init|
+    4. Configuration .......................... |ergoterm-configuration|
+        4.1 Terminal Defaults ................ |ergoterm-terminal-defaults|
+        4.2 Picker Configuration ............. |ergoterm-picker-config|
+        4.3 Text Decorators .................. |ergoterm-text-decorators|
+    5. Commands ............................... |ergoterm-commands|
+    6. API Reference .......................... |ergoterm-api|
+        6.1 Collection Methods ............... |ergoterm-collection|
+        6.2 Instance Methods ................. |ergoterm-instance|
+    7. About .................................. |ergoterm-about|
 
 ==============================================================================
-1. INTRODUCTION                                         *ergoterm-introduction*
+1. INTRODUCTION                                        *ergoterm-introduction*
 
-ErgoTerm is a Neovim plugin for seamless terminal workflow integration. 
-Smart picker-based terminal selection, flexible text sending from any buffer, 
-and persistent configuration with comprehensive lifecycle control.
+A flexible terminal management plugin for Neovim that puts you in control of
+your workflow.
 
-Key Features:
-• Flexible terminal creation with customizable layouts
-• Smart terminal selection using your favorite picker
-• Seamless text sending from buffers to terminals
-- Reuse terminal configurations across Neovim sessions
-- The most flexible plugin for any AI-assisted coding tools
-• Powerful Lua API for custom workflows
+PHILOSOPHY ~
 
-ErgoTerm started as a fork of toggleterm.nvim but has evolved into a 
-comprehensive terminal management solution with its own unique approach.
+Most Neovim terminal integration follows a tool-specific approach: specialized
+plugins for AI chats, testing, task runners and other CLI tools (e.g.,
+lazygit), each with their own terminal implementation and UI decisions. This
+creates friction when you want consistent behavior across tools or when no
+plugin exists for your preferred CLI application.
+
+ergoterm inverts this with a terminal-first approach: a single, powerful
+terminal abstraction that adapts to any CLI tool. Instead of conforming to
+various plugin constraints, you configure terminals with exactly the behavior
+you need.
+
+The terminal becomes your universal integration layer. You own the workflow;
+the terminals adapt to it.
 
 ==============================================================================
-2. INSTALLATION                                         *ergoterm-installation*
+2. SETUP                                                      *ergoterm-setup*
 
 Using lazy.nvim: >lua
+
     {
-      "waiting-from-dev/ergoterm.nvim",
+      "waiting-for-dev/ergoterm.nvim",
       config = function()
         require("ergoterm").setup()
       end
@@ -61,938 +58,542 @@ Using lazy.nvim: >lua
 <
 
 Using packer.nvim: >lua
+
     use {
-      "waiting-from-dev/ergoterm.nvim",
+      "waiting-for-dev/ergoterm.nvim",
       config = function()
         require("ergoterm").setup()
       end
     }
 <
 
-Using vim-plug: >vim
-    Plug 'waiting-from-dev/ergoterm.nvim'
-<
-
-Then add this to your init.lua or in a lua block: >lua
-    require("ergoterm").setup()
-<
-
 ==============================================================================
-3. QUICK START                                             *ergoterm-quickstart*
-
-After installation, you can immediately start using ErgoTerm:
-
-1. Create a new terminal: >vim
-    :TermNew
-<
-
-2. Create a floating terminal with custom settings: >vim
-    :TermNew layout=float name=server dir=~/my-project
-<
-
-3. Select from existing terminals: >vim
-    :TermSelect
-<
-
-4. Send current line to a terminal: >vim
-    :TermSend
-<
-
-5. Send visual selection to last focused terminal: >vim
-    :'<,'>TermSend!
-<
-
-==============================================================================
-4. COMMANDS                                                 *ergoterm-commands*
-
-ErgoTerm provides several commands for terminal management.
+3. USE CASES                                              *ergoterm-use-cases*
 
 ------------------------------------------------------------------------------
-4.1 TermNew                                                 *ergoterm-termnew*
+3.1 ON-DEMAND TERMINAL ACCESS                             *ergoterm-on-demand*
 
-Create and open a new terminal with optional configuration.
+For ad-hoc terminal operations through Vim commands.
 
-Syntax: >vim
-    :TermNew [options]
-<
+See full guide: https://github.com/waiting-for-dev/ergoterm.nvim/blob/main/docs/on-demand-usage.md
 
-All terminal configuration options are available (see |ergoterm-options| for
-the complete list), except callback functions (on_create, on_open, on_close,
-on_focus, on_unfocus, on_start, on_stop, on_job_exit, on_job_stdout, on_job_stderr).
+TERMINAL SELECTION PATTERN ~
 
-Special syntax for nested and list settings:
-    • Dot notation for table settings: Use table.key=value to set individual
-      table keys. For example, size.below=20 sets only the "below" key in the
-      size table without affecting other size values.
+Most commands support three ways to select terminals:
 
-    • Comma-separated for lists: Use setting=value1,value2,value3 for list
-      values. For example, tags=dev,test,prod creates a list with three tags.
-
-Available layouts:
-    above      Horizontal split above current window
-    below      Horizontal split below current window
-    left       Vertical split to the left
-    right      Vertical split to the right
-    tab        New tab page
-    float      Floating window
-    window     Replace current window content
-
-Examples: >vim
-    :TermNew
-    :TermNew layout=float
-    :TermNew layout=right name=server dir=~/project cmd=npm start
-    :TermNew layout=float auto_scroll=false persist_mode=true
-    :TermNew size.below=20 size.right=30% float_opts.border=rounded
-    :TermNew tags=dev,backend meta.project=myapp
-<
-
-------------------------------------------------------------------------------
-4.2 TermSelect                                           *ergoterm-termselect*
-
-Choose from active terminals.
-
-Syntax: >vim
-    :TermSelect
-    :TermSelect!        " Focus last focused terminal directly
-<
-
-Uses your configured picker (Telescope, fzf-lua, or built-in vim.ui.select)
-to display all available terminals. Only shows terminals that have been
-started and have `auto_list` set to true.
-
-The bang (!) version focuses the last focused terminal directly without
-opening a picker, similar to other bang commands.
-
-Advanced Picker Keybindings ~
-
-When using fzf-lua or Telescope, additional keybindings are available:
-
-    <Enter>     Open terminal in previous layout
-    <C-s>       Open in horizontal split
-    <C-v>       Open in vertical split
-    <C-t>       Open in new tab
-    <C-f>       Open in floating window
-
-These keybindings can be customized through the `picker.select_actions` and
-`picker.extra_select_actions` configuration options. See |ergoterm-picker-actions|
-for details.
-
-------------------------------------------------------------------------------
-4.3 TermSend                                               *ergoterm-termsend*
-
-Send text from your buffer to a terminal.
-
-Syntax: >vim
-    :TermSend [options]
-    :TermSend! [options]        " Use last focused terminal
-    :'<,'>TermSend [options]    " Send visual selection
-<
-
-Without a range, sends the current line. With a visual range, sends the
-selected text (character-wise or line-wise). The bang (!) version sends to the
-last focused terminal without opening a picker.
-
-Options:
-    text={text}           Custom text to send
-    action={action}       Terminal behavior (default: "focus")
-    decorator={decorator} Text transformation (default: "identity")
-    trim={boolean}        Remove whitespace (default: true)
-    new_line={boolean}    Add newline for execution (default: true)
-
-Action modes:
-    focus         Focus terminal after sending (default)
-    open          Show terminal but keep current focus
-    start         Send without opening terminal
-
-Text decorators:
-    identity         Send text as-is (default)
-    markdown_code    Wrap in markdown code block
-    Custom decorators can be registered in configuration (see |ergoterm-text_decorators|)
-
-Examples: >vim
-    :TermSend
+1. Bang (`!`) - Use the last focused terminal >vim
+    :TermSelect!
     :TermSend!
-    :TermSend action=open
-    :TermSend text="echo hello" action=start
-    :'<,'>TermSend decorator=markdown_code
+<
+
+2. Target by name - Specify terminal by name >vim
+    :TermSelect target=myterminal
+    :TermSend target=tests
+<
+
+3. Picker - Open selection UI (default) >vim
+    :TermSelect
+    :TermSend
+<
+
+BASIC KEYBINDINGS ~
+>lua
+    local map = vim.keymap.set
+    local opts = { noremap = true, silent = true }
+
+    -- Create terminals with different layouts
+    map("n", "<leader>cs", ":TermNew layout=below<CR>", opts)
+    map("n", "<leader>cv", ":TermNew layout=right<CR>", opts)
+    map("n", "<leader>cf", ":TermNew layout=float<CR>", opts)
+
+    -- Open terminal picker
+    map("n", "<leader>cl", ":TermSelect<CR>", opts)
+
+    -- Send text to last focused terminal
+    map("n", "<leader>cs", ":TermSend! new_line=false<CR>", opts)
+    map("x", "<leader>cs", ":TermSend! new_line=false<CR>", opts)
 <
 
 ------------------------------------------------------------------------------
-4.4 TermUpdate                                           *ergoterm-termupdate*
+3.2 INTERACTIVE AI ASSISTANTS                        *ergoterm-ai-assistants*
 
-Update configuration of existing terminals.
+Integrate AI chat tools (like Claude CLI, Cursor, Aider) into your workflow.
 
-Syntax: >vim
-    :TermUpdate {option}={value}
-    :TermUpdate! {option}={value}    " Update last focused terminal
-<
+See full guide: https://github.com/waiting-for-dev/ergoterm.nvim/blob/main/docs/interactive-ai-assistants.md
 
-The bang (!) version updates the last focused terminal without opening
-a picker.
-
-All options from TermNew are available (see |ergoterm-options| for the
-complete list), except `cmd` and `dir` which are immutable after terminal
-creation.
-
-Special update behavior:
-    • Table settings (using dot notation): Only the specified nested keys are
-      updated while other keys remain unchanged. For example, :TermUpdate!
-      size.below=20 updates only "below", preserves "above", "left", "right".
-
-    • List settings (comma-separated): The entire list is replaced. For
-      example, :TermUpdate! tags=prod,critical replaces all tags with the
-      new list.
-
-Examples: >vim
-    :TermUpdate layout=float
-    :TermUpdate! name=server
-    :TermUpdate! size.below=25
-    :TermUpdate! float_opts.border=double float_opts.width=120
-    :TermUpdate! size.below=15 size.right=40%
-    :TermUpdate! tags=prod,critical
-    :TermUpdate! meta.env=production
-<
-
-------------------------------------------------------------------------------
-4.5 TermInspect                                           *ergoterm-terminspect*
-
-Inspect a terminal's internal state for debugging purposes.
-
-Syntax: >vim
-    :TermInspect
-    :TermInspect!        " Inspect last focused terminal directly
-<
-
-Displays the terminal object's internal structure using vim.inspect(). This is
-useful for debugging and understanding terminal configuration, including all
-internal state and settings.
-
-The bang (!) version inspects the last focused terminal directly without
-opening a picker.
-
-Examples: >vim
-    :TermInspect         " Select terminal to inspect via picker
-    :TermInspect!        " Inspect last focused terminal
-<
-
-------------------------------------------------------------------------------
-4.6 TermToggleUniversalSelection        *ergoterm-termtoggleuniversalselection*
-
-Toggle universal selection mode for all terminals.
-
-Syntax: >vim
-    :TermToggleUniversalSelection
-<
-
-When universal selection is enabled, all terminals become auto_list and can
-be targeted by bang commands, regardless of their individual `auto_list` and
-`bang_target` settings. This provides a temporary override for accessing
-non-auto_list terminals through pickers and non-bang-target terminals through
-bang commands.
-
-==============================================================================
-5. CONFIGURATION                                       *ergoterm-configuration*
-
-------------------------------------------------------------------------------
-5.1 Setup                                                    *ergoterm-setup*
-
-Configure ErgoTerm by calling the setup function: >lua
-    require("ergoterm").setup({
-      -- your configuration here
-    })
-<
-
-All configuration options are optional and will use sensible defaults.
-
-------------------------------------------------------------------------------
-5.2 Options                                                 *ergoterm-options*
-
-Configuration is organized into two main sections:
-
-**terminal_defaults** - Default settings applied to all new terminals
-(overridable on individual instances):
-
-                                                              *ergoterm-shell*
-terminal_defaults.shell ~
-    Default: `vim.o.shell`
-    Type: `string` or `function`
-    
-    Default shell command to use for new terminals.
-
-                                                             *ergoterm-layout*
-terminal_defaults.layout ~
-    Default: `"below"`
-    Type: `string`
-    
-    Default window layout for new terminals.
-    See |ergoterm-termnew| for available layouts.
-
-                                                        *ergoterm-auto_scroll*
-terminal_defaults.auto_scroll ~
-    Default: `false`
-    Type: `boolean`
-
-    Automatically scroll terminal output to bottom.
-
-                                                         *ergoterm-bang_target*
-terminal_defaults.bang_target ~
-    Default: `true`
-    Type: `boolean`
-
-    Allow terminal to be targeted by bang commands. When set to false,
-    the terminal will not be considered for bang commands (e.g., `:TermSend!`,
-    `:TermUpdate!`).
-
-    Note: This setting can be temporarily overridden by enabling universal
-    selection mode with |ergoterm-termtoggleuniversalselection|.
-
-                                                         *ergoterm-watch_files*
-terminal_defaults.watch_files ~
-    Default: `false`
-    Type: `boolean`
-
-    Watch for file changes when terminal produces output. Useful when
-    terminal commands modify files that are open in Neovim.
-
-    Note: Requires Vim's `autoread` option to be enabled for file changes
-    to be detected.
-
-                                                 *ergoterm-cleanup_on_success*
-terminal_defaults.cleanup_on_success ~
-    Default: `true`
-    Type: `boolean`
-    
-    Close terminal window when the job process exits successfully (exit code 0).
-
-                                                 *ergoterm-cleanup_on_failure*
-terminal_defaults.cleanup_on_failure ~
-    Default: `false`
-    Type: `boolean`
-
-    Close terminal window when the job process exits with failure (exit code non-zero).
-
-                                                      *ergoterm-scrollback*
-terminal_defaults.scrollback ~
-    Default: `vim.o.scrollback`
-    Type: `number`
-
-    Number of lines to keep in terminal scrollback buffer.
-
-                                                      *ergoterm-show_on_success*
-terminal_defaults.show_on_success ~
-    Default: `false`
-    Type: `boolean`
-
-    Open terminal window when the job process exits successfully (exit code 0).
-    Requires `cleanup_on_success` to be false.
-
-                                                      *ergoterm-show_on_failure*
-terminal_defaults.show_on_failure ~
-    Default: `false`
-    Type: `boolean`
-
-    Open terminal window when the job process exits with failure (exit code non-zero).
-    Requires `cleanup_on_failure` to be false.
-
-                                                    *ergoterm-default_action*
-terminal_defaults.default_action ~
-    Default: `function(term) term:focus() end`
-    Type: `function(term: Terminal)`
-
-    Function to invoke when selecting the terminal in picker with <Enter>.
-
-                                                       *ergoterm-persist_mode*
-terminal_defaults.persist_mode ~
-    Default: `false`
-    Type: `boolean`
-    
-    Remember terminal mode (normal/insert) between visits.
-
-                                                       *ergoterm-persist_size*
-terminal_defaults.persist_size ~
-    Default: `true`
-    Type: `boolean`
-    
-    Remember terminal size between visits.
-
-
-                                                    *ergoterm-start_in_insert*
-terminal_defaults.start_in_insert ~
-    Default: `true`
-    Type: `boolean`
-    
-    Start terminals in insert mode by default.
-
-                                                         *ergoterm-auto_list*
-terminal_defaults.auto_list ~
-    Default: `true`
-    Type: `boolean`
-
-    Show terminals in picker selection by default. When set to false, the
-    terminal is not visible from the picker.
-
-    Note: This setting can be temporarily overridden by enabling universal
-    selection mode with |ergoterm-termtoggleuniversalselection|.
-
-                                                            *ergoterm-sticky*
-terminal_defaults.sticky ~
-    Default: `false`
-    Type: `boolean`
-
-    Keep terminals visible in picker even when stopped. When set to true,
-    the terminal remains available for selection in pickers regardless of
-    whether it has been started or stopped, as long as `auto_list` is also true.
-    This is useful for persistent terminal configurations that you want to
-    access quickly even when not currently running.
-
-
-                                                               *ergoterm-size*
-terminal_defaults.size ~
-    Default: See below
-    Type: `table`
-
-    Size configuration for different window layouts: >lua
-        size = {
-          below = "50%",
-          above = "50%", 
-          left = "50%",
-          right = "50%"
-        }
-
-
-    Each direction accepts either:
-    • String with percentage (e.g., "30%") - Percentage of screen dimension
-    • Number - Absolute size in lines (for above/below) or columns (for left/right)
-
-    Examples: >lua
-        size = {
-          below = 20,      -- 20 lines high
-          right = "40%",   -- 40% of screen width
-          float = "80%"    -- Not used, floats use float_opts instead
-        }
-
-
-                                                         *ergoterm-float_opts*
-terminal_defaults.float_opts ~
-    Default: See below
-    Type: `table`
-    
-    Configuration for floating windows: >lua
-        float_opts = {
-          title_pos = "left",
-          relative = "editor",
-          border = "single",
-          zindex = 50
-        }
-<
-
-                                                     *ergoterm-float_winblend*
-terminal_defaults.float_winblend ~
-    Default: `10`
-    Type: `number`
-    
-    Transparency level for floating windows (0-100).
-
-                                                          *ergoterm-clear_env*
-terminal_defaults.clear_env ~
-    Default: `false`
-    Type: `boolean`
-    
-    Use clean environment for terminal jobs.
-
-                                                               *ergoterm-env*
-terminal_defaults.env ~
-    Default: `nil`
-    Type: `table<string, string>`
-
-    Environment variables to pass to terminal jobs.
-    Example: `{ PATH = "/custom/path", DEBUG = "1" }`
-
-**picker** - Picker configuration:
-
-                                                             *ergoterm-picker*
-picker.picker ~
-    Default: `nil` (auto-detect)
-    Type: `string`, `table`, or `nil`
-
-    Picker to use for terminal selection. Can be:
-    • `nil` - Auto-detect (telescope > fzf-lua > vim.ui.select)
-    • `"telescope"` - Use Telescope picker
-    • `"fzf-lua"` - Use fzf-lua picker  
-    • `"vim-ui-select"` - Use built-in vim.ui.select
-    • Custom picker table with `select` function
-
-                                                 *ergoterm-picker-actions*
-picker.select_actions ~
-    Default: See below
-    Type: `table<string, PickerCallbackDefinition>`
-
-    Actions available in the terminal picker. These completely replace the
-    built-in actions. Each key is a keybinding, and the value is a table with:
-    • `fn` - Function that receives the selected terminal
-    • `desc` - Description shown in picker UI
-
-    Default actions: >lua
-        select_actions = {
-          default = { fn = function(term) term:focus() end, desc = "Open" },
-          ["<C-s>"] = { fn = function(term) term:focus("below") end, desc = "Open in horizontal split" },
-          ["<C-v>"] = { fn = function(term) term:focus("right") end, desc = "Open in vertical split" },
-          ["<C-t>"] = { fn = function(term) term:focus("tab") end, desc = "Open in tab" },
-          ["<C-f>"] = { fn = function(term) term:focus("float") end, desc = "Open in float window" }
-        }
-
-
-picker.extra_select_actions ~
-    Default: `{}` (empty)
-    Type: `table<string, PickerCallbackDefinition>`
-
-    Additional actions to append to `select_actions`. These are merged with
-    the default or configured `select_actions`, allowing you to add custom
-    actions without replacing the built-in ones.
-
-    Example: >lua
-        extra_select_actions = {
-          ["<C-d>"] = { fn = function(term) term:cleanup() end, desc = "Cleans up terminal" },
-          ["<C-r>"] = { fn = function(term) term:stop(); term:start() end, desc = "Restart terminal" }
-        }
-
-
-**text_decorators** - Text decorator configuration:
-
-                                                    *ergoterm-text_decorators*
-text_decorators.default ~
-    Default: See below
-    Type: `table<string, function>`
-
-    Default text decorators available by name. These completely replace the
-    built-in decorators. Each key is a decorator name, and the value is a
-    function that takes an array of text lines and returns a transformed array.
-
-    Default decorators: >lua
-        text_decorators = {
-          default = {
-            identity = function(text) return text end,
-            markdown_code = function(text)
-              -- Wraps text in markdown code block with filetype
-            end
-          }
-        }
-<
-
-text_decorators.extra ~
-    Default: `{}` (empty)
-    Type: `table<string, function>`
-
-    Additional decorators to append to `default`. These are merged with
-    the default decorators, allowing you to add custom decorators without
-    replacing the built-in ones.
-
-    Example: >lua
-        text_decorators = {
-          extra = {
-            timestamp = function(text)
-              local timestamp = os.date("%H:%M:%S")
-              local result = {}
-              for _, line in ipairs(text) do
-                table.insert(result, string.format("[%s] %s", timestamp, line))
-              end
-              return result
-            end
-          }
-        }
-<
-
-------------------------------------------------------------------------------
-5.3 Callbacks                                             *ergoterm-callbacks*
-
-ErgoTerm supports various callbacks for terminal lifecycle events:
-
-**Callbacks** - All callbacks are part of terminal_defaults:
-
-                                                           *ergoterm-on_close*
-terminal_defaults.on_close ~
-    Type: `function(term)`
-    Default: No-op
-    
-    Called when a terminal window is closed.
-
-                                                          *ergoterm-on_create*
-terminal_defaults.on_create ~
-    Type: `function(term)`
-    Default: No-op
-    
-    Called when a terminal buffer is first created.
-
-                                                           *ergoterm-on_focus*
-terminal_defaults.on_focus ~
-    Type: `function(term)`
-    Default: No-op
-
-    Called when a terminal window gains focus.
-
-                                                         *ergoterm-on_unfocus*
-terminal_defaults.on_unfocus ~
-    Type: `function(term)`
-    Default: No-op
-
-    Called when a terminal window loses focus.
-
-                                                        *ergoterm-on_job_exit*
-terminal_defaults.on_job_exit ~
-    Type: `function(term, job_id, exit_code, event_name)`
-    Default: No-op
-    
-    Called when the terminal process exits.
-
-                                                      *ergoterm-on_job_stderr*
-terminal_defaults.on_job_stderr ~
-    Type: `function(term, channel_id, data_lines, stream_name)`
-    Default: No-op
-    
-    Called when the terminal process outputs to stderr.
-
-                                                      *ergoterm-on_job_stdout*
-terminal_defaults.on_job_stdout ~
-    Type: `function(term, channel_id, data_lines, stream_name)`
-    Default: No-op
-    
-    Called when the terminal process outputs to stdout.
-
-                                                            *ergoterm-on_open*
-terminal_defaults.on_open ~
-    Type: `function(term)`
-    Default: No-op
-    
-    Called when a terminal window is opened.
-
-                                                           *ergoterm-on_start*
-terminal_defaults.on_start ~
-    Type: `function(term)`
-    Default: No-op
-    
-    Called when a terminal job process starts.
-
-                                                            *ergoterm-on_stop*
-terminal_defaults.on_stop ~
-    Type: `function(term)`
-    Default: No-op
-    
-    Called when a terminal job process stops.
-
-==============================================================================
-6. STANDALONE TERMINALS                                 *ergoterm-standalone*
-
-Create persistent terminal configurations that survive across Neovim sessions.
-These terminals are defined once and can be quickly accessed.
-
-Example: >lua
+SIMPLE SETUP ~
+>lua
     local ergoterm = require("ergoterm")
 
-    -- Create standalone terminals
-    local lazygit = ergoterm:new({
-      name = "lazygit",
-      cmd = "lazygit", 
-      layout = "float",
-      dir = "git_dir",
+    local claude = ergoterm:new({
+      cmd = "claude",
+      name = "claude",
+      layout = "right",
       auto_list = false,
-      bang_target = false
+      bang_target = false,
+      sticky = true,
+      watch_files = true
     })
-  
-    local server = ergoterm:new({
-      name = "server",
-      cmd = "npm start",
-      layout = "right",
-      dir = "~/my-project",
-      auto_list = false
-    })
-    
-    -- Map to keybindings
-    vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end)
-    vim.keymap.set("n", "<leader>ss", function() server:toggle() end)
 <
 
-Project-Specific Terminals with .nvim.lua ~
+MULTIPLE AI ASSISTANTS ~
+>lua
+    local ai_chats = ergoterm.with_defaults({
+      layout = "right",
+      auto_list = false,
+      bang_target = false,
+      sticky = true,
+      watch_files = true,
+      tags = { "ai_chat" }
+    })
 
-For project-specific terminal configurations, create a `.nvim.lua` file in your
-project root. This is especially useful with the `sticky` option to keep
-project terminals available even when stopped: >lua
+    local claude_sonnet = ai_chats:new({
+      cmd = "claude --model sonnet",
+      name = "claude (sonnet)",
+      meta = {
+        add_file = function(file) return "@" .. file end
+      }
+    })
+
+    local aider = ai_chats:new({
+      cmd = "aider",
+      name = "aider",
+      meta = {
+        add_file = function(file) return "/add " .. file end
+      }
+    })
+<
+
+SMART SELECTION ~
+>lua
+    local chats = ergoterm.filter_by_tag("ai_chat")
+
+    vim.keymap.set("n", "<leader>as", function()
+      ergoterm.select_started({
+        terminals = chats,
+        prompt = "Send to chat",
+        callbacks = function(term)
+          return term:send("single_line")
+        end,
+        default = claude_sonnet
+      })
+    end)
+<
+
+------------------------------------------------------------------------------
+3.3 TEST RUNNER                                        *ergoterm-test-runner*
+
+Integrate test runners into your Neovim workflow.
+
+See full guide: https://github.com/waiting-for-dev/ergoterm.nvim/blob/main/docs/test-runner.md
+
+EXAMPLE SETUP ~
+>lua
+    local ergoterm = require("ergoterm")
+
+    local rspec = ergoterm:new({
+      auto_list = false,
+      bang_target = false,
+      sticky = true,
+      layout = "below",
+      size = { below = "20%" },
+      auto_scroll = true
+    })
+<
+
+BASIC KEYBINDINGS ~
+>lua
+    -- Test single test at cursor
+    vim.keymap.set("n", "<leader>tt", function()
+      rspec:send({
+        'bundle exec rspec ' .. vim.fn.expand("%") .. ':' .. vim.fn.line(".")
+      }, { action = "open" })
+    end, { desc = "Test single test" })
+
+    -- Test current file
+    vim.keymap.set("n", "<leader>tf", function()
+      rspec:send({ 'bundle exec rspec ' .. vim.fn.expand("%") },
+        { action = "open" })
+    end, { desc = "Test current file" })
+
+    -- Re-run last test
+    vim.keymap.set("n", "<leader>tl", function()
+      rspec:send("last", { action = "open" })
+    end, { desc = "Re-run last test" })
+<
+
+------------------------------------------------------------------------------
+3.4 TASK RUNNER                                        *ergoterm-task-runner*
+
+Quick access to common project tasks using project-specific configuration.
+
+See full guide: https://github.com/waiting-for-dev/ergoterm.nvim/blob/main/docs/task-runner.md
+
+PROJECT-SPECIFIC SETUP ~
+
+Create a `.nvim.lua` file in your project root: >lua
 
     local ergoterm = require("ergoterm")
 
-    ergoterm:new({
-      name = "Phoenix Server",
-      cmd = "iex -S mix phx.server",
-      layout = "right",
-      sticky = true
-    })
-
-    ergoterm:new({
-      name = "DB Console",
-      cmd = "psql -U postgres my_database",
+    local tasks = ergoterm.with_defaults({
       layout = "below",
+      size = { below = "30%" },
+      tags = { "task" },
+      auto_list = false,
+      bang_target = false,
+      sticky = true,
+      auto_scroll = true,
+      default_action = function(term) term:open() end
+    })
+
+    -- Define common tasks
+    local db_migrate = tasks:new({
+      name = "db:migrate",
+      cmd = "rails db:migrate"
+    })
+
+    local db_seed = tasks:new({
+      name = "db:seed",
+      cmd = "rails db:seed"
+    })
+
+    -- Task selection keybinding
+    local task_list = ergoterm.filter_by_tag("task")
+
+    vim.keymap.set("n", ",t", function()
+      ergoterm.select({
+        terminals = task_list,
+        prompt = "Run Task"
+      })
+    end, { noremap = true, silent = true, desc = "Run Task" })
+<
+
+------------------------------------------------------------------------------
+3.5 DEVELOPMENT ENVIRONMENT                        *ergoterm-dev-environment*
+
+Create comprehensive development environments with project-specific terminals.
+
+See full guide: https://github.com/waiting-for-dev/ergoterm.nvim/blob/main/docs/development-environment.md
+
+PROJECT-SPECIFIC SETUP ~
+
+Create a `.nvim.lua` file in your project root: >lua
+
+    local ergoterm = require("ergoterm")
+
+    -- Development server (Phoenix)
+    local dev_server = ergoterm:new({
+      name = "dev",
+      cmd = "mix phx.server",
+      layout = "right",
+      size = { right = "40%" },
       sticky = true
     })
 
-With `sticky = true`, these terminals remain visible in the picker
-(`:TermSelect`) even when stopped, making it easy to restart your development
-environment. The terminals are automatically loaded when you open the project
-in Neovim.
+    -- Staging console (connected to Fly.io)
+    local staging_console = ergoterm:new({
+      name = "staging",
+      cmd = "fly ssh console --app myapp-staging " ..
+           "--command '/app/bin/myapp remote'",
+      layout = "right",
+      size = { right = "40%" },
+      sticky = true
+    })
 
-All terminal creation options are available for standalone terminals.
-See |ergoterm-options| for the complete list.
+    -- Local database (psql)
+    local local_db = ergoterm:new({
+      name = "db-local",
+      cmd = "psql -U postgres -d myapp_dev",
+      layout = "below",
+      size = { below = "30%" },
+      sticky = true
+    })
+<
+
+Use `:TermSelect` to access all defined terminals.
+
+------------------------------------------------------------------------------
+3.6 PROJECT INITIALIZATION                              *ergoterm-project-init*
+
+Automatically run initialization tasks when opening a project.
+
+See full guide: https://github.com/waiting-for-dev/ergoterm.nvim/blob/main/docs/project-initialization.md
+
+BACKGROUND INITIALIZATION ~
+
+Create a `.nvim.lua` file in your project root: >lua
+
+    local ergoterm = require("ergoterm")
+
+    -- Start Docker services
+    local docker_init = ergoterm:new({
+      name = "docker-init",
+      cmd = "docker-compose up -d",
+      auto_list = false,
+      show_on_failure = true,
+      sticky = true,
+      on_job_exit = function(term, job, exit_code)
+        if exit_code == 0 then
+          vim.notify("Docker services started", vim.log.levels.INFO)
+        end
+      end
+    })
+
+    -- Fetch remote changes
+    local git_fetch = ergoterm:new({
+      name = "git-fetch",
+      cmd = "git fetch --all --prune",
+      auto_list = false,
+      show_on_failure = true,
+      sticky = true,
+      on_job_exit = function(term, job, exit_code)
+        if exit_code == 0 then
+          vim.notify("Git fetch completed", vim.log.levels.INFO)
+        end
+      end
+    })
+
+    -- Start both terminals in the background
+    docker_init:start()
+    git_fetch:start()
+<
+
+With `show_on_failure = true`, terminals run silently in the background but
+automatically surface if they fail.
 
 ==============================================================================
-7. API REFERENCE                                               *ergoterm-api*
-
-ErgoTerm provides a comprehensive Lua API for terminal management.
+4. CONFIGURATION                                      *ergoterm-configuration*
 
 ------------------------------------------------------------------------------
-7.1 Terminal Lifecycle                                    *ergoterm-lifecycle*
+4.1 TERMINAL DEFAULTS                             *ergoterm-terminal-defaults*
 
-Every terminal follows this progression:
-
-1. **Create** - `Terminal:new()` - Creates terminal instance
-2. **Start** - `Terminal:start()` - Initializes buffer and job  
-3. **Open** - `Terminal:open()` - Creates window
-4. **Focus** - `Terminal:focus()` - Brings into active focus
-
-Each method is idempotent and automatically calls prerequisite methods: >lua
-    local ergoterm = require("ergoterm")
-    local term = ergoterm:new({ cmd = "htop" })
-    
-    -- These cascade - focus() calls start() and open() if needed
-    term:focus()  -- Automatically starts and opens if needed
-    
-    -- Or call individually
-    term:start()  -- Just start the job
-    term:open()   -- Just create window (starts if needed)
+All options can be set globally in `setup()` under `terminal_defaults`, or
+per-terminal when creating instances.
+>lua
+    require("ergoterm").setup({
+      terminal_defaults = {
+        layout = "right",
+        cleanup_on_success = false,
+        auto_scroll = true
+      }
+    })
 <
 
-------------------------------------------------------------------------------
-7.2 Core Methods                                           *ergoterm-methods*
+OPTIONS ~
 
-Terminal:new({opts})                                    *Terminal:new()*
-    Create a new terminal instance with configuration options.
-    See |ergoterm-options| for available options.
+auto_list                                               *ergoterm-auto_list*
+    Type: `boolean`
+    Default: `true`
+    Show terminal in default picker selection list (e.g., `:TermSelect`)
 
-Terminal:start()                                        *Terminal:start()*
-    Initialize terminal buffer and start job process.
-    Idempotent - safe to call multiple times.
+auto_scroll                                           *ergoterm-auto_scroll*
+    Type: `boolean`
+    Default: `false`
+    Automatically scroll to bottom on new output
 
-Terminal:open({layout})                                 *Terminal:open()*
-    Create window for the terminal. Optional layout parameter
-    overrides the terminal's default layout.
+bang_target                                           *ergoterm-bang_target*
+    Type: `boolean`
+    Default: `true`
+    Include terminal as target for bang (`!`) commands
 
-Terminal:focus({layout})                                *Terminal:focus()*
-    Bring terminal into focus. Cascades through start() and open()
-    if needed. Optional layout parameter for first-time opening.
+clear_env                                               *ergoterm-clear_env*
+    Type: `boolean`
+    Default: `false`
+    Clear environment variables before starting
 
-Terminal:unfocus({win_id})                              *Terminal:unfocus()*
-    Remove focus from terminal window. Persists mode if configured,
-    and closes floating terminals. Optionally switches to a different
-    window if win_id is provided.
+cleanup_on_failure                             *ergoterm-cleanup_on_failure*
+    Type: `boolean`
+    Default: `false`
+    Cleanup terminal when process exits with non-zero code
 
-    Parameters:
-        {win_id} - number, optional window ID to switch to after unfocusing
+cleanup_on_success                             *ergoterm-cleanup_on_success*
+    Type: `boolean`
+    Default: `true`
+    Cleanup terminal when process exits with code 0
 
-Terminal:close()                                        *Terminal:close()*
-    Close terminal window but keep job running.
-    Terminal can be reopened later.
+default_action                                     *ergoterm-default_action*
+    Type: `function`
+    Default: `function(term) term:focus() end`
+    Action performed when selecting terminal with default picker action
 
-Terminal:stop({close})                             *Terminal:stop()*
-    Terminate job process and clean up buffer.
-    Terminal can be restarted later.
+float_opts                                             *ergoterm-float_opts*
+    Type: `table`
+    Floating window configuration options (see |nvim_open_win()|)
+    Subkeys:
+    - border: `string` (default: "single")
+    - col: `number` (default: auto-centered)
+    - height: `number` (default: auto-calculated)
+    - relative: `string` (default: "editor")
+    - row: `number` (default: auto-centered)
+    - title: `string` (default: terminal name)
+    - title_pos: `string` (default: "left")
+    - width: `number` (default: auto-calculated)
+    - zindex: `number` (default: +1)
 
-    Parameters:
-        {close} - boolean, whether to close the terminal window (default: true)
+float_winblend                                     *ergoterm-float_winblend*
+    Type: `number`
+    Default: `10`
+    Transparency level for floating windows (0-100)
 
-Terminal:cleanup({opts})                                *Terminal:cleanup()*
+layout                                                     *ergoterm-layout*
+    Type: `string`
+    Default: `"below"`
+    Window layout: "below", "above", "left", "right", "float", "tab",
+    "window"
 
-    Cleans up the terminal and optionally removes it from the session.
-    Always stops the terminal if running and cleans up resources. For sticky
-    terminals, only removes from the session registry if force is true,
-    otherwise they remain available for future use. Non-sticky terminals
-    are always removed from the session.
+meta                                                         *ergoterm-meta*
+    Type: `table`
+    Default: `{}`
+    Custom user metadata for storing arbitrary data. Useful for terminal
+    polymorphism.
 
-    Parameters:
-        {opts} - table with cleanup options
-          force - boolean, whether to force removal of sticky terminals from the session (default: false)
+on_close                                                 *ergoterm-on_close*
+    Type: `function`
+    Default: No-op
+    Callback when terminal window closes: `function(term)`
 
-Terminal:toggle({layout})                               *Terminal:toggle()*
-    Close if open, focus if closed. Convenient show/hide toggle.
+on_focus                                                 *ergoterm-on_focus*
+    Type: `function`
+    Default: No-op
+    Callback when terminal gains focus: `function(term)`
 
-Terminal:send({input}, {opts})                          *Terminal:send()*
-    Send text to terminal with various behavior options.
-    
-    Input can be provided as:
-    • Array of strings - sends the text directly
-    • "single_line" - sends the current line under cursor
-    • "visual_lines" - sends the current visual line selection
-    • "visual_selection" - sends the current visual character selection
-    - "last" - sends the last sent text again
+on_job_exit                                           *ergoterm-on_job_exit*
+    Type: `function`
+    Default: No-op
+    Callback when job exits: `function(term, job, exit_code, event)`
 
-    Parameters:
-        {input}    - Array of text lines or selection type string
-        {opts}     - Table with options:
-          action   - "focus"|"open"|"start" (default: "focus")
-          trim     - Remove whitespace (default: true)
-          new_line - Add newline (default: true)
-          decorator - Text transformation function or string name
+on_job_stderr                                       *ergoterm-on_job_stderr*
+    Type: `function`
+    Default: No-op
+    Callback on stderr: `function(term, channel_id, data, name)`
 
-Terminal:clear()                                        *Terminal:clear()*
-    Clear terminal display using platform-appropriate command.
+on_job_stdout                                       *ergoterm-on_job_stdout*
+    Type: `function`
+    Default: No-op
+    Callback on stdout: `function(term, channel_id, data, name)`
 
-Terminal:update({opts})                                 *Terminal:update()*
-    Update terminal configuration after creation.
-    Most options can be changed except 'cmd' and 'dir'.
+on_open                                                   *ergoterm-on_open*
+    Type: `function`
+    Default: No-op
+    Callback when terminal window opens: `function(term)`
 
-------------------------------------------------------------------------------
-7.3 State Queries                                          *ergoterm-queries*
+on_start                                                 *ergoterm-on_start*
+    Type: `function`
+    Default: No-op
+    Callback when terminal job starts: `function(term)`
 
-Terminal:is_started()                                   *Terminal:is_started()*
-    Returns true if terminal job is running.
+on_stop                                                   *ergoterm-on_stop*
+    Type: `function`
+    Default: No-op
+    Callback when terminal job stops: `function(term)`
 
-Terminal:is_active()                                    *Terminal:is_active()*
-    Returns true if terminal has active buffer.
+on_unfocus                                             *ergoterm-on_unfocus*
+    Type: `function`
+    Default: No-op
+    Callback when terminal loses focus: `function(term)`
 
-Terminal:is_open()                                      *Terminal:is_open()*
-    Returns true if terminal has visible window.
+persist_mode                                         *ergoterm-persist_mode*
+    Type: `boolean`
+    Default: `false`
+    Remember insert/normal mode between focus sessions
 
-Terminal:is_focused()                                   *Terminal:is_focused()*
-    Returns true if terminal is currently active window.
+persist_size                                         *ergoterm-persist_size*
+    Type: `boolean`
+    Default: `true`
+    Remember window size when resizing splits
 
-Terminal:is_stopped()                                   *Terminal:is_stopped()*
-    Returns true if job has been terminated.
+scrollback                                             *ergoterm-scrollback*
+    Type: `number`
+    Default: `vim.o.scrollback`
+    Terminal scrollback buffer size
 
-Terminal:get_state({key})                               *Terminal:get_state()*
-    Access internal terminal state (primarily for debugging).
+shell                                                       *ergoterm-shell*
+    Type: `string`
+    Default: `vim.o.shell`
+    Default shell command to run if no `cmd` is given
 
-Module Functions:                                       *ergoterm-module*
+show_on_failure                                   *ergoterm-show_on_failure*
+    Type: `boolean`
+    Default: `false`
+    Show terminal window when process fails (incompatible with
+    `cleanup_on_failure`)
 
-Note: All module functions are available through require("ergoterm").
-For backward compatibility, require("ergoterm.terminal") is still supported
-but deprecated.
+show_on_success                                   *ergoterm-show_on_success*
+    Type: `boolean`
+    Default: `false`
+    Show terminal window when process succeeds (incompatible with
+    `cleanup_on_success`)
 
-require("ergoterm").get_focused()                       *ergoterm.get_focused()*
-    Returns terminal that currently has window focus.
+size                                                         *ergoterm-size*
+    Type: `table`
+    Size for split layouts (number of rows/columns or percentage string)
+    Subkeys:
+    - above: `string|number` (default: "50%")
+    - below: `string|number` (default: "50%")
+    - left: `string|number` (default: "50%")
+    - right: `string|number` (default: "50%")
 
-require("ergoterm").get_target_for_bang()                  *ergoterm.get_target_for_bang()*
-    Returns most recently focused terminal.
+start_in_insert                                   *ergoterm-start_in_insert*
+    Type: `boolean`
+    Default: `true`
+    Start in insert mode when focusing terminal
 
-require("ergoterm").get_all()                           *ergoterm.get_all()*
-    Returns array of all terminal instances.
+sticky                                                     *ergoterm-sticky*
+    Type: `boolean`
+    Default: `false`
+    Keep terminal active even after cleanup so it can be restarted
 
-require("ergoterm").get({id})                           *ergoterm.get()*
-    Retrieve terminal by unique identifier.
+tags                                                         *ergoterm-tags*
+    Type: `string[]`
+    Default: `{}`
+    Tags for organizing and filtering terminals
 
-require("ergoterm").get_by_name({name})                 *ergoterm.get_by_name()*
-    Find first terminal with specified name.
-
-require("ergoterm").find({predicate})                   *ergoterm.find()*
-    Find first terminal matching condition function.
-
-require("ergoterm").filter({predicate})                 *ergoterm.filter()*
-    Return all terminals matching condition function.
-
-require("ergoterm").filter_by_tag({tag})                     *ergoterm.with_tag()*
-    Return all terminals that have the specified tag.
-
-require("ergoterm").select({opts})                 *ergoterm.select()*
-    Present picker interface for terminal selection.
-
-    Parameters:
-        {opts} - Table with options:
-          terminals - Array of terminal instances to select from
-          prompt    - String to display in picker prompt (optional)
-          callbacks - Table of picker callback definitions (optional)
-          picker    - Custom picker implementation (optional)
-
-require("ergoterm").select_started({opts})         *ergoterm.select_started()*
-    Present picker interface for started terminals only. Filters the provided
-    terminals to only include those that have been started, then presents
-    them in a picker interface. All other behavior matches select().
-    If none of the terminals are started and a default terminal is provided,
-    that terminal is selected instead.
-
-    Parameters:
-        {opts} - Table with options:
-          terminals - Array of terminal instances to select from
-          prompt    - String to display in picker prompt (optional)
-          callbacks - Table of picker callback definitions (optional)
-          picker    - Custom picker implementation (optional)
-          default   - Terminal to select when none are started (optional)
-
-require("ergoterm").cleanup_all()                       *ergoterm.cleanup_all()*
-    Clean up all terminals. Non-sticky terminals are removed from the session,
-    while sticky terminals are only removed if force option is true.
-
-require("ergoterm").toggle_universal_selection()         *ergoterm.toggle_universal_selection()*
-    Toggle universal selection mode. Returns the new state (boolean).
-    When enabled, all terminals are auto_list regardless of their
-    individual auto_list setting.
-
-require("ergoterm").with_defaults({custom_defaults})      *ergoterm.with_defaults()*
-    Create a terminal factory with custom defaults.
-    Returns a factory table with a new() method that creates terminals
-    with the provided defaults merged with global configuration.
-
-    Parameters:
-        {custom_defaults} - Table of default values to apply to new terminals
-
-    Returns:
-        Factory table with new() method
-
-    Example: >lua
-        local task = require("ergoterm").with_defaults({
-          tags = { "task" },
-          auto_list = false
-        })
-        local term = task:new({ name = "foo" })
-    <
+watch_files                                           *ergoterm-watch_files*
+    Type: `boolean`
+    Default: `false`
+    Refresh buffer when stdout is received
 
 ------------------------------------------------------------------------------
-7.4 Custom Text Decorators                             *ergoterm-decorators*
+4.2 PICKER CONFIGURATION                           *ergoterm-picker-config*
 
-Text decorators transform text before sending it to terminals. ErgoTerm
-includes built-in decorators and supports custom ones.
-
-Built-in Decorators:
-    "identity"         Send text unchanged (default)
-    "markdown_code"    Wrap in markdown code block with filetype
-
-Built-in Decorator Builders:
-    "prompt"           Prefix with given text and an empty line
-
-Creating Custom Decorators ~
-
-A decorator is a function that takes an array of text lines and returns
-a transformed array: >lua
-    ---@param text string[] Array of text lines
-    ---@return string[] Transformed text lines
-    function my_decorator(text)
-      -- Transform the text
-      return transformed_text
-    end
+Configure terminal selection picker behavior.
+>lua
+    require("ergoterm").setup({
+      picker = {
+        picker = "telescope",
+        extra_select_actions = {
+          ["<C-d>"] = {
+            fn = function(term) term:cleanup() end,
+            desc = "Delete terminal"
+          }
+        }
+      }
+    })
 <
 
-You can use decorators in two ways:
+extra_select_actions                         *ergoterm-extra_select_actions*
+    Type: `table`
+    Default: `{}`
+    Additional custom keybindings merged with defaults
 
-Option 1 - Pass decorator function directly: >lua
-    local function timestamp_decorator(text)
-      local timestamp = os.date("%H:%M:%S")
-      local result = {}
-      for _, line in ipairs(text) do
-        table.insert(result, string.format("[%s] %s", timestamp, line))
-      end
-      return result
-    end
+picker                                                     *ergoterm-picker*
+    Type: `string|table|nil`
+    Default: `nil`
+    Picker implementation: `nil` (auto-detect), "telescope", "fzf-lua",
+    "vim-ui-select", or custom picker table
 
-    local ergoterm = require("ergoterm")
-    local term = ergoterm.get_target_for_bang()
-    term:send("single_line", { decorator = timestamp_decorator })
-<
+select_actions                                     *ergoterm-select_actions*
+    Type: `table`
+    Default keybindings: `default` (runs `default_action`), `<C-s>` (open
+    below), `<C-v>` (open right), `<C-t>` (open in tab), `<C-f>` (open
+    float). Each action is a table with `fn` (callback function) and `desc`
+    (description)
 
-Option 2 - Register named decorator in configuration: >lua
+------------------------------------------------------------------------------
+4.3 TEXT DECORATORS                               *ergoterm-text-decorators*
+
+Text decorators transform text before sending to terminals.
+>lua
     require("ergoterm").setup({
       text_decorators = {
         extra = {
@@ -1007,121 +608,634 @@ Option 2 - Register named decorator in configuration: >lua
         }
       }
     })
+<
 
-    -- Then use by name
-    local ergoterm = require("ergoterm")
-    local term = ergoterm.get_target_for_bang()
-    term:send("single_line", { decorator = "timestamp" })
-    -- Or from command line
-    :TermSend decorator=timestamp
+default                                      *ergoterm-text_decorators-default*
+    Type: `table`
+    Built-in decorators: `identity` (no transformation), `markdown_code`
+    (wraps in markdown code block)
+
+extra                                          *ergoterm-text_decorators-extra*
+    Type: `table`
+    Default: `{}`
+    Custom text decorators. Each decorator is a function that takes
+    `string[]` and returns `string[]`
+
+Use with `:TermSend decorator=name` or `term:send(input, {decorator = "name"})`.
+
+==============================================================================
+5. COMMANDS                                              *ergoterm-commands*
+
+:TermNew                                                        *:TermNew*
+    Create and focus a new terminal with optional configuration. >vim
+        :TermNew [option=value ...]
+<
+    All options from |ergoterm-terminal-defaults| are supported except
+    callbacks (`on_*` functions). Additionally:
+
+    - cmd: Command to run (default: shell)
+    - dir: Working directory (default: current directory). Special value:
+      `git_dir` expands to git root
+    - name: Terminal name (default: command name)
+
+    Syntax for complex types:
+    - Table settings: Use dot notation: `size.right="30%"`
+    - List settings: Use comma-separated values: `tags=git,dev`
+
+    Examples: >vim
+        :TermNew
+        :TermNew cmd=lazygit layout=float name=git
+        :TermNew cmd=claude watch_files=true layout=right
+        :TermNew cmd="rspec --watch" size.below="30%" name=tests
+<
+
+:TermSelect                                                  *:TermSelect*
+    Open terminal picker or focus a specific terminal. >vim
+        :TermSelect[!] [target=name]
+<
+    Examples: >vim
+        :TermSelect
+        :TermSelect!
+        :TermSelect target=tests
+<
+
+:TermUpdate                                                  *:TermUpdate*
+    Update terminal settings after creation. >vim
+        :TermUpdate[!] option=value [option=value ...]
+<
+    All options from `:TermNew` can be updated except:
+    - cmd
+    - dir
+    - scrollback
+    - env
+
+    Examples: >vim
+        :TermUpdate! layout=float
+        :TermUpdate target=server cleanup_on_success=false
+<
+
+:TermSend                                                      *:TermSend*
+    Send text from buffer to terminal. >vim
+        :TermSend[!] [option=value ...]
+        :[range]TermSend[!] [option=value ...]
+<
+    Without a range, sends the current line. With a range (visual selection),
+    sends selected text.
+
+    Options:
+    - action: Terminal action ("focus", "open", "start")
+    - clear: Clear terminal before sending (boolean)
+    - decorator: Text decorator to apply (string)
+    - new_line: Append newline to execute command (boolean)
+    - text: Explicit text to send (string)
+    - trim: Trim leading/trailing whitespace (boolean)
+
+    Examples: >vim
+        :TermSend!
+        :'<,'>TermSend!
+        :TermSend! new_line=false
+        :TermSend! action=open
+        :TermSend text="npm test" target=tests
+<
+
+:TermInspect                                                *:TermInspect*
+    Display terminal internal state for debugging. >vim
+        :TermInspect[!] [target=name]
+<
+
+:TermToggleUniversalSelection                *:TermToggleUniversalSelection*
+    Toggle universal selection mode, which makes all terminals visible from
+    `:TermSelect` picker and a target for bang commands. >vim
+        :TermToggleUniversalSelection
 <
 
 ==============================================================================
-8. EXAMPLES                                                 *ergoterm-examples*
+6. API REFERENCE                                                *ergoterm-api*
 
-------------------------------------------------------------------------------
-8.1 Keymaps                                                 *ergoterm-keymaps*
+The ergoterm API is split into two main components:
 
-Useful keymaps to get started: >lua
-    local map = vim.keymap.set
-    local opts = { noremap = true, silent = true }
-    
-    -- Terminal creation with different layouts
-    map("n", "<leader>cs", ":TermNew layout=below<CR>", opts)
-    map("n", "<leader>cv", ":TermNew layout=right<CR>", opts)
-    map("n", "<leader>cf", ":TermNew layout=float<CR>", opts)
-    map("n", "<leader>ct", ":TermNew layout=tab<CR>", opts)
-    
-    -- Open terminal picker
-    map("n", "<leader>cl", ":TermSelect<CR>", opts)
-    
-    -- Send text to last focused terminal
-    map("n", "<leader>cs", ":TermSend! new_line=false<CR>", opts)
-    map("x", "<leader>cs", ":TermSend! new_line=false<CR>", opts)
-    
-    -- Send and show output without focusing terminal
-    map("n", "<leader>cx", ":TermSend! action=open<CR>", opts)
-    map("x", "<leader>cx", ":TermSend! action=open<CR>", opts)
-    
-    -- Send as markdown code block
-    map("n", "<leader>cS", ":TermSend! action=open trim=false decorator=markdown_code<CR>", opts)
-    map("x", "<leader>cS", ":TermSend! action=open trim=false decorator=markdown_code<CR>", opts)
+- Collection methods: Functions to manage and query all terminals
+- Instance methods: Methods to control individual terminal instances
+
+Example: >lua
+    local ergoterm = require("ergoterm")
+
+    -- Collection method: create a new terminal
+    local term = ergoterm:new({ cmd = "htop", layout = "float" })
+
+    -- Instance methods: control the terminal
+    term:start()
+    term:focus()
+    term:send({ "q" })
 <
 
 ------------------------------------------------------------------------------
-8.2 AI Integration                                             *ergoterm-ai*
+6.1 COLLECTION METHODS                                  *ergoterm-collection*
 
-Example integration with Claude for AI-assisted development: >lua
-    local ergoterm = require("ergoterm")
+Collection methods are accessed through the main ergoterm module.
 
-    -- Create persistent Claude terminal
-    local claude = ergoterm:new({
-      name = "claude",
-      cmd = "claude",
-      layout = "right", 
-      dir = "git_dir",
-      auto_list = false,
-      watch_files = true
-    })
-    
-    local map = vim.keymap.set
-    local opts = { noremap = true, silent = true }
-    
-    -- Toggle Claude terminal
-    map("n", "<leader>ai", function() claude:toggle() end, { desc = "Toggle Claude" })
-    
-    -- Reference current file to Claude session
-    map("n", "<leader>aa", function()
-      local file = vim.fn.expand("%:p")
-      claude:send({ "@" .. file .. " " }, { new_line = false })
-    end, opts)
+ergoterm:new({args})                                        *ergoterm:new()*
+    Creates a new terminal instance with the specified configuration.
 
-    -- Sends current line to Claude session
-    map("n", "<leader>as", function()
-      claude:send("single_line")
-    end, opts)
+    Parameters: ~
+        {args}  (table, optional) Terminal configuration. See
+                |ergoterm-terminal-defaults| for available options.
+                Additional fields:
+                - cmd: Command to run (default: shell)
+                - dir: Working directory. Special: "git_dir" = git root
+                - env: Environment variables (table)
+                - name: Terminal name (made unique automatically if duplicate)
+                - meta: Custom metadata (table)
+                - tags: Tags for organizing (string[])
 
-    -- Sends current visual selection to Claude session
-    map("v", "<leader>as", function()
-      claude:send("visual_selection", { trim = false })
-    end, opts)
+    Returns: ~
+        Terminal instance
 
-    -- Send code to Claude as markdown (preserves formatting)
-    map("n", "<leader>aS", function()
-      claude:send("single_line", { trim = false, decorator = "markdown_code" })
-    end, opts)
-    map("v", "<leader>aS", function()
-      claude:send("visual_selection", { trim = false, decorator = "markdown_code" })
-    end, opts)
+    Example: >lua
+        local dev_server = ergoterm:new({
+          name = "server",
+          cmd = "npm run dev",
+          layout = "right",
+          tags = { "dev", "server" }
+        })
+<
+
+ergoterm.with_defaults({custom_defaults})        *ergoterm.with_defaults()*
+    Creates a factory for creating terminals with shared default settings.
+
+    Parameters: ~
+        {custom_defaults}  (table) Default configuration for all terminals
+                          created by this factory
+
+    Returns: ~
+        Factory object with a `new(args)` method
+
+    Example: >lua
+        local tasks = ergoterm.with_defaults({
+          layout = "below",
+          size = { below = "30%" },
+          sticky = true
+        })
+
+        local migrate = tasks:new({
+          name = "migrate",
+          cmd = "rails db:migrate"
+        })
+<
+
+ergoterm.find({predicate})                               *ergoterm.find()*
+    Finds the first terminal matching the given condition.
+
+    Parameters: ~
+        {predicate}  (function) Function that returns `true` for matching
+                     terminals: `function(term)`
+
+    Returns: ~
+        Terminal or `nil`
+
+    Example: >lua
+        local server = ergoterm.find(function(term)
+          return term.name == "server"
+        end)
+<
+
+ergoterm.filter({predicate})                           *ergoterm.filter()*
+    Returns all terminals matching the given condition.
+
+    Parameters: ~
+        {predicate}  (function) Function that returns `true` for matching
+                     terminals: `function(term)`
+
+    Returns: ~
+        Array of Terminal instances
+
+    Example: >lua
+        local running = ergoterm.filter(function(term)
+          return term:is_started()
+        end)
+<
+
+ergoterm.get_all()                                     *ergoterm.get_all()*
+    Returns all terminals in the current session.
+
+    Returns: ~
+        Array of Terminal instances
+
+ergoterm.get({id})                                         *ergoterm.get()*
+    Gets a terminal by its unique ID.
+
+    Parameters: ~
+        {id}  (number) Terminal ID
+
+    Returns: ~
+        Terminal or `nil`
+
+ergoterm.get_by_name({name})                       *ergoterm.get_by_name()*
+    Finds the terminal with the specified name.
+
+    Parameters: ~
+        {name}  (string) Terminal name
+
+    Returns: ~
+        Terminal or `nil`
+
+    Example: >lua
+        local server = ergoterm.get_by_name("server")
+        if server then
+          server:focus()
+        end
+<
+
+ergoterm.filter_by_tag({tag})                     *ergoterm.filter_by_tag()*
+    Returns all terminals that have the specified tag.
+
+    Parameters: ~
+        {tag}  (string) Tag to search for
+
+    Returns: ~
+        Array of Terminal instances
+
+    Example: >lua
+        local dev_terminals = ergoterm.filter_by_tag("dev")
+<
+
+ergoterm.get_focused()                             *ergoterm.get_focused()*
+    Returns the terminal that currently has window focus.
+
+    Returns: ~
+        Terminal or `nil`
+
+ergoterm.identify()                                   *ergoterm.identify()*
+    Returns the terminal associated with the current buffer.
+
+    Returns: ~
+        Terminal or `nil`
+
+ergoterm.get_target_for_bang()             *ergoterm.get_target_for_bang()*
+    Returns the most recently focused terminal eligible for bang commands.
+
+    If universal_selection is enabled, returns the last focused terminal
+    regardless of its `bang_target` flag. Otherwise, returns the last focused
+    terminal that has `bang_target = true`.
+
+    Returns: ~
+        Terminal or `nil`
+
+ergoterm.select({defaults})                           *ergoterm.select()*
+    Presents a picker interface for terminal selection.
+
+    Parameters: ~
+        {defaults}  (table, optional) Configuration options:
+                    - terminals: Terminals to choose from (default: auto-list
+                      terminals that are active or sticky)
+                    - prompt: Picker prompt text (default: "Please select a
+                      terminal")
+                    - callbacks: Action callbacks (see below)
+                    - picker: Custom picker implementation
+
+    Callbacks can be provided in two formats:
+
+    1. Simple function: A single function for the default action >lua
+        callbacks = function(term) term:toggle() end
+<
+    2. Table of keybindings: A table mapping keys to action definitions >lua
+        callbacks = {
+          default = {
+            fn = function(term) term:toggle() end,
+            desc = "Toggle terminal"
+          },
+          ["<C-x>"] = {
+            fn = function(term) term:close() end,
+            desc = "Close terminal"
+          }
+        }
+<
+    Each action must have:
+    - fn: Function that receives the terminal as parameter
+    - desc: Description shown in the picker
+
+    Returns: ~
+        Result from picker, or `nil` if no terminals available
+
+    Example: >lua
+        local dev_terms = ergoterm.filter_by_tag("dev")
+
+        ergoterm.select({
+          terminals = dev_terms,
+          prompt = "Select Development Terminal",
+          callbacks = function(term)
+            term:toggle()
+          end
+        })
+<
+
+ergoterm.select_started({defaults})           *ergoterm.select_started()*
+    Presents a picker interface for started terminals only.
+
+    Filters the provided terminals to only include those that have been
+    started. If none are started and a `default` terminal is provided, that
+    terminal is selected instead.
+
+    Parameters: ~
+        {defaults}  (table) Configuration options (same as |ergoterm.select()|)
+                    Additional field:
+                    - default: Terminal to select when none are started
+
+    Behavior:
+    - If no terminals are started and `default` is provided: selects default
+    - If one terminal is started: selects it directly (no picker shown)
+    - If multiple terminals are started: shows picker
+
+    Returns: ~
+        Result from picker, or `nil` if no started terminals available
+
+    Example: >lua
+        local chats = ergoterm.filter_by_tag("ai_chat")
+
+        ergoterm.select_started({
+          terminals = chats,
+          prompt = "Send to chat",
+          callbacks = function(term)
+            term:send("single_line")
+          end,
+          default = claude_sonnet
+        })
+<
+
+ergoterm.cleanup_all({opts})                       *ergoterm.cleanup_all()*
+    Cleans up all terminals in the current session. This is a destructive
+    operation that cannot be undone.
+
+    Parameters: ~
+        {opts}  (table, optional) Cleanup options:
+                - force: Force removal of sticky terminals (boolean,
+                  default: false)
+
+    Example: >lua
+        ergoterm.cleanup_all({ force = true })
+<
+
+ergoterm.toggle_universal_selection()  *ergoterm.toggle_universal_selection()*
+    Toggles universal selection mode.
+
+    When enabled, all terminals are shown in the default selection and can be
+    targeted by bang commands, regardless of their `auto_list` or
+    `bang_target` settings.
+
+    Returns: ~
+        boolean - The new state after toggling
+
+ergoterm.get_state({key})                             *ergoterm.get_state()*
+    Accesses internal module state. Primarily used for debugging and testing.
+
+    Parameters: ~
+        {key}  (string) State key to retrieve
+
+    Returns: ~
+        State value for the given key
+
+ergoterm.reset_ids()                                 *ergoterm.reset_ids()*
+    Resets the terminal ID sequence back to 1.
+
+    Terminal IDs are never reused, even after deletion. This function clears
+    the ID history, allowing the sequence to restart from 1. Useful for
+    testing.
+
+------------------------------------------------------------------------------
+6.2 INSTANCE METHODS                                    *ergoterm-instance*
+
+Instance methods are called on individual terminal objects.
+
+term:start()                                                *term:start()*
+    Initializes the terminal job and buffer.
+
+    Recomputes the working directory, starts the job with configured
+    environment and handlers, sets up buffer autocommands, and triggers the
+    `on_start` callback.
+
+    Returns: ~
+        Terminal (self)
+
+term:is_started()                                      *term:is_started()*
+    Checks if the terminal job is running.
+
+    Returns: ~
+        boolean
+
+term:stop()                                                  *term:stop()*
+    Terminates the terminal job.
+
+    Stops the underlying job process, closes any open windows, and triggers
+    the `on_stop` callback.
+
+    Returns: ~
+        Terminal (self)
+
+term:is_active()                                        *term:is_active()*
+    Checks if the terminal has an active buffer.
+
+    A terminal is active when started or when already stopped but not yet
+    cleaned up.
+
+    Returns: ~
+        boolean
+
+term:cleanup({opts})                                      *term:cleanup()*
+    Cleans up the terminal.
+
+    Stops the terminal if needed and removes the buffer reference. If the
+    terminal is not sticky or `opts.force` is true, it will be removed from
+    the collection entirely.
+
+    Parameters: ~
+        {opts}  (table, optional) Cleanup options:
+                - force: Force removal even if sticky (boolean, default: false)
+
+term:is_cleaned_up()                                *term:is_cleaned_up()*
+    Checks if the terminal has been cleaned up.
+
+    A terminal is cleaned up when it has been started at least once and its
+    buffer is no longer present.
+
+    Returns: ~
+        boolean
+
+term:open({layout})                                          *term:open()*
+    Creates a window for the terminal without focusing it.
+
+    Automatically starts the terminal if not already started. Uses the
+    provided layout or falls back to the terminal's configured layout.
+
+    Parameters: ~
+        {layout}  (string, optional) Window layout: "below", "above", "left",
+                  "right", "float", "tab", "window"
+
+    Returns: ~
+        Terminal (self)
+
+term:is_open()                                            *term:is_open()*
+    Returns whether the terminal window is currently open.
+
+    Returns: ~
+        boolean
+
+term:close()                                                *term:close()*
+    Closes the terminal window while keeping the job running.
+
+    If the terminal is the only window open, it replaces its buffer with an
+    empty buffer to avoid closing Vim entirely. Persists the window size if
+    `persist_size` is enabled. Triggers the `on_close` callback.
+
+    Returns: ~
+        Terminal (self)
+
+term:focus({layout})                                        *term:focus()*
+    Brings the terminal window into focus and switches to it.
+
+    Automatically starts and opens the terminal if needed. Switches to the
+    terminal's tabpage and window. Sets the terminal as the last focused
+    terminal and sets up the appropriate terminal mode. Triggers the
+    `on_focus` callback.
+
+    Parameters: ~
+        {layout}  (string, optional) Window layout to use if opening for the
+                  first time
+
+    Returns: ~
+        Terminal (self)
+
+term:is_focused()                                      *term:is_focused()*
+    Checks if this terminal is the currently active window.
+
+    Returns: ~
+        boolean
+
+term:unfocus({win_id})                                    *term:unfocus()*
+    Removes focus from the terminal window.
+
+    Persists mode if configured and closes floating terminals. Optionally
+    switches to a different window. Triggers the `on_unfocus` callback.
+
+    Parameters: ~
+        {win_id}  (number, optional) Window ID to switch to after unfocusing
+
+    Returns: ~
+        Terminal (self)
+
+term:toggle({layout})                                      *term:toggle()*
+    Toggles terminal state between focused and closed.
+
+    Closes the terminal if currently open, or focuses it if closed.
+
+    Parameters: ~
+        {layout}  (string, optional) Window layout to use when opening
+
+    Returns: ~
+        Terminal (self)
+
+    Example: >lua
+        vim.keymap.set("n", "<leader>tt", function()
+          term:toggle()
+        end)
+<
+
+term:send({input}, {opts})                                  *term:send()*
+    Sends text input to the terminal job.
+
+    Parameters: ~
+        {input}  (string[]|string) Text to send (array of lines) or selection
+                 type:
+                 - "single_line": Sends the current line
+                 - "visual_lines": Sends lines covered by visual line selection
+                 - "visual_selection": Sends exact text covered by visual
+                   selection
+                 - "last": Resends the last sent text
+
+        {opts}  (table, optional) Send options:
+                - action: Terminal action ("focus", "open", "start")
+                - trim: Trim whitespace (boolean, default: true)
+                - new_line: Append newline to execute command (boolean,
+                  default: true)
+                - clear: Clear terminal before sending (boolean, default: false)
+                - decorator: Text decorator to apply (string|function)
+
+    Returns: ~
+        Terminal (self)
+
+    Example: >lua
+        term:send({ "echo 'hello'" })
+        term:send("single_line", { action = "open", new_line = false })
+        term:send("last")
+<
+
+term:clear({action})                                        *term:clear()*
+    Clears the terminal display.
+
+    Sends the appropriate clear command for the current platform (`cls` on
+    Windows, `clear` on Unix systems).
+
+    Parameters: ~
+        {action}  (string, optional) Terminal action before clearing: "focus",
+                  "open", "start"
+
+term:update({settings}, {opts})                            *term:update()*
+    Updates terminal settings after creation.
+
+    Parameters: ~
+        {settings}  (table) Properties to update. See
+                    |ergoterm-terminal-defaults| for available options.
+        {opts}  (table, optional) Update options:
+                - deep_merge: Deep merge table settings (boolean,
+                  default: false)
+
+    Note: Cannot update immutable properties: `cmd`, `dir`, `scrollback`, `env`
+
+    Returns: ~
+        Terminal or `nil`
+
+    Example: >lua
+        term:update({ layout = "float", size = { below = "40%" } })
+<
+
+term:get_status_icon()                            *term:get_status_icon()*
+    Gets the status icon for the terminal.
+
+    Returns an appropriate UTF icon based on the current terminal state:
+    - ○ Not active (only for sticky terminals)
+    - ▶ Started and running
+    - ✓ Stopped but active, process succeeded
+    - ✗ Stopped but active, process failed
+
+    Returns: ~
+        string
+
+term:get_state({key})                                  *term:get_state()*
+    Accesses internal terminal state. Primarily used for debugging and
+    testing.
+
+    Parameters: ~
+        {key}  (string) State key to retrieve
+
+    Returns: ~
+        State value for the given key
+
 
 ==============================================================================
-9. TROUBLESHOOTING                                   *ergoterm-troubleshooting*
+7. ABOUT                                                      *ergoterm-about*
 
-Common Issues and Solutions:
+ACKNOWLEDGMENTS ~
 
-**Terminal doesn't appear in picker**
-    Check that `auto_list` is true and the terminal has been started.
+This plugin started as a fork of toggleterm.nvim
+(https://github.com/akinsho/toggleterm.nvim). Thanks to the original author
+and contributors for their foundational work.
 
-**Commands not working**
-    Ensure ErgoTerm is properly installed and setup() has been called.
+LICENSE ~
 
-**Floating windows not positioned correctly**
-    Adjust `float_opts` in your configuration to customize positioning.
+GPL-3.0
 
-**Text not sending to terminal**
-    Verify the terminal is started and the job is running. Check that
-    the terminal process can accept input.
+CONTRIBUTING ~
 
-**Picker not working**
-    ErgoTerm auto-detects available pickers. Install Telescope or fzf-lua
-    for better picker experience, or it will fall back to vim.ui.select.
+Contributions are welcome! Visit the GitHub repository:
+https://github.com/waiting-for-dev/ergoterm.nvim
 
-**General troubleshooting**
-    Run `:checkhealth ergoterm` to diagnose common configuration issues
-    and verify your setup is working correctly.
-
-For more help, check the project repository or file an issue:
-https://github.com/waiting-from-dev/ergoterm.nvim
-
-==============================================================================
 vim:tw=78:ts=8:ft=help:norl:

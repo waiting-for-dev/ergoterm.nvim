@@ -379,6 +379,7 @@ end
 ---Handles buffer enter events for the terminal
 ---
 ---Restores the appropriate terminal mode and sets the last focused terminal.
+---@private
 function Terminal:on_buf_enter()
   return on_buf_enter(self)
 end
@@ -387,6 +388,7 @@ end
 ---
 ---Saves the current mode if persist_mode is enabled, and automatically closes
 ---floating terminals.
+---@private
 function Terminal:on_win_leave()
   return on_win_leave(self)
 end
