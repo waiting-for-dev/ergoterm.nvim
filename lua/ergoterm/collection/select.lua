@@ -73,7 +73,7 @@ function M._parse_callbacks(callbacks)
   elseif callbacks then
     return callbacks
   else
-    return M._get_default_callbacks()
+    return config.get_all_picker_select_callbacks()
   end
 end
 
