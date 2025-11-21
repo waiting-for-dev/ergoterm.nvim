@@ -2,6 +2,8 @@
 
 A flexible terminal management plugin for Neovim that puts you in control of your workflow.
 
+![Demo](docs/demo.gif)
+
 ## Philosophy
 
 Most Neovim terminal integration follows a **tool-specific approach**: specialized plugins for AI chats, testing, task runners and other CLI tools (e.g., lazygit), each with their own terminal implementation and UI decisions. This creates friction when you want consistent behavior across tools or when no plugin exists for your preferred CLI application.
