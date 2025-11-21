@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## 1.0.0 - 2025-11-21
+
+- API has been stabilized
+
 ## 0.10.0 - 2025-11-21
 
 - BREAKING: `selectable` option has been deprecated in favor of `auto_list`.
