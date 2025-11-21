@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## 0.10.0 - 2025-11-21
+
 - BREAKING: `selectable` option has been deprecated in favor of `auto_list`.
 - BREAKING: Rename `.get_last_focused()` to `.get_target_for_bang()`.
 - Added `scrollback` setting to configure terminal scrollback buffer size.
