@@ -1,10 +1,10 @@
-# ergoterm.nvim
+# 🖥️ ergoterm.nvim
 
 A flexible terminal management plugin for Neovim that puts you in control of your workflow.
 
 ![Demo](docs/demo.gif)
 
-## Philosophy
+## 💡 Philosophy
 
 Most Neovim terminal integration follows a **tool-specific approach**: specialized plugins for AI chats, testing, task runners and other CLI tools (e.g., lazygit), each with their own terminal implementation and UI decisions. This creates friction when you want consistent behavior across tools or when no plugin exists for your preferred CLI application.
 
@@ -12,7 +12,7 @@ ergoterm inverts this with a **terminal-first approach**: a single, powerful ter
 
 **The terminal becomes your universal integration layer.** You own the workflow; the terminals adapt to it.
 
-## Setup
+## ⚙️ Setup
 
 Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
@@ -36,7 +36,7 @@ use {
 }
 ```
 
-## Use Cases
+## 🎯 Use Cases
 
 - [On-Demand Terminal Access](docs/on-demand-usage.md)
 - [Interactive AI Assistants](docs/interactive-ai-assistants.md)
@@ -46,7 +46,7 @@ use {
 - [Project Initialization on Startup](docs/project-initialization.md)
 - [API Reference](docs/api-reference.md)
 
-## Configuration
+## 🔧 Configuration
 
 ### Terminal Defaults
 
@@ -158,7 +158,7 @@ require("ergoterm").setup({
 
 Use with `:TermSend decorator=name` or `term:send(input, {decorator = "name"})`.
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! To get started:
 
@@ -168,10 +168,10 @@ Contributions are welcome! To get started:
 
 Make sure all tests pass before submitting your PR.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
 This plugin started as a fork of [toggleterm.nvim](https://github.com/akinsho/toggleterm.nvim). Thanks to the original author and contributors for their foundational work.
 
-## License
+## 📄 License
 
 GPL-3.0
