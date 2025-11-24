@@ -532,8 +532,12 @@ function Terminal:_compute_float_win_config()
   float_opts.title = float_opts.title or self.name
   float_opts.height = float_opts.height or math.ceil(math.min(vim.o.lines, math.max(20, vim.o.lines - 5)))
   float_opts.width = float_opts.width or math.ceil(math.min(vim.o.columns, math.max(80, vim.o.columns - 10)))
-  float_opts.row = float_opts.row or math.ceil(vim.o.lines - float_opts.height) * 0.5 - 1
-  float_opts.col = float_opts.col or math.ceil(vim.o.columns - float_opts.width) * 0.5 - 1
+  float_opts.row = float_opts.row or math.ceil(vim.o.lines - float_opts.height) * 0.5
+  float_opts.col = float_opts.col or math.ceil(vim.o.columns - float_opts.width) * 0.5
+  if float_opts.border ~= 'none' then
+    float_opts.row = float_opts.row - 1
+    float_opts.col = float_opts.col - 1
+  end
   float_opts.zindex = (vim.api.nvim_win_get_config(0).zindex or 0) + 1
   return float_opts
 end
