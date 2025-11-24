@@ -299,10 +299,16 @@ describe(":new", function()
     assert.equal("foo", term:get_state("float_opts").title)
   end)
 
-  it("initializes float_opts row from height when not given", function()
+  it("initializes float_opts row from height when not given with border", function()
     local term = Terminal:new({ float_opts = { height = 20 } })
 
     assert.equal(math.ceil((vim.o.lines - 20)) * 0.5 - 1, term:get_state("float_opts").row)
+  end)
+
+  it("initializes float_opts row from height when not given without border", function()
+    local term = Terminal:new({ float_opts = { height = 20, border = "none" } })
+
+    assert.equal(math.ceil((vim.o.lines - 20)) * 0.5, term:get_state("float_opts").row)
   end)
 
   it("doesn't override float_opts row when given", function()
@@ -311,10 +317,16 @@ describe(":new", function()
     assert.equal(10, term:get_state("float_opts").row)
   end)
 
-  it("initializes float_opts col from width when not given", function()
+  it("initializes float_opts col from width when not given with border", function()
     local term = Terminal:new({ float_opts = { width = 100 } })
 
     assert.equal(math.ceil((vim.o.columns - 100)) * 0.5 - 1, term:get_state("float_opts").col)
+  end)
+
+  it("initializes float_opts col from width when not given without border", function()
+    local term = Terminal:new({ float_opts = { width = 100, border = "none" } })
+
+    assert.equal(math.ceil((vim.o.columns - 100)) * 0.5, term:get_state("float_opts").col)
   end)
 
   it("doesn't override float_opts col when given", function()
