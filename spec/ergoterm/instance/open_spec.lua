@@ -169,59 +169,83 @@ describe(".open", function()
   end)
 
   it("sets the window as no number", function()
-    local term = Terminal:new()
+    test_helpers.with_option("number", true, function()
+      local term = Terminal:new()
 
-    open.open(term)
+      open.open(term)
 
-    assert.is_false(vim.wo[term:get_state("window")].number)
+      assert.is_false(vim.wo[term:get_state("window")].number)
+    end)
   end)
 
   it("sets the window as no sign column", function()
-    local term = Terminal:new()
+    test_helpers.with_option("signcolumn", "yes", function()
+      local term = Terminal:new()
 
-    open.open(term)
+      open.open(term)
 
-    assert.equal("no", vim.wo[term:get_state("window")].signcolumn)
+      assert.equal("no", vim.wo[term:get_state("window")].signcolumn)
+    end)
   end)
 
   it("sets the window as no relative number", function()
-    local term = Terminal:new()
+    test_helpers.with_option("relativenumber", true, function()
+      local term = Terminal:new()
 
-    open.open(term)
+      open.open(term)
 
-    assert.is_false(vim.wo[term:get_state("window")].relativenumber)
+      assert.is_false(vim.wo[term:get_state("window")].relativenumber)
+    end)
+  end)
+
+  it("sets the window as no list", function()
+    test_helpers.with_option("list", true, function()
+      local term = Terminal:new()
+
+      open.open(term)
+
+      assert.is_false(vim.wo[term:get_state("window")].list)
+    end)
   end)
 
   it("sets the window with foldmethod manual", function()
-    local term = Terminal:new()
+    test_helpers.with_option("foldmethod", "expr", function()
+      local term = Terminal:new()
 
-    open.open(term)
+      open.open(term)
 
-    assert.equal("manual", vim.wo[term:get_state("window")].foldmethod)
+      assert.equal("manual", vim.wo[term:get_state("window")].foldmethod)
+    end)
   end)
 
   it("sets the window with foldtext foldtext()", function()
-    local term = Terminal:new()
+    test_helpers.with_option("foldtext", "custom", function()
+      local term = Terminal:new()
 
-    open.open(term)
+      open.open(term)
 
-    assert.equal("foldtext()", vim.wo[term:get_state("window")].foldtext)
+      assert.equal("foldtext()", vim.wo[term:get_state("window")].foldtext)
+    end)
   end)
 
   it("sets the window as no side scroll when layout is float", function()
-    local term = Terminal:new()
+    test_helpers.with_option("sidescrolloff", 5, function()
+      local term = Terminal:new()
 
-    open.open(term, "float")
+      open.open(term, "float")
 
-    assert.equal(0, vim.wo[term:get_state("window")].sidescrolloff)
+      assert.equal(0, vim.wo[term:get_state("window")].sidescrolloff)
+    end)
   end)
 
   it("sets the window with float_windblend given in initialization if layout is float", function()
-    local term = Terminal:new({ float_winblend = 20 })
+    test_helpers.with_option("winblend", 0, function()
+      local term = Terminal:new({ float_winblend = 20 })
 
-    open.open(term, "float")
+      open.open(term, "float")
 
-    assert.equal(20, vim.wo[term:get_state("window")].winblend)
+      assert.equal(20, vim.wo[term:get_state("window")].winblend)
+    end)
   end)
 end)
 

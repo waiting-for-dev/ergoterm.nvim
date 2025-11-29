@@ -19,4 +19,11 @@ M.mocking_notify = function(callback)
   return result
 end
 
+M.with_option = function(option, mock_value, callback)
+  local original_value = vim.o[option]
+  vim.o[option] = mock_value
+  callback()
+  vim.o[option] = original_value
+end
+
 return M
