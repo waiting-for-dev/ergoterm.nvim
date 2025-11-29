@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 - Fix: Correctly center floating terminal when no borders are used.
+- Set terminal window as `nolist`.
 
 ## 1.0.0 - 2025-11-21
 
