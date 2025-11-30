@@ -96,12 +96,10 @@ function M._set_win_options(term)
   vim.api.nvim_set_option_value("foldmethod", "manual", { scope = "local", win = window })
   vim.api.nvim_set_option_value("foldtext", "foldtext()", { scope = "local", win = window })
 
-  if term.persist_size then
-    if term._state.layout == "above" or term._state.layout == "below" then
-      vim.api.nvim_set_option_value("winfixheight", true, { scope = "local", win = window })
-    elseif term._state.layout == "left" or term._state.layout == "right" then
-      vim.api.nvim_set_option_value("winfixwidth", true, { scope = "local", win = window })
-    end
+  if (term._state.layout == "above" or term._state.layout == "below") and term.fixed_height then
+    vim.api.nvim_set_option_value("winfixheight", true, { scope = "local", win = window })
+  elseif (term._state.layout == "left" or term._state.layout == "right") and term.fixed_width then
+    vim.api.nvim_set_option_value("winfixwidth", true, { scope = "local", win = window })
   end
 
   if term._state.layout == "float" then

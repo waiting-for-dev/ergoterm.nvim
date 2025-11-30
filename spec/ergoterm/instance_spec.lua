@@ -117,6 +117,18 @@ describe(":new", function()
     assert.is_true(term.persist_size)
   end)
 
+  it("defaults to config's fixed_width", function()
+    local term = Terminal:new()
+
+    assert.is_true(term.fixed_width)
+  end)
+
+  it("defaults to config's fixed_height", function()
+    local term = Terminal:new()
+
+    assert.is_true(term.fixed_height)
+  end)
+
   it("defaults to config's start_in_insert", function()
     local term = Terminal:new()
 

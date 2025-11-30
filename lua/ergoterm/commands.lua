@@ -28,6 +28,8 @@ function M.new(args)
   vim.validate("watch_files", parsed.watch_files, "boolean", true)
   vim.validate("persist_mode", parsed.persist_mode, "boolean", true)
   vim.validate("persist_size", parsed.persist_size, "boolean", true)
+  vim.validate("fixed_width", parsed.fixed_width, "boolean", true)
+  vim.validate("fixed_height", parsed.fixed_height, "boolean", true)
   vim.validate("auto_list", parsed.auto_list, "boolean", true)
   vim.validate("start_in_insert", parsed.start_in_insert, "boolean", true)
   vim.validate("sticky", parsed.sticky, "boolean", true)
@@ -50,6 +52,8 @@ function M.new(args)
     watch_files = parsed.watch_files,
     persist_mode = parsed.persist_mode,
     persist_size = parsed.persist_size,
+    fixed_width = parsed.fixed_width,
+    fixed_height = parsed.fixed_height,
     auto_list = parsed.auto_list,
     start_in_insert = parsed.start_in_insert,
     sticky = parsed.sticky,
@@ -175,6 +179,8 @@ function M.update(args, bang, picker)
   vim.validate("watch_files", parsed.watch_files, "boolean", true)
   vim.validate("persist_mode", parsed.persist_mode, "boolean", true)
   vim.validate("persist_size", parsed.persist_size, "boolean", true)
+  vim.validate("fixed_width", parsed.fixed_width, "boolean", true)
+  vim.validate("fixed_height", parsed.fixed_height, "boolean", true)
   vim.validate("auto_list", parsed.auto_list, "boolean", true)
   vim.validate("start_in_insert", parsed.start_in_insert, "boolean", true)
   vim.validate("sticky", parsed.sticky, "boolean", true)

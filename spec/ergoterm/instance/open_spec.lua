@@ -248,28 +248,36 @@ describe(".open", function()
     end)
   end)
 
-  it("sets winfixheight if layout is horizontal and persist_size is true", function()
-    local term = Terminal:new({ persist_size = true })
+  it("sets winfixheight if layout is horizontal and fixed_height is true", function()
+    local term = Terminal:new({ fixed_height = true })
 
     open.open(term, "below")
 
     assert.is_true(vim.wo[term:get_state("window")].winfixheight)
   end)
 
-  it("sets winfixwidth if layout is vertical and persist_size is true", function()
-    local term = Terminal:new({ persist_size = true })
+  it("sets winfixwidth if layout is vertical and fixed_width is true", function()
+    local term = Terminal:new({ fixed_width = true })
 
     open.open(term, "right")
 
     assert.is_true(vim.wo[term:get_state("window")].winfixwidth)
   end)
 
-  it("does not set winfixheight if persist_size is false", function()
-    local term = Terminal:new({ persist_size = false })
+  it("does not set winfixheight if fixed_height is false", function()
+    local term = Terminal:new({ fixed_height = false })
 
     open.open(term, "below")
 
     assert.is_false(vim.wo[term:get_state("window")].winfixheight)
+  end)
+
+  it("does not set winfixwidth if fixed_width is false", function()
+    local term = Terminal:new({ fixed_width = false })
+
+    open.open(term, "right")
+
+    assert.is_false(vim.wo[term:get_state("window")].winfixwidth)
   end)
 end)
 
