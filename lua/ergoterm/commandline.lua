@@ -51,6 +51,8 @@ end
 ---@field watch_files boolean?
 ---@field persist_mode boolean?
 ---@field persist_size boolean?
+---@field fixed_width boolean?
+---@field fixed_height boolean?
 ---@field auto_list boolean?
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
