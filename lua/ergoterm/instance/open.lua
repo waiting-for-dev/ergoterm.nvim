@@ -4,6 +4,8 @@
 local utils = require("ergoterm.utils")
 
 local NEW_WINDOW_LAYOUTS = { "above", "below", "left", "right", "float" }
+local HORIZONTAL_LAYOUTS = { "above", "below" }
+local VERTICAL_LAYOUTS = { "left", "right" }
 local TAB_LAYOUT = "tab"
 local CURRENT_WINDOW_LAYOUT = "window"
 
@@ -96,9 +98,10 @@ function M._set_win_options(term)
   vim.api.nvim_set_option_value("foldmethod", "manual", { scope = "local", win = window })
   vim.api.nvim_set_option_value("foldtext", "foldtext()", { scope = "local", win = window })
 
-  if (term._state.layout == "above" or term._state.layout == "below") and term.fixed_height then
+  if (term.fixed_height and vim.tbl_contains(HORIZONTAL_LAYOUTS, term._state.layout)) then
     vim.api.nvim_set_option_value("winfixheight", true, { scope = "local", win = window })
-  elseif (term._state.layout == "left" or term._state.layout == "right") and term.fixed_width then
+  end
+  if (term.fixed_width and vim.tbl_contains(VERTICAL_LAYOUTS, term._state.layout)) then
     vim.api.nvim_set_option_value("winfixwidth", true, { scope = "local", win = window })
   end
 
