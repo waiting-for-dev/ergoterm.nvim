@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Fix: Correctly center floating terminal when no borders are used.
 - Set terminal window as `nolist`.
+- Add `fixed_height` & `fixed_width` options to control whether terminal size should be preserved on new splits.
 
 ## 1.0.0 - 2025-11-21
 
