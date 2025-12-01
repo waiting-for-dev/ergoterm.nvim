@@ -17,6 +17,8 @@ local ALLOWED_SETTINGS = {
   "env",
   "name",
   "meta",
+  "fixed_width",
+  "fixed_height",
   "float_props",
   "float_winblend",
   "persist_mode",
@@ -76,9 +78,9 @@ end
 ---@param deep_merge boolean
 function M._update_setting(term, setting, value, deep_merge)
   local should_merge = deep_merge
-    and type(value) == "table"
-    and type(term[setting]) == "table"
-    and not vim.islist(value)
+      and type(value) == "table"
+      and type(term[setting]) == "table"
+      and not vim.islist(value)
 
   if should_merge then
     term[setting] = vim.tbl_deep_extend("force", term[setting], value)
