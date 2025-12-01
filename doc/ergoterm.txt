@@ -416,6 +416,16 @@ default_action                                     *ergoterm-default_action*
     Default: `function(term) term:focus() end`
     Action performed when selecting terminal with default picker action
 
+fixed_height                                     *ergoterm-fixed_height*
+    Type: `boolean`
+    Default: `true`
+    Keep the terminal height when new horizontal splits are opened (it depends on vim's `equalalways` being set)
+
+fixed_width                                       *ergoterm-fixed_width*
+    Type: `boolean`
+    Default: `true`
+    Keep the terminal width when new vertical splits are opened (it depends on vim's `equalalways` being set)
+
 float_opts                                             *ergoterm-float_opts*
     Type: `table`
     Floating window configuration options (see |nvim_open_win()|)

@@ -79,6 +79,8 @@ local utils = require("ergoterm.utils")
 ---@field float_winblend number
 ---@field persist_mode boolean
 ---@field persist_size boolean
+---@field fixed_width boolean
+---@field fixed_height boolean
 ---@field auto_list boolean
 ---@field size Size
 ---@field start_in_insert boolean
@@ -132,6 +134,8 @@ function Terminal:new(args)
   term.float_winblend = term.float_winblend or config.get("terminal_defaults.float_winblend")
   term.persist_mode = vim.F.if_nil(term.persist_mode, config.get("terminal_defaults.persist_mode"))
   term.persist_size = vim.F.if_nil(term.persist_size, config.get("terminal_defaults.persist_size"))
+  term.fixed_width = vim.F.if_nil(term.fixed_width, config.get("terminal_defaults.fixed_width"))
+  term.fixed_height = vim.F.if_nil(term.fixed_height, config.get("terminal_defaults.fixed_height"))
   if term.selectable ~= nil then
     utils.notify(
       "[ergoterm] `selectable` option is deprecated and will be removed soon. Use `auto_list` instead.",
@@ -533,9 +537,9 @@ function Terminal:_compute_float_win_config()
   float_opts.height = float_opts.height or math.ceil(math.min(vim.o.lines, math.max(20, vim.o.lines - 5)))
   float_opts.width = float_opts.width or math.ceil(math.min(vim.o.columns, math.max(80, vim.o.columns - 10)))
   float_opts.row = float_opts.row or
-  math.ceil(vim.o.lines - float_opts.height) * 0.5 - (float_opts.border ~= 'none' and 1 or 0)
+      math.ceil(vim.o.lines - float_opts.height) * 0.5 - (float_opts.border ~= 'none' and 1 or 0)
   float_opts.col = float_opts.col or
-  math.ceil(vim.o.columns - float_opts.width) * 0.5 - (float_opts.border ~= 'none' and 1 or 0)
+      math.ceil(vim.o.columns - float_opts.width) * 0.5 - (float_opts.border ~= 'none' and 1 or 0)
   float_opts.zindex = (vim.api.nvim_win_get_config(0).zindex or 0) + 1
   return float_opts
 end
