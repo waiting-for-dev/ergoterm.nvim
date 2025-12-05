@@ -503,7 +503,7 @@ function Terminal:_compute_dir()
   elseif self.dir == nil then
     dir = vim.loop.cwd()
   else
-    dir = vim.fn.expand(self.dir)
+    dir = vim.fn.expand(self.dir, true)
     if vim.fn.isdirectory(dir) == 0 then
       utils.notify(
         string.format("%s is not a directory", dir),
