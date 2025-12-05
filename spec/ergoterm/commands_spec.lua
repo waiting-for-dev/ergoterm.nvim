@@ -21,7 +21,8 @@ describe("M.new", function()
     local original_expand = vim.fn.expand
     local original_isdirectory = vim.fn.isdirectory
     --- @diagnostic disable: duplicate-set-field
-    vim.fn.expand = function(path) return path end
+    --- @diagnostic disable-next-line: unused-vararg
+    vim.fn.expand = function(path, ...) return path end
     vim.fn.isdirectory = function(_) return 1 end
     --- @diagnostic enable: duplicate-set-field
 

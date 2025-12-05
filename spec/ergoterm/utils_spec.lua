@@ -127,7 +127,8 @@ describe(".get_dir", function()
     ---@diagnostic disable: duplicate-set-field
     utils.git_dir = function() return "/git/dir" end
     vim.loop.cwd = function() return "/current/dir" end
-    vim.fn.expand = function(arg) return "/expanded/" .. arg end
+    --- @diagnostic disable-next-line: unused-vararg
+    vim.fn.expand = function(arg, ...) return "/expanded/" .. arg end
     vim.fn.isdirectory = function(_) return 1 end
   end)
 

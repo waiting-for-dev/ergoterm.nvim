@@ -284,6 +284,14 @@ describe(":new", function()
     assert.equal("/tmp", term:get_state("dir"))
   end)
 
+  it("initializes directory even when it matches wildignore pattern", function()
+    test_helpers.with_option("wildignore", "**/tmp", function()
+      local term = Terminal:new({ dir = "/tmp" })
+
+      assert.equal("/tmp", term:get_state("dir"))
+    end)
+  end)
+
   it("errors if dir is not a valid directory", function()
     local result = test_helpers.mocking_notify(function()
       Terminal:new({ dir = "/invalid" })
