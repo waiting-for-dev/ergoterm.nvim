@@ -112,6 +112,18 @@ describe(".open", function()
     assert.equal("right", win_config.split)
   end)
 
+  it("does nothing if buffer is missing", function()
+    local term = Terminal:new():start()
+    term:cleanup()
+
+    local ok = pcall(function()
+      open.show(term)
+    end)
+
+    assert.is_true(ok)
+    assert.is_nil(term:get_state("window"))
+  end)
+
   it("errors if layout is invalid", function()
     local term = Terminal:new()
 
