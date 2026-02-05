@@ -34,7 +34,7 @@ end
 ---@param term Terminal
 ---@param layout layout?
 function M.show(term, layout)
-  if not M.is_open(term) then
+  if not M.is_open(term) and term._state.bufnr and vim.api.nvim_buf_is_valid(term._state.bufnr) then
     layout = layout or term._state.layout
     local window = nil
     if vim.tbl_contains(NEW_WINDOW_LAYOUTS, layout) then

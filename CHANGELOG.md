@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 - Fix: Correctly center floating terminal when no borders are used.
+- Fix: Skip showing terminal if buffer is no longer valid or it doesn't exist.
 - Set terminal window as `nolist`.
 - Add `fixed_height` & `fixed_width` options to control whether terminal size should be preserved on new splits.
 - Do not ignore wildcard patterns when expanding `dir`.
