@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## 1.1.0 - 2026-02-05
+
 - Fix: Correctly center floating terminal when no borders are used.
 - Fix: Skip showing terminal if buffer is no longer valid or it doesn't exist.
 - Set terminal window as `nolist`.
