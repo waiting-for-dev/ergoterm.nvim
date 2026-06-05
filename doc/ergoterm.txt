@@ -416,6 +416,12 @@ default_action                                     *ergoterm-default_action*
     Default: `function(term) term:focus() end`
     Action performed when selecting terminal with default picker action
 
+exclusive_layout                               *ergoterm-exclusive_layout*
+    Type: `boolean`
+    Default: `false`
+    When this terminal opens, close any other terminal currently shown in the
+    same layout.
+
 fixed_height                                     *ergoterm-fixed_height*
     Type: `boolean`
     Default: `true`

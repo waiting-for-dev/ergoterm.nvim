@@ -70,6 +70,7 @@ require("ergoterm").setup({
 | `clear_env` | `boolean` | `false` | Clear environment variables before starting |
 | `cleanup_on_failure` | `boolean` | `false` | Cleanup terminal when process exits with non-zero code |
 | `cleanup_on_success` | `boolean` | `true` | Cleanup terminal when process exits with code 0 |
+| `exclusive_layout` | `boolean` | `false` | When this terminal opens, close any other terminal currently shown in the same layout (jobs are kept alive) |
 | `default_action` | `function` | `function(term) term:focus() end` | Action performed when selecting terminal with default picker action |
 | `fixed_height` | boolean | `true` | Keep the terminal height when new horizontal splits are opened (it depends on vim's `equalalways` being set) |
 | `fixed_width` | boolean | `true` | Keep the terminal width when new vertical splits are opened (it depends on vim's `equalalways` being set) |

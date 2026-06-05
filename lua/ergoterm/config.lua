@@ -77,6 +77,7 @@ M.NULL_CALLBACK = function(...) end
 ---@field size Size?
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
+---@field exclusive_layout boolean?
 ---@field tags string[]?
 
 ---@class TerminalDefaults : TerminalDefaultsFromConfig
@@ -120,6 +121,7 @@ local config = {
     fixed_height = true,
     auto_list = true,
     sticky = false,
+    exclusive_layout = false,
     size = {
       below = "50%",
       above = "50%",

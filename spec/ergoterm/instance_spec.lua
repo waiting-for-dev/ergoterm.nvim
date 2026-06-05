@@ -111,7 +111,7 @@ describe(":new", function()
     assert.is_false(term.persist_mode)
   end)
 
-  it("defaults to config's persist_mode", function()
+  it("defaults to config's persist_size", function()
     local term = Terminal:new()
 
     assert.is_true(term.persist_size)
@@ -145,6 +145,12 @@ describe(":new", function()
     local term = Terminal:new()
 
     assert.is_false(term.sticky)
+  end)
+
+  it("defaults to config's exclusive_layout", function()
+    local term = Terminal:new()
+
+    assert.is_false(term.exclusive_layout)
   end)
 
   it("defaults to config's watch_files", function()

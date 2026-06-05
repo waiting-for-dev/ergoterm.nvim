@@ -26,6 +26,7 @@ local ALLOWED_SETTINGS = {
   "size",
   "start_in_insert",
   "sticky",
+  "exclusive_layout",
   "on_close",
   "on_create",
   "on_focus",

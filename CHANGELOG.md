@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Add `exclusive_layout` option (default `false`). When enabled, opening the terminal closes any other terminal currently shown in the same layout.
+
 ## 1.1.0 - 2026-02-05
 
 - Fix: Correctly center floating terminal when no borders are used.

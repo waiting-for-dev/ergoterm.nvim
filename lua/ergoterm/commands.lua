@@ -37,6 +37,7 @@ function M.new(args)
   vim.validate("cleanup_on_failure", parsed.cleanup_on_failure, "boolean", true)
   vim.validate("show_on_success", parsed.show_on_success, "boolean", true)
   vim.validate("show_on_failure", parsed.show_on_failure, "boolean", true)
+  vim.validate("exclusive_layout", parsed.exclusive_layout, "boolean", true)
   vim.validate("size", parsed.size, "table", true)
   vim.validate("float_opts", parsed.float_opts, "table", true)
   vim.validate("tags", parsed.tags, "table", true)
@@ -61,6 +62,7 @@ function M.new(args)
     cleanup_on_failure = parsed.cleanup_on_failure,
     show_on_success = parsed.show_on_success,
     show_on_failure = parsed.show_on_failure,
+    exclusive_layout = parsed.exclusive_layout,
     size = parsed.size,
     float_opts = parsed.float_opts,
     tags = parsed.tags,
@@ -188,6 +190,7 @@ function M.update(args, bang, picker)
   vim.validate("cleanup_on_failure", parsed.cleanup_on_failure, "boolean", true)
   vim.validate("show_on_success", parsed.show_on_success, "boolean", true)
   vim.validate("show_on_failure", parsed.show_on_failure, "boolean", true)
+  vim.validate("exclusive_layout", parsed.exclusive_layout, "boolean", true)
   vim.validate("size", parsed.size, "table", true)
   vim.validate("float_opts", parsed.float_opts, "table", true)
   vim.validate("tags", parsed.tags, "table", true)
