@@ -85,6 +85,7 @@ local utils = require("ergoterm.utils")
 ---@field size Size
 ---@field start_in_insert boolean
 ---@field sticky boolean
+---@field exclusive_layout boolean
 ---@field name string
 ---@field on_close on_close
 ---@field on_focus on_focus
@@ -148,6 +149,7 @@ function Terminal:new(args)
   term.size = vim.tbl_deep_extend("keep", term.size or {}, config.get("terminal_defaults.size"))
   term.start_in_insert = vim.F.if_nil(term.start_in_insert, config.get("terminal_defaults.start_in_insert"))
   term.sticky = vim.F.if_nil(term.sticky, config.get("terminal_defaults.sticky"))
+  term.exclusive_layout = vim.F.if_nil(term.exclusive_layout, config.get("terminal_defaults.exclusive_layout"))
   term.on_close = vim.F.if_nil(term.on_close, config.get("terminal_defaults.on_close"))
   term.on_focus = vim.F.if_nil(term.on_focus, config.get("terminal_defaults.on_focus"))
   term.on_unfocus = vim.F.if_nil(term.on_unfocus, config.get("terminal_defaults.on_unfocus"))

@@ -56,6 +56,7 @@ end
 ---@field auto_list boolean?
 ---@field start_in_insert boolean?
 ---@field sticky boolean?
+---@field exclusive_layout boolean?
 ---@field cleanup_on_success boolean?
 ---@field cleanup_on_failure boolean?
 ---@field scrollback number?
@@ -109,6 +110,7 @@ function M.parse(args)
       auto_list = true,
       start_in_insert = true,
       sticky = true,
+      exclusive_layout = true,
       cleanup_on_success = true,
       cleanup_on_failure = true,
       show_on_success = true,
@@ -309,6 +311,8 @@ M._all_options = {
 
   sticky = M._boolean_options,
 
+  exclusive_layout = M._boolean_options,
+
   cleanup_on_success = M._boolean_options,
 
   cleanup_on_failure = M._boolean_options,
@@ -389,6 +393,7 @@ M._term_new_options = {
   ["env."] = M._all_options["env."],
   start_in_insert = M._all_options.start_in_insert,
   sticky = M._all_options.sticky,
+  exclusive_layout = M._all_options.exclusive_layout,
   cleanup_on_success = M._all_options.cleanup_on_success,
   cleanup_on_failure = M._all_options.cleanup_on_failure,
   scrollback = M._all_options.scrollback,
@@ -425,6 +430,7 @@ M._term_update_options = {
   auto_list = M._all_options.auto_list,
   start_in_insert = M._all_options.start_in_insert,
   sticky = M._all_options.sticky,
+  exclusive_layout = M._all_options.exclusive_layout,
   cleanup_on_success = M._all_options.cleanup_on_success,
   cleanup_on_failure = M._all_options.cleanup_on_failure,
   show_on_success = M._all_options.show_on_success,

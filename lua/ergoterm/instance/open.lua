@@ -1,5 +1,7 @@
 ---@diagnostic disable: invisible
 
+---@module "ergoterm.collection"
+local collection = require("ergoterm.collection")
 ---@module "ergoterm.utils"
 local utils = require("ergoterm.utils")
 
@@ -36,6 +38,9 @@ end
 function M.show(term, layout)
   if not M.is_open(term) and term._state.bufnr and vim.api.nvim_buf_is_valid(term._state.bufnr) then
     layout = layout or term._state.layout
+    if term.exclusive_layout then
+      M._close_siblings_with_same_layout(term, layout)
+    end
     local window = nil
     if vim.tbl_contains(NEW_WINDOW_LAYOUTS, layout) then
       window = M._open_in_new_window(term, layout)
@@ -115,6 +120,17 @@ function M._set_float_options(term)
   local window = term._state.window
   vim.api.nvim_set_option_value("sidescrolloff", 0, { scope = "local", win = window })
   vim.api.nvim_set_option_value("winblend", term.float_winblend, { scope = "local", win = window })
+end
+
+---@private
+function M._close_siblings_with_same_layout(term, layout)
+  for _, other in ipairs(collection.get_all()) do
+    if other ~= term
+        and other:is_open()
+        and other._state.layout == layout then
+      other:close()
+    end
+  end
 end
 
 return setmetatable(M, {
