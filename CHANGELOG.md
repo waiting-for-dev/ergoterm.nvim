@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## 1.2.0 - 2026-06-16
+
 - Add `exclusive_layout` option (default `false`). When enabled, opening the terminal closes any other terminal currently shown in the same layout.
 
 ## 1.1.0 - 2026-02-05
