@@ -764,6 +764,16 @@ describe("on job exit", function()
   end)
 end)
 
+describe(":dir", function()
+  it("returns the computed dir", function()
+    local term = Terminal:new({ dir = "git_dir" })
+
+    local expected_dir = vim.fn.getcwd()
+
+    assert.equal(expected_dir, term:cwd())
+  end)
+end)
+
 describe(":get_state", function()
   it("returns the given key in the state of the terminal", function()
     local term = Terminal:new()

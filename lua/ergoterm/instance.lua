@@ -397,6 +397,13 @@ function Terminal:on_win_leave()
   return on_win_leave(self)
 end
 
+---Gets the working directory of the terminal.
+---
+---@return string computed terminal directory
+function Terminal:cwd()
+  return self:get_state("dir")
+end
+
 ---Accesses internal terminal state
 ---
 ---Primarily used for debugging and testing.
