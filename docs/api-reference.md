@@ -748,3 +748,14 @@ Accesses internal terminal state. Primarily used for debugging and testing.
 ```lua
 local bufnr = term:get_state("bufnr")
 ```
+
+#### `term:cwd()`
+
+Gets the working directory of the terminal.
+
+**Returns:** `string` computed terminal directory
+
+**Example:**
+```lua
+print("Current directory: " .. term:cwd())
+```

@@ -1235,6 +1235,12 @@ term:get_state({key})                                  *term:get_state()*
     Returns: ~
         State value for the given key
 
+term:cwd()                                                      *term:cwd()*
+    Gets the working directory of the terminal.
+
+    Returns: ~
+        string computed terminal directory
+
 
 ==============================================================================
 7. ABOUT                                                      *ergoterm-about*
