@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 - Add `term:dir()` returning the computed terminal process working directory
+- Fix: scope the deferred mode restore to the window it was scheduled for so a
+  `BufEnter` fired while another plugin (e.g. fzf-lua) restores windows no
+  longer leaks insert mode into the restored buffer.
 
 ## 1.2.0 - 2026-06-16
 

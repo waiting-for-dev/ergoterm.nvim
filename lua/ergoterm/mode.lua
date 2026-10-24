@@ -27,11 +27,19 @@ function M.set_initial(start_in_insert)
 end
 
 function M.set(mode)
-  if mode == M.INSERT then
-    vim.defer_fn(function() vim.cmd("startinsert") end, 100)
-  elseif mode == M.NORMAL then
-    vim.defer_fn(function() vim.cmd("stopinsert") end, 100)
-  end
+  if mode ~= M.INSERT and mode ~= M.NORMAL then return end
+  local win = vim.api.nvim_get_current_win()
+  vim.defer_fn(function()
+    if not vim.api.nvim_win_is_valid(win)
+        or vim.api.nvim_get_current_win() ~= win then
+      return
+    end
+    if mode == M.INSERT then
+      vim.cmd("startinsert")
+    elseif mode == M.NORMAL then
+      vim.cmd("stopinsert")
+    end
+  end, 100)
 end
 
 return M
